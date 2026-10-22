@@ -1,0 +1,765 @@
+@import "tailwindcss";
+
+@theme {
+  --shadow-skeuo-raised: 0 8px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --shadow-skeuo-well: inset 0 2px 4px rgba(0, 0, 0, 0.06), 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-skeuo-pressed: inset 0 3px 6px rgba(0, 0, 0, 0.2), 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+:root {
+  --lhbd-red: #e51a24;
+  --lhbd-red-dark: #c8141d;
+  --lhbd-ink: #1a1a1a;
+  --lhbd-ink-2: #212529;
+  --lhbd-muted: #6c757d;
+  --lhbd-bg: #ffffff;
+  --lhbd-paper: #ffffff;
+  --font-latin: "Manrope", sans-serif;
+  --font-bangla: "Hind Siliguri", "Noto Sans Bengali", sans-serif;
+
+  /* Clean neutral skeuomorphic elevation tokens */
+  --skeuo-raised:
+    0 8px 20px rgba(0, 0, 0, 0.07),
+    0 2px 5px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04);
+  --skeuo-raised-hover:
+    0 12px 26px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 #ffffff,
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+  --skeuo-well:
+    inset 0 2px 4px rgba(0, 0, 0, 0.06),
+    inset 0 1px 2px rgba(0, 0, 0, 0.04),
+    0 1px 0 rgba(255, 255, 255, 0.95);
+  --skeuo-pressed:
+    inset 0 3px 6px rgba(0, 0, 0, 0.18),
+    inset 0 1px 2px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: #ffffff;
+}
+
+body {
+  font-family: var(--font-latin), var(--font-bangla), sans-serif;
+  color: var(--lhbd-ink);
+  background-color: #ffffff;
+  background-image: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(229, 26, 36, 0.14);
+  color: var(--lhbd-ink);
+}
+
+/* ---------------- Entrance & Status Animations ---------------- */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(229, 26, 36, 0.42);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(229, 26, 36, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(229, 26, 36, 0);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -600px 0;
+  }
+  100% {
+    background-position: 600px 0;
+  }
+}
+
+@keyframes resultLoad {
+  from {
+    width: 8%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes livePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes currentRing {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.32);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.1);
+  }
+}
+
+@keyframes reelSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.anim-fade-up {
+  animation: fadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.anim-fade-in {
+  animation: fadeIn 0.6s ease both;
+}
+.anim-pop {
+  animation: popIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.anim-pulse-ring {
+  animation: pulseRing 2s infinite;
+}
+.anim-pulse-live {
+  animation: livePulse 2s infinite;
+}
+.anim-current-ring {
+  animation: currentRing 2.2s ease-in-out infinite;
+}
+.anim-reel {
+  animation: reelSpin 3.2s linear infinite;
+}
+.anim-marquee {
+  animation: marquee 32s linear infinite;
+}
+.anim-marquee:hover {
+  animation-play-state: paused;
+}
+.result-loader-bar {
+  animation: resultLoad 0.8s ease-out forwards;
+}
+
+.delay-100 {
+  animation-delay: 0.1s;
+}
+.delay-200 {
+  animation-delay: 0.2s;
+}
+.delay-300 {
+  animation-delay: 0.3s;
+}
+.delay-400 {
+  animation-delay: 0.4s;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------------- Pure White Tactile Skeuomorphic Surfaces ---------------- */
+
+/* Embossed pure-white card */
+.card,
+.skeuo-card {
+  background: #ffffff;
+  border: 1px solid rgba(26, 26, 26, 0.09);
+  box-shadow: var(--skeuo-raised);
+}
+
+/* Frosted white header bar */
+.glass,
+.skeuo-bar {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(26, 26, 26, 0.09);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Clean white / neutral surface */
+.skeuo-desk {
+  background-color: #ffffff;
+}
+
+/* Recessed neutral container well */
+.skeuo-well {
+  background: linear-gradient(180deg, #f1f3f5 0%, #f8f9fa 50%, #ffffff 100%);
+  border: 1px solid rgba(26, 26, 26, 0.1);
+  box-shadow: var(--skeuo-well);
+}
+
+/* Pure white sheet with subtle neutral rule & corner fold */
+.skeuo-paper {
+  position: relative;
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 34px,
+      rgba(229, 26, 36, 0.1) 34px,
+      rgba(229, 26, 36, 0.1) 35px,
+      transparent 35px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 31px,
+      rgba(26, 26, 26, 0.035) 31px,
+      rgba(26, 26, 26, 0.035) 32px
+    );
+  border: 1px solid rgba(26, 26, 26, 0.1);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.07),
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    3px 3px 0 #f8f9fa,
+    4px 4px 0 rgba(26, 26, 26, 0.09),
+    inset 0 1px 0 #ffffff;
+}
+
+.skeuo-paper::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    #f8f9fa 0%,
+    #e9ecef 48%,
+    rgba(26, 26, 26, 0.12) 52%,
+    transparent 54%
+  );
+  border-top-left-radius: 4px;
+  box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Neutral binder ring perforations strip */
+.skeuo-binder {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 26px;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #f8f9fa 0%, #ffffff 100%);
+  border-right: 1px dashed rgba(26, 26, 26, 0.12);
+}
+.skeuo-binder span {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #f1f3f5;
+  border: 1px solid rgba(26, 26, 26, 0.16);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.16), 0 1px 0 #ffffff;
+}
+
+/* Original LHBD Dark Charcoal hardware console chassis (#1A1A1A / #212529) */
+.skeuo-chassis {
+  background: linear-gradient(180deg, #212529 0%, #1a1a1a 100%);
+  border: 1px solid #141619;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+}
+
+/* Recessed LCD readout */
+.skeuo-lcd {
+  background: linear-gradient(180deg, #111614 0%, #18201d 60%, #121816 100%);
+  border: 1px solid rgba(0, 0, 0, 0.75);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.75),
+    0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #86efac;
+  text-shadow: 0 0 8px rgba(134, 239, 172, 0.3);
+}
+
+.skeuo-lcd-danger {
+  background: linear-gradient(180deg, #241113 0%, #2e1518 60%, #210f11 100%);
+  border: 1px solid rgba(229, 26, 36, 0.65);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #fca5a5;
+  text-shadow: 0 0 10px rgba(248, 113, 113, 0.4);
+}
+
+.lift {
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+.lift:hover {
+  transform: translateY(-2px);
+  border-color: rgba(229, 26, 36, 0.32);
+  box-shadow: var(--skeuo-raised-hover);
+}
+
+/* ---------------- Molded Hardware Buttons (LHBD Colors) ---------------- */
+
+.btn-red {
+  background: linear-gradient(180deg, #ef232d 0%, #e51a24 58%, #c8141d 100%);
+  color: #ffffff;
+  border: 1px solid #b5121a;
+  box-shadow:
+    0 3px 0 #990e15,
+    0 7px 14px rgba(229, 26, 36, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.22);
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.12s ease,
+    filter 0.15s ease;
+}
+.btn-red:hover:not(:disabled) {
+  filter: brightness(1.04);
+}
+.btn-red:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 #990e15,
+    inset 0 2px 5px rgba(0, 0, 0, 0.32);
+}
+
+.btn-ink {
+  background: linear-gradient(180deg, #2b3035 0%, #212529 55%, #1a1a1a 100%);
+  color: #ffffff;
+  border: 1px solid #141619;
+  box-shadow:
+    0 3px 0 #0d0f12,
+    0 6px 14px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.12s ease,
+    filter 0.15s ease;
+}
+.btn-ink:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.btn-ink:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 #0d0f12,
+    inset 0 2px 5px rgba(0, 0, 0, 0.45);
+}
+
+.btn-ghost,
+.skeuo-key {
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid rgba(26, 26, 26, 0.14);
+  color: var(--lhbd-ink);
+  box-shadow:
+    0 2px 0 rgba(26, 26, 26, 0.1),
+    0 5px 10px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 #ffffff;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.12s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+.btn-ghost:hover:not(:disabled),
+.skeuo-key:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: rgba(26, 26, 26, 0.26);
+}
+.btn-ghost:active:not(:disabled),
+.skeuo-key:active:not(:disabled),
+.skeuo-key-pressed {
+  transform: translateY(2px);
+  background: #f1f3f5;
+  box-shadow: var(--skeuo-pressed);
+}
+
+/* ---------------- Etched White Input Wells & Physical Switches ---------------- */
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+textarea,
+select {
+  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 42%);
+  border: 1px solid rgba(26, 26, 26, 0.15);
+  box-shadow: var(--skeuo-well);
+  color: var(--lhbd-ink);
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):focus,
+textarea:focus,
+select:focus {
+  background: #ffffff;
+  border-color: #e51a24;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.05),
+    0 0 0 3px rgba(229, 26, 36, 0.12);
+}
+
+/* Physical toggle switch styling for role="switch" */
+button[role="switch"] {
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(26, 26, 26, 0.18);
+}
+button[role="switch"] > span {
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f8f9fa 65%, #dee2e6 100%);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 #ffffff;
+}
+
+/* Studio range fader */
+input[type="range"].skeuo-fader {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #0f1114 0%, #212529 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.75),
+    0 1px 0 rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+}
+input[type="range"].skeuo-fader::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #ffffff 0%, #dee2e6 55%, #adb5bd 100%);
+  border: 1px solid #1a1a1a;
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 #ffffff;
+}
+input[type="range"].skeuo-fader::-moz-range-thumb {
+  width: 16px;
+  height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #ffffff 0%, #dee2e6 55%, #adb5bd 100%);
+  border: 1px solid #1a1a1a;
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 #ffffff;
+}
+
+/* Neutral skeleton shimmer */
+.shimmer {
+  background: linear-gradient(90deg, #f1f3f5 25%, #e9ecef 50%, #f1f3f5 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+.link-slide {
+  position: relative;
+}
+.link-slide::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 2px;
+  width: 100%;
+  background: var(--lhbd-red);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-slide:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 9%, black 91%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 9%, black 91%, transparent);
+}
+
+.status-pill {
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* Neutral Scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+::-webkit-scrollbar-thumb {
+  background: #ced4da;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #adb5bd;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+/* ---------------- Resizable Exam Split Architecture ---------------- */
+
+.exam-split-shell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.exam-mobile-tabs {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+}
+.exam-mobile-tabs button {
+  flex: 1;
+  border: 1px solid rgba(26, 26, 26, 0.14);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6c757d;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  box-shadow: 0 2px 0 rgba(26, 26, 26, 0.08), inset 0 1px 0 #fff;
+}
+.exam-mobile-tabs button.is-active {
+  color: #ffffff;
+  background: linear-gradient(180deg, #2b3035 0%, #1a1a1a 100%);
+  border-color: #141619;
+  box-shadow: var(--skeuo-pressed);
+}
+.exam-split {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.exam-split-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.exam-split-pane.is-mobile-hidden {
+  display: none;
+}
+.exam-split-divider {
+  display: none;
+}
+.exam-split-grip {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 3px;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #ffffff 0%, #e9ecef 100%);
+  border: 1px solid rgba(26, 26, 26, 0.18);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 #fff;
+}
+.exam-split-grip i {
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background: #6c757d;
+}
+
+@media (min-width: 768px) {
+  .exam-mobile-tabs {
+    display: none !important;
+  }
+  .exam-split {
+    display: grid;
+    grid-template-columns: minmax(0, var(--split-left, 50%)) 14px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .exam-split-pane,
+  .exam-split-pane.is-mobile-hidden {
+    display: flex;
+    height: 100%;
+  }
+  .exam-split-divider {
+    display: flex;
+    position: relative;
+    z-index: 5;
+    align-items: center;
+    justify-content: center;
+    cursor: col-resize;
+    background: linear-gradient(
+      90deg,
+      #f8f9fa 0%,
+      #ffffff 35%,
+      #dee2e6 50%,
+      #ffffff 65%,
+      #f8f9fa 100%
+    );
+    border-left: 1px solid rgba(26, 26, 26, 0.09);
+    border-right: 1px solid rgba(26, 26, 26, 0.09);
+    touch-action: none;
+  }
+  .exam-split-divider:hover .exam-split-grip {
+    background: #ffffff;
+    border-color: rgba(229, 26, 36, 0.45);
+  }
+  .exam-split.is-dragging {
+    cursor: col-resize;
+    user-select: none;
+  }
+}
+
+/* Graceful tactile scaling on compact mobile screens */
+@media (max-width: 640px) {
+  :root {
+    --skeuo-raised:
+      0 4px 10px rgba(0, 0, 0, 0.05),
+      inset 0 1px 0 #ffffff;
+  }
+  .skeuo-paper::after {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.spring-heading-word {
+  will-change: opacity, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-pulse-live,
+  .anim-current-ring,
+  .anim-reel {
+    animation: none;
+  }
+  .lift:hover {
+    transform: none;
+  }
+  .spring-heading-word {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}
+
+/* Additive velocity cursor. Native cursor is intentionally untouched. */
+.velocity-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  background: #ffffff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: center;
+  will-change: transform, opacity;
+  contain: layout style;
+}
+
+/* ---------------- Print (PDF report) ---------------- */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  body {
+    background: #fff !important;
+  }
+  .print\:hidden,
+  .velocity-cursor {
+    display: none !important;
+  }
+  .spring-heading-word {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
