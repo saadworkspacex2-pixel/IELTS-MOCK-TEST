@@ -62,7 +62,7 @@ export default function LoginPage() {
 
   return (
     <div className="grid min-h-screen place-items-center bg-white px-4 py-10">
-      <div className="anim-pop card w-full max-w-md rounded-xl p-8">
+      <div data-tour="login-card" className="anim-pop card w-full max-w-md rounded-xl p-8">
         <div className="text-center">
           <span className="mx-auto inline-block">
             <LogoMark size={48} />
@@ -121,7 +121,7 @@ export default function LoginPage() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={avatar}
-                      alt="avatar"
+                      alt="নির্বাচিত প্রোফাইল ছবি"
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -218,6 +218,7 @@ export default function LoginPage() {
               placeholder="কমপক্ষে ৬ অক্ষর"
               className={input}
             />
+            {mode === "login" && <Link href="/forgot-password" className="mt-2 inline-block text-xs font-bold text-[#E51A24] hover:underline">পাসওয়ার্ড ভুলে গেছেন?</Link>}
           </div>
 
           {error && <p className="text-sm text-rose-600">{error}</p>}

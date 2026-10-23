@@ -34,7 +34,7 @@ export default async function StudentsPage() {
                       <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-[#F8F9FA]">
                         {u.avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={u.avatar} alt="" className="h-full w-full object-cover" />
+                          <img src={u.avatar} alt="শিক্ষার্থীর প্রোফাইল ছবি" className="h-full w-full object-cover" />
                         ) : (u.nameBn || u.nameEn || "?").slice(0, 1)}
                       </span>
                       <span><span className="block font-bold">{u.nameBn || u.nameEn}</span><span className="block text-xs text-[#6C757D]">{u.nameEn}</span></span>

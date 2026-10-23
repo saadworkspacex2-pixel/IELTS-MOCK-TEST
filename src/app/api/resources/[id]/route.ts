@@ -22,6 +22,9 @@ export async function PUT(req: Request, { params }: Params) {
       ...(body.category !== undefined && { category: String(body.category) }),
       ...(body.type !== undefined && { type: String(body.type) }),
       ...(body.url !== undefined && { url: String(body.url) }),
+      ...(body.accessLevel !== undefined && {
+        accessLevel: body.accessLevel === "premium" ? "premium" : "free",
+      }),
     })
     .where(eq(resources.id, Number(id)))
     .returning();

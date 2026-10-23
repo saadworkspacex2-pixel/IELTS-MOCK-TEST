@@ -8,6 +8,8 @@ import Footer from "@/components/Footer";
 import DynamicSections from "@/components/DynamicSections";
 import Reveal from "@/components/Reveal";
 import { toBn } from "@/lib/bn";
+import { currentUser } from "@/lib/userAuth";
+import { canAccessLevel } from "@/lib/premium";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +19,7 @@ export default async function ExamsPage({
   searchParams: Promise<{ category?: string }>;
 }) {
   const { category } = await searchParams;
+  const user = await currentUser();
 
   const rows = await db
     .select({
@@ -48,7 +51,7 @@ export default async function ExamsPage({
           </p>
         </div>
 
-        <div className="anim-fade-up delay-200 mt-8 flex flex-wrap gap-2">
+        <div data-tour="exams-filters" className="anim-fade-up delay-200 mt-8 flex flex-wrap gap-2">
           <Link
             href="/exams"
             className={`rounded-full px-4 py-2 text-sm font-semibold ${
@@ -70,7 +73,7 @@ export default async function ExamsPage({
           ))}
         </div>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+        <div data-tour="exams-grid" className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
           {filtered.map((r, i) => (
             <Reveal key={r.exam.id} delay={(i % 3) * 80}>
               <Link
@@ -81,10 +84,13 @@ export default async function ExamsPage({
                   <span className="skeuo-well rounded-full px-3 py-1 text-xs font-semibold text-[#6C757D]">
                     {r.exam.category}
                   </span>
-                  <span className="status-pill flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold">
-                    <span className="anim-pulse-live h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    LIVE
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {r.exam.accessLevel === "premium" && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-800">✦ PREMIUM</span>}
+                    <span className="status-pill flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold">
+                      <span className="anim-pulse-live h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      LIVE
+                    </span>
+                  </div>
                 </div>
                 <SpringHeading as="h2" className="mt-4 text-lg font-semibold transition-colors group-hover:text-[#E51A24]">
                   {r.exam.title}
@@ -92,6 +98,7 @@ export default async function ExamsPage({
                 <p className="mt-2 line-clamp-2 text-sm text-[#6C757D]">
                   {r.exam.description}
                 </p>
+                {r.exam.accessLevel === "premium" && !canAccessLevel(r.exam.accessLevel, user) && <p className="mt-2 text-xs font-semibold text-amber-700">প্রিমিয়াম অ্যাক্সেস প্রয়োজন</p>}
                 <div className="skeuo-well mt-5 grid grid-cols-3 gap-2 rounded-lg p-3 text-center text-xs">
                   <div>
                     <div className="font-bold text-slate-800">

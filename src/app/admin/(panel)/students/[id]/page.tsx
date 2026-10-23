@@ -22,7 +22,7 @@ export default async function StudentDetail({ params }: { params: Promise<{ id: 
         <span className="grid h-20 w-20 place-items-center overflow-hidden rounded-full bg-[#F8F9FA] text-2xl font-bold">
           {user.avatar ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={user.avatar} alt="" className="h-full w-full object-cover" />
+            <img src={user.avatar} alt="শিক্ষার্থীর প্রোফাইল ছবি" className="h-full w-full object-cover" />
           ) : (user.nameBn || user.nameEn).slice(0, 1)}
         </span>
         <div className="flex-1">

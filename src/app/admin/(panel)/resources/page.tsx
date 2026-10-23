@@ -11,14 +11,17 @@ type R = {
   category: string;
   type: string;
   url: string;
+  accessLevel: "free" | "premium";
 };
 
-const emptyForm = {
+type ResourceForm = Omit<R, "id">;
+const emptyForm: ResourceForm = {
   title: "",
   description: "",
   category: "সাধারণ জ্ঞান",
   type: "article",
   url: "",
+  accessLevel: "free",
 };
 
 export default function AdminResourcesPage() {
@@ -138,6 +141,13 @@ export default function AdminResourcesPage() {
               <option value="video">ভিডিও</option>
             </select>
           </div>
+          <div>
+            <label className="text-sm font-medium text-slate-700">কনটেন্ট অ্যাক্সেস</label>
+            <select value={form.accessLevel} onChange={(e) => setForm((f) => ({ ...f, accessLevel: e.target.value === "premium" ? "premium" : "free" }))} className={input}>
+              <option value="free">ফ্রি</option>
+              <option value="premium">Premium</option>
+            </select>
+          </div>
           <div className="sm:col-span-2">
             <label className="text-sm font-medium text-slate-700">লিংক</label>
             <input
@@ -187,7 +197,7 @@ export default function AdminResourcesPage() {
               <div className="min-w-0">
                 <p className="font-semibold">{r.title}</p>
                 <p className="mt-0.5 text-xs text-[#6C757D]">
-                  {r.category} •{" "}
+                  {r.category} • {r.accessLevel === "premium" ? "Premium" : "Free"} •{" "}
                   {r.type === "pdf"
                     ? "পিডিএফ"
                     : r.type === "video"
@@ -205,6 +215,7 @@ export default function AdminResourcesPage() {
                       category: r.category,
                       type: r.type,
                       url: r.url,
+                      accessLevel: r.accessLevel,
                     });
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}

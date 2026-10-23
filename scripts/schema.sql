@@ -120,7 +120,34 @@ CREATE TABLE IF NOT EXISTS exam_sessions (
 );
 
 ALTER TABLE exams ADD COLUMN IF NOT EXISTS rules jsonb NOT NULL DEFAULT '{}';
+ALTER TABLE exams ADD COLUMN IF NOT EXISTS access_level text NOT NULL DEFAULT 'free';
+ALTER TABLE resources ADD COLUMN IF NOT EXISTS access_level text NOT NULL DEFAULT 'free';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS membership_tier text NOT NULL DEFAULT 'free';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS premium_until timestamp;
 ALTER TABLE attempts ADD COLUMN IF NOT EXISTS feedback jsonb NOT NULL DEFAULT '{}';
 ALTER TABLE attempts ADD COLUMN IF NOT EXISTS ip text NOT NULL DEFAULT '';
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id serial PRIMARY KEY,
+  user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  code_hash text NOT NULL,
+  attempt_count integer NOT NULL DEFAULT 0,
+  expires_at timestamp NOT NULL,
+  used_at timestamp,
+  created_at timestamp NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS payment_requests (
+  id serial PRIMARY KEY,
+  user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  tier text NOT NULL,
+  payment_method text NOT NULL,
+  transaction_id text NOT NULL,
+  sender_number text NOT NULL DEFAULT '',
+  status text NOT NULL DEFAULT 'pending',
+  admin_note text NOT NULL DEFAULT '',
+  created_at timestamp NOT NULL DEFAULT now(),
+  updated_at timestamp NOT NULL DEFAULT now()
+);
 
 COMMIT;

@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
+import { triggerGuidedTour } from "@/components/InstructionTour";
 
 const NAV = [
   { href: "/admin", label: "ড্যাশবোর্ড", icon: "chart", area: "all" },
@@ -19,6 +20,7 @@ const NAV = [
   { href: "/admin/theme", label: "থিম ও ফন্ট", icon: "bulb", area: "theme" },
   { href: "/admin/media", label: "মিডিয়া ভল্ট", icon: "play", area: "media" },
   { href: "/admin/resources", label: "রিসোর্স", icon: "book", area: "pages" },
+  { href: "/admin/payments", label: "Premium পেমেন্ট", icon: "trophy", area: "all" },
   { href: "/admin/results", label: "ফলাফল", icon: "trophy", area: "exams" },
   { href: "/admin/settings", label: "সেটিংস ও SEO", icon: "globe", area: "settings" },
   { href: "/admin/staff", label: "স্টাফ ও রোল", icon: "shield", area: "staff" },
@@ -52,7 +54,7 @@ export default function AdminShell({
   };
 
   const nav = (
-    <nav className="flex max-h-[calc(100vh-4rem)] flex-col gap-1 overflow-y-auto p-4">
+    <nav data-tour="admin-sidebar" className="flex max-h-[calc(100vh-4rem)] flex-col gap-1 overflow-y-auto p-4">
       {visibleNav.map((n) => {
         const active =
           n.href === "/admin" ? pathname === "/admin" : pathname.startsWith(n.href);
@@ -60,6 +62,7 @@ export default function AdminShell({
           <Link
             key={n.href}
             href={n.href}
+            data-tour={n.href === "/admin/exams" ? "admin-exams" : n.href === "/admin/payments" ? "admin-payments" : undefined}
             onClick={() => setOpen(false)}
             className={`flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-all ${
               active
@@ -104,6 +107,7 @@ export default function AdminShell({
           অ্যাডমিন <span className="text-[#E51A24]">প্যানেল</span>
         </SpringHeading>
         <div className="flex items-center gap-3">
+          <button type="button" onClick={triggerGuidedTour} className="skeuo-key rounded-md px-3 py-1.5 text-xs font-bold">গাইড</button>
           <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-[#E51A24]" title={adminName}>
             ● অনলাইন
           </span>

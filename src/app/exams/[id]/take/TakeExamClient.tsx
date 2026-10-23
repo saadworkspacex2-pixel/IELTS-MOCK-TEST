@@ -61,6 +61,7 @@ export default function TakeExamClient({ examId }: { examId: number }) {
   );
   const [optionOrders, setOptionOrders] = useState<Record<number, number[]>>({});
   const [sectionSeconds, setSectionSeconds] = useState<number | null>(null);
+  const [fullscreenActive, setFullscreenActive] = useState(false);
 
   const studentName =
     typeof window !== "undefined"
@@ -93,6 +94,19 @@ export default function TakeExamClient({ examId }: { examId: number }) {
       .catch(() => setError("পরীক্ষা লোড করা যায়নি। আবার চেষ্টা করুন।"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [examId]);
+
+  useEffect(() => {
+    const syncFullscreen = () => setFullscreenActive(Boolean(document.fullscreenElement));
+    syncFullscreen();
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
+
+  const enterFullscreen = () => {
+    document.documentElement.requestFullscreen?.().catch(() => {
+      setError("পূর্ণস্ক্রিন চালু করতে ব্রাউজারের অনুমতি দিন।");
+    });
+  };
 
   // parts: sections if any, else one virtual part containing everything
   const parts = useMemo(() => {
@@ -459,6 +473,16 @@ export default function TakeExamClient({ examId }: { examId: number }) {
 
   return (
     <div className="skeuo-desk flex h-screen flex-col overflow-hidden text-[#1A1A1A]">
+      {!fullscreenActive && (
+        <div className="fixed inset-0 z-[200] grid place-items-center bg-slate-950/80 px-5 backdrop-blur-sm">
+          <div className="card w-full max-w-md rounded-2xl p-7 text-center">
+            <p className="text-xs font-bold tracking-[0.18em] text-[#E51A24]">EXAM MODE</p>
+            <SpringHeading as="h2" className="mt-3 text-2xl font-bold">পূর্ণস্ক্রিনে পরীক্ষা শুরু করুন</SpringHeading>
+            <p className="mt-3 text-sm leading-relaxed text-[#6C757D]">পরীক্ষার সময় ফোকাস ধরে রাখতে এই টেস্টটি পূর্ণস্ক্রিন মোডে চলবে। ব্রাউজার অনুমতি চাইলে Allow/Full Screen দিন।</p>
+            <button type="button" onClick={enterFullscreen} className="btn-red mt-6 w-full rounded-lg py-3.5 text-sm font-bold">পূর্ণস্ক্রিন চালু করুন</button>
+          </div>
+        </div>
+      )}
       {/* ===== Brushed hardware exam console bar ===== */}
       <header className="skeuo-chassis z-30 flex h-16 shrink-0 items-center justify-between px-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">

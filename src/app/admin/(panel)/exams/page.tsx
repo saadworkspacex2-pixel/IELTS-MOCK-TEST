@@ -14,6 +14,7 @@ type Exam = {
   durationMinutes: number;
   negativeMark: number;
   isLive: boolean;
+  accessLevel: "free" | "premium";
   createdAt: string;
 };
 
@@ -67,13 +68,14 @@ export default function AdminExamsPage() {
         </div>
         <Link
           href="/admin/exams/new"
+          data-tour="admin-new-exam-btn"
           className="rounded-md btn-red px-5 py-2.5 text-sm font-bold text-white transition"
         >
           + নতুন পরীক্ষা
         </Link>
       </div>
 
-      <div className="mt-6">
+      <div data-tour="admin-bulk-tools" className="mt-6">
         <BulkTools exams={rows} onDone={load} />
       </div>
 
@@ -87,7 +89,7 @@ export default function AdminExamsPage() {
           ))}
         </div>
       ) : (
-        <div className="anim-fade-up delay-100 mt-8 overflow-hidden rounded-lg border border-black/[0.07]">
+        <div data-tour="admin-exams-table" className="anim-fade-up delay-100 mt-8 overflow-hidden rounded-lg border border-black/[0.07]">
           <table className="w-full text-sm">
             <thead className="bg-white text-left text-xs text-[#6C757D]">
               <tr>

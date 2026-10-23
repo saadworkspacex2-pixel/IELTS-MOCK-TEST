@@ -15,6 +15,7 @@ export type ExamFormData = {
   marksPerQuestion: number;
   negativeMark: number;
   isLive: boolean;
+  accessLevel: "free" | "premium";
   rules: ExamRules;
 };
 
@@ -48,6 +49,7 @@ export default function ExamForm({
       marksPerQuestion: 1,
       negativeMark: 0,
       isLive: true,
+      accessLevel: "free",
       rules: { showExplanations: true },
     },
   );
@@ -93,7 +95,7 @@ export default function ExamForm({
     "mt-2 w-full rounded-md border border-slate-300 bg-[#F8F9FA] px-4 py-3 text-sm outline-none transition focus:border-[#E51A24] focus:ring-2 focus:ring-red-100";
 
   return (
-    <div className="rounded-lg border border-black/[0.07] card p-7">
+    <div data-tour="admin-exam-form" className="rounded-lg border border-black/[0.07] card p-7">
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label className="text-sm font-medium text-slate-700">
@@ -186,6 +188,13 @@ export default function ExamForm({
             onChange={(e) => set("negativeMark", Number(e.target.value))}
             className={input}
           />
+        </div>
+        <div data-tour="admin-exam-premium-box">
+          <label className="text-sm font-medium text-slate-700">কনটেন্ট অ্যাক্সেস</label>
+          <select value={form.accessLevel} onChange={(e) => set("accessLevel", e.target.value === "premium" ? "premium" : "free")} className={input}>
+            <option value="free">ফ্রি — সবাই টেস্ট দিতে পারবে</option>
+            <option value="premium">Premium — শুধু অনুমোদিত সদস্য</option>
+          </select>
         </div>
         <div className="flex items-end pb-1">
           <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-slate-700">

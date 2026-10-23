@@ -36,7 +36,7 @@ export default function AdminLoginPage() {
     <div className="relative grid min-h-screen place-items-center overflow-hidden bg-white px-4">
       <div className="pointer-events-none absolute inset-0">
       </div>
-      <div className="anim-pop relative w-full max-w-md rounded-lg border border-black/[0.07] glass p-8">
+      <div data-tour="admin-login-card" className="anim-pop relative w-full max-w-md rounded-lg border border-black/[0.07] glass p-8">
         <div className="text-center">
           <span className="mx-auto inline-block">
             <LogoMark size={52} />

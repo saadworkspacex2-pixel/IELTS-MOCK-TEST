@@ -57,6 +57,7 @@ export default async function AdminDashboard() {
         <div className="flex gap-3">
           <Link
             href="/admin/exams/new"
+            data-tour="admin-new-exam-shortcut"
             className="rounded-md btn-red px-5 py-2.5 text-sm font-bold text-white transition"
           >
             + নতুন পরীক্ষা

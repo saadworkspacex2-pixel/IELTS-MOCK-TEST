@@ -9,6 +9,8 @@ import Reveal from "@/components/Reveal";
 import Icon from "@/components/Icon";
 import { formatDateBn } from "@/lib/bn";
 import Link from "next/link";
+import { currentUser } from "@/lib/userAuth";
+import { canAccessLevel } from "@/lib/premium";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +35,7 @@ export default async function ResourcesPage({
   searchParams: Promise<{ category?: string }>;
 }) {
   const { category } = await searchParams;
+  const user = await currentUser();
   const rows = await db
     .select()
     .from(resources)
@@ -53,7 +56,7 @@ export default async function ResourcesPage({
           </SpringHeading>
           <p className="mt-3 max-w-2xl text-[#6C757D]">
             নোট, সাজেশন, পিডিএফ ও ভিডিও লেকচার — প্রস্তুতির সব উপকরণ এক
-            জায়গায়, সম্পূর্ণ ফ্রি।
+            জায়গায়। ফ্রি ও নির্বাচিত Premium রিসোর্স আলাদা করে চিহ্নিত আছে।
           </p>
         </div>
 
@@ -89,8 +92,8 @@ export default async function ResourcesPage({
             return (
               <Reveal key={r.id} delay={(i % 3) * 80}>
                 <a
-                  href={r.url || "#"}
-                  target="_blank"
+                  href={r.accessLevel === "premium" && !canAccessLevel(r.accessLevel, user) ? "/premium" : r.url || "#"}
+                  target={r.accessLevel === "premium" && !canAccessLevel(r.accessLevel, user) ? undefined : "_blank"}
                   rel="noopener noreferrer"
                   className="lift group block h-full rounded-lg border border-black/[0.07] card p-6 hover:border-red-300"
                 >
@@ -100,7 +103,8 @@ export default async function ResourcesPage({
                     >
                       <Icon name={meta.icon} size={13} /> {meta.label}
                     </span>
-                    <span className="text-xs text-slate-500">
+                    <span className="flex items-center gap-2 text-xs text-slate-500">
+                      {r.accessLevel === "premium" && <b className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] text-amber-800">✦ PREMIUM</b>}
                       {formatDateBn(r.createdAt)}
                     </span>
                   </div>

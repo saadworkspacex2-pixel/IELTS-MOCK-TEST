@@ -28,6 +28,7 @@ export async function POST(req: Request) {
       category: String(body.category ?? "সাধারণ"),
       type: String(body.type ?? "article"),
       url: String(body.url ?? "#"),
+      accessLevel: body.accessLevel === "premium" ? "premium" : "free",
     })
     .returning();
   return NextResponse.json(row, { status: 201 });

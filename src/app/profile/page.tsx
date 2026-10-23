@@ -30,7 +30,7 @@ export default async function ProfilePage() {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={user.avatar}
-                alt="profile"
+                alt="ব্যবহারকারীর প্রোফাইল ছবি"
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -60,6 +60,14 @@ export default async function ProfilePage() {
             </Link>
             <LogoutButton />
           </div>
+        </div>
+
+        <div className="anim-fade-up delay-100 mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 p-5">
+          <div>
+            <p className="text-xs font-bold tracking-wide text-amber-800">MEMBERSHIP</p>
+            <p className="mt-1 font-bold text-[#1A1A1A]">{user.membershipTier === "free" ? "Free সদস্য" : `Premium ${user.membershipTier}`}</p>
+          </div>
+          <Link href="/premium" className="skeuo-key rounded-md px-4 py-2 text-sm font-bold">{user.membershipTier === "free" ? "Premium দেখুন" : "প্ল্যান দেখুন"}</Link>
         </div>
 
         {/* overall + module donuts */}

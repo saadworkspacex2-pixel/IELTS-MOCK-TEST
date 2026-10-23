@@ -6,6 +6,8 @@ import { isAdmin } from "@/lib/adminAuth";
 import { currentUser } from "@/lib/userAuth";
 import { bandFromRaw, matchesAcceptedAnswer } from "@/lib/band";
 import { rulesOf } from "@/lib/examRules";
+import { canAccessLevel } from "@/lib/premium";
+import { sendExamResultEmail, siteUrl } from "@/lib/email";
 
 export async function GET() {
   if (!(await isAdmin())) {
@@ -44,6 +46,9 @@ export async function POST(req: Request) {
   const [exam] = await db.select().from(exams).where(eq(exams.id, examId));
   if (!exam) {
     return NextResponse.json({ error: "পরীক্ষা পাওয়া যায়নি" }, { status: 404 });
+  }
+  if (!canAccessLevel(exam.accessLevel, user)) {
+    return NextResponse.json({ error: "এই Premium টেস্টের জন্য প্রিমিয়াম অ্যাক্সেস প্রয়োজন" }, { status: 403 });
   }
   const rules = rulesOf(exam.rules);
 
@@ -104,6 +109,7 @@ export async function POST(req: Request) {
       })
       .returning();
     await closeSession();
+    if (user) void sendExamResultEmail(user.email, user.nameBn || user.nameEn, exam.title, "ইনস্ট্রাক্টর রিভিউয়ের জন্য জমা হয়েছে", `${siteUrl()}/results/${row.id}`).catch((error) => console.error("Result email failed", error));
     return NextResponse.json({ attemptId: row.id }, { status: 201 });
   }
 
@@ -186,5 +192,9 @@ export async function POST(req: Request) {
     .returning();
 
   await closeSession();
+  if (user) {
+    const result = bandScore !== null ? `Band ${bandScore}` : rules.hideResults || hasEssay ? "রিভিউয়ের জন্য জমা হয়েছে" : `${score} নম্বর`;
+    void sendExamResultEmail(user.email, user.nameBn || user.nameEn, exam.title, result, `${siteUrl()}/results/${row.id}`).catch((error) => console.error("Result email failed", error));
+  }
   return NextResponse.json({ attemptId: row.id }, { status: 201 });
 }

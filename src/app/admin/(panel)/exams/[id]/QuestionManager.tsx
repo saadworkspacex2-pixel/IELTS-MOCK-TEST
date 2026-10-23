@@ -129,6 +129,16 @@ export default function QuestionManager({
     load();
   }, [load]);
 
+  useEffect(() => {
+    const openQuestionForm = () => setQOpen(true);
+    window.addEventListener("lhbd-open-question-form", openQuestionForm);
+    window.addEventListener("lhbd:open-question-form", openQuestionForm);
+    return () => {
+      window.removeEventListener("lhbd-open-question-form", openQuestionForm);
+      window.removeEventListener("lhbd:open-question-form", openQuestionForm);
+    };
+  }, []);
+
   const flash = (msg: string) => {
     setNotice(msg);
     setTimeout(() => setNotice(""), 2600);
@@ -459,7 +469,7 @@ export default function QuestionManager({
   return (
     <div className="space-y-8">
       {/* ---- toolbar: undo / redo ---- */}
-      <div className="card flex flex-wrap items-center justify-between gap-3 rounded-lg px-5 py-3">
+      <div data-tour="qm-undo-redo" className="card flex flex-wrap items-center justify-between gap-3 rounded-lg px-5 py-3">
         <div className="flex items-center gap-2">
           <button
             onClick={undo}
@@ -488,7 +498,7 @@ export default function QuestionManager({
 
       {/* ================= SECTIONS ================= */}
       {needsSections && (
-        <div className="space-y-4">
+        <div data-tour="qm-passages-box" className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <SpringHeading as="h3" className="font-semibold text-slate-800">
@@ -721,7 +731,7 @@ export default function QuestionManager({
       {/* ================= QUESTIONS ================= */}
       {!isWriting && (
         <div className="space-y-4">
-          <div className="card rounded-lg">
+          <div data-tour="qm-add-question-box" className="card rounded-lg">
             <button
               onClick={() => {
                 setQOpen((v) => !v);
@@ -748,7 +758,7 @@ export default function QuestionManager({
 
             {qOpen && (
               <div className="anim-fade-in border-t border-black/[0.06] px-6 py-6">
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div data-tour="qm-qtype-box" className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label className="text-sm font-medium text-slate-700">
                       প্রশ্নের ধরন
@@ -798,6 +808,7 @@ export default function QuestionManager({
                   প্রশ্ন *
                 </label>
                 <textarea
+                  data-tour="qm-question-text"
                   value={qForm.text}
                   onChange={(e) =>
                     setQForm((f) => ({ ...f, text: e.target.value }))
@@ -807,7 +818,7 @@ export default function QuestionManager({
                 />
 
                 {(qForm.qtype === "mcq" || qForm.qtype === "matching" || qForm.qtype === "dnd") && (
-                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div data-tour="qm-options-box" className="mt-4 grid gap-4 sm:grid-cols-2">
                     {OPTION_KEYS.map((key, i) => (
                       <div key={key}>
                         <label className="flex items-center justify-between text-sm font-medium text-slate-700">
@@ -885,7 +896,7 @@ export default function QuestionManager({
                   </div>
                 )}
 
-                <label className="mt-4 block text-sm font-medium text-slate-700">
+                <label data-tour="qm-explanation-box" className="mt-4 block text-sm font-medium text-slate-700">
                   ব্যাখ্যা (ঐচ্ছিক)
                 </label>
                 <textarea
@@ -931,7 +942,7 @@ export default function QuestionManager({
           {list.map((q, idx) => {
             const sec = secs.find((s) => s.id === q.sectionId);
             return (
-              <div key={q.id} className="card rounded-lg p-6">
+              <div key={q.id} data-tour="qm-questions-list" className="card rounded-lg p-6">
                 <div className="flex items-start justify-between gap-4">
                   <SpringHeading as="h3" className="font-semibold leading-relaxed">
                     {toBn(idx + 1)}. {q.text}

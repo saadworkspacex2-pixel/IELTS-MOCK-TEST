@@ -4,12 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Logo from "./Logo";
+import MobileStickyCTA from "./MobileStickyCTA";
+import { triggerGuidedTour } from "./InstructionTour";
 
 const links = [
   { href: "/", label: "হোম" },
   { href: "/exams", label: "টেস্ট" },
   { href: "/leaderboard", label: "লিডারবোর্ড" },
   { href: "/resources", label: "রিসোর্স" },
+  { href: "/premium", label: "Premium" },
 ];
 
 export default function Navbar() {
@@ -40,7 +43,7 @@ export default function Navbar() {
         <nav className="flex h-16 items-center justify-between px-4 sm:px-6">
           <Logo />
 
-          <div className="skeuo-well hidden items-center gap-1 rounded-full p-1 md:flex">
+          <div data-tour="nav-links" className="skeuo-well hidden items-center gap-1 rounded-full p-1 md:flex">
             {links.map((l) => {
               const active =
                 l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
@@ -48,6 +51,7 @@ export default function Navbar() {
                 <Link
                   key={l.href}
                   href={l.href}
+                  data-tour={l.href === "/exams" ? "nav-tests" : l.href === "/premium" ? "nav-premium" : undefined}
                   className={`relative rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
                     active
                       ? "skeuo-key text-[#E51A24]"
@@ -60,7 +64,15 @@ export default function Navbar() {
             })}
           </div>
 
-          <div className="hidden items-center gap-2.5 md:flex">
+          <div data-tour="nav-actions" className="hidden items-center gap-2.5 md:flex">
+            <button type="button" onClick={triggerGuidedTour} className="hidden skeuo-key rounded-full px-3 py-2 text-xs font-bold xl:inline-flex">গাইড</button>
+            <Link
+              href="/login"
+              data-tour="nav-login"
+              className="skeuo-key rounded-full px-4 py-2 text-sm font-semibold"
+            >
+              লগইন
+            </Link>
             <Link
               href="/profile"
               className="skeuo-key rounded-full px-4 py-2 text-sm font-semibold"
@@ -75,6 +87,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/exams"
+              data-free-test-start="true"
               className="btn-red rounded-full px-5 py-2 text-sm font-bold"
             >
               ফ্রি টেস্ট দিন
@@ -106,6 +119,7 @@ export default function Navbar() {
           <div className="anim-fade-in border-t border-black/10 px-4 py-3 md:hidden">
             {[
               ...links,
+              { href: "/login", label: "লগইন" },
               { href: "/profile", label: "আমার প্রোফাইল" },
               { href: "/admin", label: "অ্যাডমিন প্যানেল" },
             ].map((l) => (
@@ -120,6 +134,7 @@ export default function Navbar() {
             ))}
             <Link
               href="/exams"
+              data-free-test-start="true"
               onClick={() => setOpen(false)}
               className="btn-red mt-2 block rounded-md px-3 py-3 text-center text-sm font-bold"
             >
@@ -128,6 +143,7 @@ export default function Navbar() {
           </div>
         )}
       </div>
+      <MobileStickyCTA />
     </header>
   );
 }

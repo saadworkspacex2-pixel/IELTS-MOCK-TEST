@@ -41,7 +41,7 @@ export default async function EditExamPage({
       </div>
 
       <div className="mt-7 space-y-10">
-        <section>
+        <section data-tour="exam-details">
           <SpringHeading as="h2" className="mb-4 text-lg font-semibold text-slate-700">
             পরীক্ষার তথ্য
           </SpringHeading>
@@ -56,6 +56,7 @@ export default async function EditExamPage({
               marksPerQuestion: exam.marksPerQuestion,
               negativeMark: exam.negativeMark,
               isLive: exam.isLive,
+              accessLevel: exam.accessLevel === "premium" ? "premium" : "free",
               rules: rulesOf(exam.rules),
             }}
           />

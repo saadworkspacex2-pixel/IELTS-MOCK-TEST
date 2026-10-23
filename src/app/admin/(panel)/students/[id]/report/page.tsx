@@ -24,7 +24,7 @@ export default async function AdminStudentReport({ params }: { params: Promise<{
           <span className="grid h-28 w-28 place-items-center overflow-hidden rounded-lg bg-[#F8F9FA] text-3xl font-bold">
             {user.avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.avatar} alt="" className="h-full w-full object-cover" />
+              <img src={user.avatar} alt="শিক্ষার্থীর প্রোফাইল ছবি" className="h-full w-full object-cover" />
             ) : (user.nameBn || user.nameEn).slice(0, 1)}
           </span>
           <div className="flex-1"><SpringHeading as="h1" className="text-3xl font-bold">{user.nameBn || user.nameEn}</SpringHeading><p className="text-[#6C757D]">{user.nameEn} · {user.email} · {toBn(user.phone)}</p><p className="mt-2 text-xs text-[#6C757D]">LHBD Progress Report · {formatDateBn(new Date())}</p></div>

@@ -61,7 +61,7 @@ export default async function ReportPage() {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={user.avatar}
-                alt="profile"
+                alt="ব্যবহারকারীর প্রোফাইল ছবি"
                 className="h-full w-full object-cover"
               />
             ) : (

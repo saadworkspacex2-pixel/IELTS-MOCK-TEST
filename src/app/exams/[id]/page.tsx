@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import SpringHeading from "@/components/SpringHeading";
 import { notFound } from "next/navigation";
 import { db } from "@/db";
@@ -7,8 +8,18 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import StartExamCard from "./StartExamCard";
 import { toBn } from "@/lib/bn";
+import { currentUser } from "@/lib/userAuth";
+import { canAccessLevel } from "@/lib/premium";
+import PremiumGate from "@/components/PremiumGate";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const [exam] = await db.select({ title: exams.title, description: exams.description }).from(exams).where(eq(exams.id, Number(id)));
+  if (!exam) return { title: "টেস্ট পাওয়া যায়নি" };
+  return { title: exam.title, description: exam.description || `${exam.title} — IELTS Mock Test-এ অনুশীলন করুন।` };
+}
 
 export default async function ExamDetailPage({
   params,
@@ -21,6 +32,8 @@ export default async function ExamDetailPage({
 
   const [exam] = await db.select().from(exams).where(eq(exams.id, examId));
   if (!exam) notFound();
+  const user = await currentUser();
+  const hasAccess = canAccessLevel(exam.accessLevel, user);
 
   const [[qCount], [secCount], topAttempts] = await Promise.all([
     db
@@ -62,6 +75,7 @@ export default async function ExamDetailPage({
           <span className="ml-2 rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-[#E51A24]">
             {moduleBadge}
           </span>
+          {exam.accessLevel === "premium" && <span className="ml-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">✦ PREMIUM</span>}
           <SpringHeading as="h1" className="mt-4 text-3xl font-bold sm:text-4xl">{exam.title}</SpringHeading>
           {exam.description && (
             <p className="mt-3 max-w-2xl leading-relaxed text-[#6C757D]">
@@ -207,11 +221,15 @@ export default async function ExamDetailPage({
           </div>
 
           <div className="anim-fade-up delay-200">
-            <StartExamCard
-              examId={exam.id}
-              hasQuestions={isWriting ? secCount.c > 0 : qCount.c > 0}
-              durationMinutes={exam.durationMinutes}
-            />
+            {hasAccess ? (
+              <StartExamCard
+                examId={exam.id}
+                hasQuestions={isWriting ? secCount.c > 0 : qCount.c > 0}
+                durationMinutes={exam.durationMinutes}
+              />
+            ) : (
+              <PremiumGate title="এই টেস্টটি Premium" description="টেস্ট শুরু করতে একটি Premium প্ল্যান নির্বাচন করুন। পেমেন্ট রিকোয়েস্ট যাচাইয়ের পর অ্যাক্সেস চালু হবে।" />
+            )}
           </div>
         </div>
       </main>

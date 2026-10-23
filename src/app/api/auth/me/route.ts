@@ -15,6 +15,8 @@ export async function GET() {
       nameEn: user.nameEn,
       nameBn: user.nameBn,
       avatar: user.avatar,
+      membershipTier: user.membershipTier,
+      premiumUntil: user.premiumUntil,
     },
   });
 }

@@ -7,6 +7,7 @@ import {
   newSessionToken,
   USER_COOKIE,
 } from "@/lib/userAuth";
+import { sendLoginAlertEmail, siteUrl } from "@/lib/email";
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -38,6 +39,7 @@ export async function POST(req: Request) {
     .set({ sessionToken: token })
     .where(eq(users.id, user.id));
 
+  void sendLoginAlertEmail(user.email, user.nameBn || user.nameEn, siteUrl()).catch((error) => console.error("Login notification email failed", error));
   const res = NextResponse.json({ ok: true });
   res.cookies.set(USER_COOKIE, token, {
     httpOnly: true,

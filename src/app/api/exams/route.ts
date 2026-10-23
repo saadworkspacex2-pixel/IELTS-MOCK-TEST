@@ -27,6 +27,7 @@ export async function POST(req: Request) {
       marksPerQuestion: Number(body.marksPerQuestion ?? 1),
       negativeMark: Number(body.negativeMark ?? 0.25),
       isLive: Boolean(body.isLive ?? true),
+      accessLevel: body.accessLevel === "premium" ? "premium" : "free",
       rules: body.rules ?? {},
     })
     .returning();

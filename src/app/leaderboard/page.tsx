@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import SpringHeading from "@/components/SpringHeading";
 import { db } from "@/db";
 import { attempts, exams } from "@/db/schema";
@@ -10,6 +11,7 @@ import { formatDateBn, formatDuration, toBn } from "@/lib/bn";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "লিডারবোর্ড", description: "IELTS Mock Test-এর সাম্প্রতিক সেরা ফলাফল ও স্কোর দেখুন।" };
 
 export default async function LeaderboardPage({
   searchParams,

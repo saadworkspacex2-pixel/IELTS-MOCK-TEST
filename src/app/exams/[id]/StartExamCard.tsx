@@ -35,11 +35,14 @@ export default function StartExamCard({
       return;
     }
     sessionStorage.setItem("mt_student_name", trimmed);
+    sessionStorage.setItem("mt_exam_fullscreen_requested", "1");
+    // Fullscreen must be requested directly from this user click; browsers may still let candidates decline it.
+    document.documentElement.requestFullscreen?.().catch(() => {});
     router.push(`/exams/${examId}/take`);
   };
 
   return (
-    <div className="skeuo-paper sticky top-24 overflow-hidden rounded-xl p-7">
+    <div data-tour="exam-start-card" className="skeuo-paper sticky top-24 overflow-hidden rounded-xl p-7">
       <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6C757D]">
         Candidate Entry Slip
       </p>

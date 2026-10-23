@@ -4,6 +4,8 @@ import { getSettings } from "@/lib/settings";
 import { buildThemeCss } from "@/lib/themeCss";
 import InjectCode from "@/components/InjectCode";
 import VelocityCursor from "@/components/VelocityCursor";
+import InstructionTour from "@/components/InstructionTour";
+import { Analytics, CookieBanner } from "@/components/AnalyticsConsent";
 
 // Self-hosted fonts (bundled with the app, no external CDN requests).
 // This keeps Bangla + English typography working in every deploy environment.
@@ -22,9 +24,10 @@ import "./globals.css";
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
   return {
-    title: s.browser_title || s.seo_title,
     description: s.seo_description,
     keywords: s.seo_keywords,
+    metadataBase: new URL(s.site_url || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+    title: { default: s.browser_title || s.seo_title, template: `%s | ${s.site_name}` },
     applicationName: s.site_name,
     ...(s.favicon_url && {
       icons: { icon: s.favicon_url, shortcut: s.favicon_url, apple: s.favicon_url },
@@ -34,7 +37,15 @@ export async function generateMetadata(): Promise<Metadata> {
       description: s.seo_description,
       siteName: s.site_name,
       type: "website",
+      images: ["/opengraph-image"],
     },
+    twitter: {
+      card: "summary_large_image",
+      title: s.seo_title,
+      description: s.seo_description,
+      images: ["/opengraph-image"],
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -53,6 +64,9 @@ export default async function RootLayout({
         />
         <InjectCode html={s.header_code ?? ""} target="head" />
         {children}
+        <InstructionTour />
+        <CookieBanner />
+        <Analytics measurementId={s.analytics_measurement_id} />
         <VelocityCursor />
         <InjectCode html={s.footer_code ?? ""} target="body" />
       </body>

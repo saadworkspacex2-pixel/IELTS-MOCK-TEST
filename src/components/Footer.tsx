@@ -23,6 +23,7 @@ export default async function Footer() {
               { href: "/exams", label: "সব টেস্ট" },
               { href: "/leaderboard", label: "লিডারবোর্ড" },
               { href: "/resources", label: "রিসোর্স" },
+              { href: "/premium", label: "Premium প্ল্যান" },
               { href: "/admin", label: "অ্যাডমিন প্যানেল" },
             ].map((l) => (
               <li key={l.href}>
@@ -56,6 +57,9 @@ export default async function Footer() {
             </li>
             <li>Academic Reading</li>
             <li>Listening ও Writing Task</li>
+            {s.contact_email && <li><a href={`mailto:${s.contact_email}`} className="transition-colors hover:text-white">{s.contact_email}</a></li>}
+            {s.contact_phone && <li><a href={`tel:${s.contact_phone}`} className="transition-colors hover:text-white">{s.contact_phone}</a></li>}
+            {s.contact_address && <li className="leading-relaxed">{s.contact_address}</li>}
           </ul>
         </div>
       </div>

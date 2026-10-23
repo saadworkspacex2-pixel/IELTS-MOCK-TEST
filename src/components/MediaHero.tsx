@@ -61,7 +61,7 @@ export default function MediaHero({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={images[index]}
-            alt=""
+            alt="প্রস্তুতি প্ল্যাটফর্মের ভিজ্যুয়াল"
             className="anim-fade-in h-full w-full object-cover opacity-60"
             key={images[index]}
           />

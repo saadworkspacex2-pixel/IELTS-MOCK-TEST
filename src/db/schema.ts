@@ -21,6 +21,7 @@ export const exams = appSchema.table("exams", {
   marksPerQuestion: real("marks_per_question").notNull().default(1),
   negativeMark: real("negative_mark").notNull().default(0),
   isLive: boolean("is_live").notNull().default(true),
+  accessLevel: text("access_level").notNull().default("free"), // free | premium
   rules: jsonb("rules").notNull().default({}),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -78,6 +79,8 @@ export const users = appSchema.table("users", {
   salt: text("salt").notNull(),
   avatar: text("avatar").notNull().default(""), // data URL
   sessionToken: text("session_token").notNull().default(""),
+  membershipTier: text("membership_tier").notNull().default("free"),
+  premiumUntil: timestamp("premium_until"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -154,7 +157,35 @@ export const resources = appSchema.table("resources", {
   category: text("category").notNull().default("সাধারণ"),
   type: text("type").notNull().default("article"),
   url: text("url").notNull().default("#"),
+  accessLevel: text("access_level").notNull().default("free"), // free | premium
   createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const passwordResetTokens = appSchema.table("password_reset_tokens", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  codeHash: text("code_hash").notNull(),
+  attemptCount: integer("attempt_count").notNull().default(0),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const paymentRequests = appSchema.table("payment_requests", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  tier: text("tier").notNull(),
+  paymentMethod: text("payment_method").notNull(),
+  transactionId: text("transaction_id").notNull(),
+  senderNumber: text("sender_number").notNull().default(""),
+  status: text("status").notNull().default("pending"), // pending | approved | rejected
+  adminNote: text("admin_note").notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export type Exam = typeof exams.$inferSelect;
@@ -162,3 +193,5 @@ export type Section = typeof sections.$inferSelect;
 export type Question = typeof questions.$inferSelect;
 export type Attempt = typeof attempts.$inferSelect;
 export type Resource = typeof resources.$inferSelect;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type PaymentRequest = typeof paymentRequests.$inferSelect;

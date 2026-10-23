@@ -113,7 +113,7 @@ const STEPS = [
 const FAQS = [
   {
     q: "টেস্ট দিতে কি টাকা লাগে?",
-    a: "না। LHBD-র সব মক টেস্ট, ব্যান্ড স্কোর, ব্যাখ্যা ও রিসোর্স সম্পূর্ণ ফ্রি। রেজিস্ট্রেশনও লাগে না, নাম লিখেই শুরু।",
+    a: "ফ্রি টেস্ট ও রিসোর্স সবার জন্য খোলা। নির্বাচিত Premium টেস্ট ও রিসোর্সের জন্য প্রিমিয়াম অ্যাক্সেস লাগবে; টেস্ট কার্ডে সেটি পরিষ্কারভাবে লেখা থাকে।",
   },
   {
     q: "ব্যান্ড স্কোর কীভাবে হিসাব হয়?",
@@ -170,7 +170,7 @@ export default async function HomePage() {
               </p>
 
               <div className="anim-fade-up delay-300 mt-9 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
-                <Link href="/exams" className="btn-red inline-flex items-center gap-2 rounded-md px-8 py-4 text-base font-bold">
+                <Link href="/exams" data-free-test-start="true" className="btn-red inline-flex items-center gap-2 rounded-md px-8 py-4 text-base font-bold">
                   ফ্রি টেস্ট শুরু করুন <Icon name="arrow" size={17} />
                 </Link>
                 <Link href="/resources" className="btn-ghost rounded-md px-8 py-4 text-base font-bold">
@@ -178,7 +178,7 @@ export default async function HomePage() {
                 </Link>
               </div>
               <p className="anim-fade-up delay-400 mt-5 text-xs font-medium text-[#6C757D]">
-                রেজিস্ট্রেশন ছাড়াই ডেমো · সঙ্গে সঙ্গে ব্যান্ড স্কোর · ব্যাখ্যাসহ রিভিউ
+                ফ্রি ডেমো · সঙ্গে সঙ্গে ব্যান্ড স্কোর · নির্বাচিত Premium কনটেন্ট
               </p>
             </div>
 
@@ -232,7 +232,7 @@ export default async function HomePage() {
       </section>
 
       {/* ================= LIVE PRODUCT DEMO ================= */}
-      <section className="mx-auto max-w-5xl px-5 pb-24 sm:px-8">
+      <section data-tour="home-live-demo" className="mx-auto max-w-5xl px-5 pb-24 sm:px-8">
         <Reveal>
           <div className="mb-6 flex items-center justify-center gap-2 text-sm font-semibold text-[#6C757D]">
             <Icon name="play" size={16} className="text-[#E51A24]" />
