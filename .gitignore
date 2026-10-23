@@ -1,8 +1,22 @@
+# Dependencies and generated Next.js files
 node_modules/
 .next/
+out/
+
+# Local environment values and runtime secrets
+.env
+.env.*
+!.env.example
 .arena/
+
+# TypeScript / editor artifacts
 next-env.d.ts
 tsconfig.tsbuildinfo
-.env
-.env.local
-.env.*.local
+*.tsbuildinfo
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
