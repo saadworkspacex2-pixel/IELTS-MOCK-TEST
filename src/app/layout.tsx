@@ -47,6 +47,9 @@ export async function generateMetadata(): Promise<Metadata> {
       images: ["/opengraph-image"],
     },
     robots: { index: true, follow: true },
+    verification: {
+      google: "nKaYKjeCY9u4rKgizm3IVwZU9453BZWQOnzX9hOmwHw",
+    },
   };
 }
 
