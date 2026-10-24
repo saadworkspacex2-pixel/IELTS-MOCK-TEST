@@ -70,6 +70,7 @@ The project is built with the Next.js App Router, TypeScript, PostgreSQL, and Dr
         <li>Registration, login, session, and password-reset flows</li>
         <li>Secure email OTP password recovery with expiry and retry protection</li>
         <li>Optional Gmail SMTP lifecycle emails for welcome, login, results, and recovery events</li>
+        <li>Admin Mail Studio with rich editable templates, logo/branding controls, image upload, dynamic variables, and safe test sends</li>
         <li>SEO metadata, sitemap, robots rules, privacy, terms, and consent surfaces</li>
       </ul>
     </td>
@@ -149,7 +150,9 @@ Copy `.env.example` to `.env.local`. Never commit a real `.env*` file.
 
 ### Transactional email
 
-When `EMAIL_USER` and `EMAIL_PASS` are available, the platform sends branded messages through Gmail SMTP using Nodemailer. Create a Google App Password after enabling 2-Step Verification; do not use the Gmail account's normal password. Email failures are intentionally non-blocking so an unavailable provider does not prevent a learner from using the application.
+When `EMAIL_USER` and `EMAIL_PASS` are available, the platform sends branded messages through Gmail SMTP using Nodemailer. Create a Google App Password after enabling 2-Step Verification; do not use the Gmail account's normal password. Lifecycle delivery is awaited in serverless routes so the platform does not silently finish a request before Nodemailer has sent the message; password recovery reports a clear error if the OTP cannot be delivered.
+
+**Admin → Mail Studio** controls the global email header/logo, colors and footer plus each automated template: password-reset OTP, password-changed, welcome, login notice, exam result, payment request, Premium approved/rejected, and receipt. It includes a browser-based rich editor for bold, italic, text/highlight colors, font size, images uploaded to the Media Vault, dynamic placeholders, HTML-source editing, default restoration, preview, and an admin-only test-email action.
 
 The protected admin-only endpoint `POST /api/admin/send-email` accepts `to`, `subject`, and `html` or `text` for operational messages. It is intentionally not public, so the application cannot become an open email relay.
 

@@ -22,6 +22,7 @@ const NAV = [
   { href: "/admin/media", label: "মিডিয়া ভল্ট", icon: "play", area: "media" },
   { href: "/admin/resources", label: "রিসোর্স", icon: "book", area: "pages" },
   { href: "/admin/payments", label: "Premium পেমেন্ট", icon: "trophy", area: "all" },
+  { href: "/admin/mail", label: "Mail Studio", icon: "doc", area: "settings" },
   { href: "/admin/results", label: "ফলাফল", icon: "trophy", area: "exams" },
   { href: "/admin/seo", label: "SEO ম্যানেজার", icon: "globe", area: "settings" },
   { href: "/admin/settings", label: "সাইট সেটিংস", icon: "screen", area: "settings" },
