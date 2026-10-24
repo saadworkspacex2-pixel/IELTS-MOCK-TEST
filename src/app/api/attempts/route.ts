@@ -109,7 +109,7 @@ export async function POST(req: Request) {
       })
       .returning();
     await closeSession();
-    if (user) void sendExamResultEmail(user.email, user.nameBn || user.nameEn, exam.title, "ইনস্ট্রাক্টর রিভিউয়ের জন্য জমা হয়েছে", `${siteUrl()}/results/${row.id}`).catch((error) => console.error("Result email failed", error));
+    if (user) { try { await sendExamResultEmail(user.email, user.nameBn || user.nameEn, exam.title, "ইনস্ট্রাক্টর রিভিউয়ের জন্য জমা হয়েছে", `${siteUrl()}/results/${row.id}`); } catch (error) { console.error("Result email failed", error); } }
     return NextResponse.json({ attemptId: row.id }, { status: 201 });
   }
 
@@ -194,7 +194,7 @@ export async function POST(req: Request) {
   await closeSession();
   if (user) {
     const result = bandScore !== null ? `Band ${bandScore}` : rules.hideResults || hasEssay ? "রিভিউয়ের জন্য জমা হয়েছে" : `${score} নম্বর`;
-    void sendExamResultEmail(user.email, user.nameBn || user.nameEn, exam.title, result, `${siteUrl()}/results/${row.id}`).catch((error) => console.error("Result email failed", error));
+    try { await sendExamResultEmail(user.email, user.nameBn || user.nameEn, exam.title, result, `${siteUrl()}/results/${row.id}`); } catch (error) { console.error("Result email failed", error); }
   }
   return NextResponse.json({ attemptId: row.id }, { status: 201 });
 }

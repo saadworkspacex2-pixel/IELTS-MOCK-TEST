@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     .set({ sessionToken: token })
     .where(eq(users.id, user.id));
 
-  void sendLoginAlertEmail(user.email, user.nameBn || user.nameEn, siteUrl()).catch((error) => console.error("Login notification email failed", error));
+  try { await sendLoginAlertEmail(user.email, user.nameBn || user.nameEn, siteUrl()); } catch (error) { console.error("Login notification email failed", error); }
   const res = NextResponse.json({ ok: true });
   res.cookies.set(USER_COOKIE, token, {
     httpOnly: true,

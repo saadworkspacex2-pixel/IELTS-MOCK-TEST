@@ -16,7 +16,13 @@ export async function POST(req: Request) {
   if (!user) return NextResponse.json({ ok: true });
   const code = String(randomInt(100000, 1_000_000));
   await db.insert(passwordResetTokens).values({ userId: user.id, codeHash: hashCode(email, code), expiresAt: new Date(Date.now() + 15 * 60 * 1000) });
-  void sendPasswordResetCodeEmail(email, code).catch((error) => console.error("Password reset email failed", error));
+  try {
+    const delivery = await sendPasswordResetCodeEmail(email, code);
+    if ("skipped" in delivery) return NextResponse.json({ error: "OTP email service এখনো configured নয়।" }, { status: 503 });
+  } catch (error) {
+    console.error("Password reset email failed", error);
+    return NextResponse.json({ error: "OTP email পাঠানো যায়নি। Gmail SMTP settings যাচাই করে আবার চেষ্টা করুন।" }, { status: 503 });
+  }
   return NextResponse.json({ ok: true });
 }
 

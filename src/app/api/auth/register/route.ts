@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     sessionToken: token,
   });
 
-  void sendWelcomeEmail(email, nameBn || nameEn, siteUrl()).catch((error) => console.error("Welcome email failed", error));
+  try { await sendWelcomeEmail(email, nameBn || nameEn, siteUrl()); } catch (error) { console.error("Welcome email failed", error); }
   const res = NextResponse.json({ ok: true }, { status: 201 });
   res.cookies.set(USER_COOKIE, token, {
     httpOnly: true,

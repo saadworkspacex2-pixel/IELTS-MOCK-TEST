@@ -25,6 +25,6 @@ export async function POST(req: Request) {
   const { salt, hash } = hashPassword(password);
   await db.update(users).set({ passwordHash: hash, salt, sessionToken: "" }).where(eq(users.id, user.id));
   await db.update(passwordResetTokens).set({ usedAt: new Date() }).where(eq(passwordResetTokens.id, token.id));
-  void sendPasswordChangedEmail(email, siteUrl()).catch((error) => console.error("Password changed email failed", error));
+  try { await sendPasswordChangedEmail(email, siteUrl()); } catch (error) { console.error("Password changed email failed", error); }
   return NextResponse.json({ ok: true });
 }

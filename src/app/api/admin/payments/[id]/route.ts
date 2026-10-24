@@ -48,10 +48,10 @@ export async function PUT(req: Request, { params }: Params) {
   }
 
   if (member && premiumTier && status === "approved") {
-    if (receiptReady) void sendPremiumReceiptEmail(member.email, { product, total, receiptUrl: `${siteUrl()}/api/payments/${payment.id}/receipt`, expiresLabel: expiryLabel }).catch((error) => console.error("Premium receipt email failed", error));
-    else void sendPremiumActivationEmail(member.email, { product, total, expiresLabel: expiryLabel, profileUrl: `${siteUrl()}/profile` }).catch((error) => console.error("Premium activation email failed", error));
+    if (receiptReady) { try { await sendPremiumReceiptEmail(member.email, { product, total, receiptUrl: `${siteUrl()}/api/payments/${payment.id}/receipt`, expiresLabel: expiryLabel }); } catch (error) { console.error("Premium receipt email failed", error); } }
+    else { try { await sendPremiumActivationEmail(member.email, { product, total, expiresLabel: expiryLabel, profileUrl: `${siteUrl()}/profile` }); } catch (error) { console.error("Premium activation email failed", error); } }
   } else if (member && premiumTier && status === "rejected") {
-    void sendMembershipStatusEmail(member.email, planLabels[premiumTier], "rejected", siteUrl()).catch((error) => console.error("Membership status email failed", error));
+    try { await sendMembershipStatusEmail(member.email, planLabels[premiumTier], "rejected", siteUrl()); } catch (error) { console.error("Membership status email failed", error); }
   }
   return NextResponse.json({ ok: true, warning: premiumSchemaWarning(capabilities) });
 }

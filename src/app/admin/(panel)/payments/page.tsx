@@ -9,7 +9,7 @@ type Row = {
   payment: { id: number; tier: string; paymentMethod: string; transactionId: string; senderNumber: string; status: string; adminNote: string; receiptCode: string; createdAt: string };
   user: { id: number; nameBn: string; nameEn: string; email: string; phone: string };
 };
-type EmailStatus = { configured: boolean; hasUser: boolean; hasPassword: boolean; sender: string; provider: string };
+type EmailStatus = { configured: boolean; hasUser: boolean; hasPassword: boolean; sender: string; provider: string; deliveryReady?: boolean; deliveryMessage?: string };
 
 export default function AdminPaymentsPage() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -55,7 +55,8 @@ export default function AdminPaymentsPage() {
 
   return <div><div className="anim-fade-up"><SpringHeading as="h1" className="text-2xl font-bold">Premium ও পেমেন্ট</SpringHeading><p className="mt-1 text-sm text-[#6C757D]">টায়ার, বাংলাদেশি Send Money নম্বর, manual membership এবং payment receipt এক জায়গা থেকে নিয়ন্ত্রণ করুন।</p></div>
     {emailStatus && !emailStatus.configured && <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"><b>Gmail SMTP email এখন প্রস্তুত নয়।</b> {!emailStatus.hasUser ? "Vercel Environment Variables-এ EMAIL_USER যোগ করুন।" : "Vercel Environment Variables-এ Gmail App Password দিয়ে EMAIL_PASS যোগ করুন।"} App Password ব্যবহার করুন—মূল Gmail password নয়।</div>}
-    {emailStatus?.configured && <p className="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-800">Gmail SMTP configured · sender: {emailStatus.sender}</p>}
+    {emailStatus?.configured && emailStatus.deliveryReady && <p className="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-800">Gmail SMTP verified · sender: {emailStatus.sender}</p>}
+    {emailStatus?.configured && emailStatus.deliveryReady === false && <p className="mt-4 rounded-lg bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-800"><b>Gmail SMTP delivery যাচাই ব্যর্থ।</b> {emailStatus.deliveryMessage}</p>}
     {notice && <p className={`mt-4 rounded-lg px-4 py-3 text-sm font-semibold ${notice.includes("যায়নি") || notice.includes("ব্যর্থ") || notice.includes("প্রস্তুত") ? "bg-rose-50 text-rose-700" : "bg-emerald-50 text-emerald-700"}`}>{notice}</p>}
     <PremiumSettingsPanel />
     <ManualMembershipPanel onUpdated={() => { void load(); }} />

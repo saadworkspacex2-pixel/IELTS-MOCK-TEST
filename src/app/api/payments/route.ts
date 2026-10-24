@@ -27,6 +27,6 @@ export async function POST(req: Request) {
   const [existing] = await db.select().from(paymentRequests).where(and(eq(paymentRequests.transactionId, transactionId), eq(paymentRequests.paymentMethod, paymentMethod)));
   if (existing) return NextResponse.json({ error: "এই Transaction ID ইতিমধ্যে ব্যবহার হয়েছে" }, { status: 409 });
   const [row] = await db.insert(paymentRequests).values({ userId: user.id, tier, paymentMethod, transactionId, senderNumber }).returning();
-  void sendPaymentRequestEmail(user.email, planLabels[tier], siteUrl()).catch((error) => console.error("Payment email failed", error));
+  try { await sendPaymentRequestEmail(user.email, planLabels[tier], siteUrl()); } catch (error) { console.error("Payment email failed", error); }
   return NextResponse.json({ id: row.id, status: row.status }, { status: 201 });
 }

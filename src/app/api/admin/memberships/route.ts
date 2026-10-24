@@ -68,9 +68,9 @@ export async function POST(req: Request) {
   }
 
   if (receiptReady && paymentId) {
-    void sendPremiumReceiptEmail(member.email, { product: details.name, total, receiptUrl: `${siteUrl()}/api/payments/${paymentId}/receipt`, expiresLabel: details.duration || "মেয়াদ নির্ধারিত নয়" }).catch((error) => console.error("Manual premium email failed", error));
+    try { await sendPremiumReceiptEmail(member.email, { product: details.name, total, receiptUrl: `${siteUrl()}/api/payments/${paymentId}/receipt`, expiresLabel: details.duration || "মেয়াদ নির্ধারিত নয়" }); } catch (error) { console.error("Manual premium email failed", error); }
   } else {
-    void sendPremiumActivationEmail(member.email, { product: details.name, total, expiresLabel: details.duration || "মেয়াদ নির্ধারিত নয়", profileUrl }).catch((error) => console.error("Manual premium activation email failed", error));
+    try { await sendPremiumActivationEmail(member.email, { product: details.name, total, expiresLabel: details.duration || "মেয়াদ নির্ধারিত নয়", profileUrl }); } catch (error) { console.error("Manual premium activation email failed", error); }
   }
   return NextResponse.json({ user, payment: paymentId ? { id: paymentId } : null, warning });
 }

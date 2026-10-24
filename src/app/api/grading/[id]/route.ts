@@ -29,7 +29,7 @@ export async function PUT(
   if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (row.userId && row.status === "scored") {
     const [detail] = await db.select({ email: users.email, nameBn: users.nameBn, nameEn: users.nameEn, examTitle: exams.title }).from(attempts).innerJoin(users, eq(attempts.userId, users.id)).innerJoin(exams, eq(attempts.examId, exams.id)).where(eq(attempts.id, row.id));
-    if (detail) void sendExamResultEmail(detail.email, detail.nameBn || detail.nameEn, detail.examTitle, row.bandScore ? `Band ${row.bandScore}` : `${row.score} নম্বর`, `${siteUrl()}/results/${row.id}`).catch((error) => console.error("Graded result email failed", error));
+    if (detail) { try { await sendExamResultEmail(detail.email, detail.nameBn || detail.nameEn, detail.examTitle, row.bandScore ? `Band ${row.bandScore}` : `${row.score} নম্বর`, `${siteUrl()}/results/${row.id}`); } catch (error) { console.error("Graded result email failed", error); } }
   }
   return NextResponse.json(row);
 }

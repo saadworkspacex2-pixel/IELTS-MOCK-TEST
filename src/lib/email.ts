@@ -27,12 +27,45 @@ function transporter() {
     globalForMail.__lhbdGmailTransporter = nodemailer.createTransport({
       service: "gmail",
       auth: { user: emailUser, pass: emailPass },
-      pool: true,
-      maxConnections: 1,
-      maxMessages: 20,
+
     });
   }
   return globalForMail.__lhbdGmailTransporter;
+}
+
+const emailAddress = /^[^<>\s@]+@[^<>\s@]+\.[^<>\s@]+$/;
+const namedMailbox = /^[^<>\[\]()\r\n]+ <([^<>\s]+)>$/;
+
+// Gmail can only send from its authenticated address or a Gmail-approved alias.
+// Invalid values (for example markdown copied into EMAIL_FROM) are ignored rather
+// than allowing one malformed display value to stop all transactional messages.
+export function effectiveEmailFrom(siteName = "IELTS Mock Test") {
+  const authenticated = (process.env.EMAIL_USER || "").trim();
+  const configured = (process.env.EMAIL_FROM || "").trim();
+  if (!authenticated) return configured || "";
+  if (configured === authenticated) return configured;
+  const named = configured.match(namedMailbox)?.[1] || "";
+  if (named && emailAddress.test(named)) return configured;
+  return `${siteName} <${authenticated}>`;
+}
+
+export async function verifyGmailSmtp() {
+  const smtp = transporter();
+  if (!smtp) return { configured: false, deliveryReady: false, message: "EMAIL_USER অথবা EMAIL_PASS সেট করা নেই।" };
+  try {
+    await smtp.verify();
+    return { configured: true, deliveryReady: true, message: "Gmail SMTP authenticated and ready." };
+  } catch (error) {
+    const code = error && typeof error === "object" && "code" in error ? String(error.code) : "";
+    console.error("Gmail SMTP verification failed", error);
+    return {
+      configured: true,
+      deliveryReady: false,
+      message: code === "EAUTH"
+        ? "Gmail authentication rejected. EMAIL_PASS-এ নতুন Gmail App Password দিন; normal Gmail password ব্যবহার করবেন না।"
+        : "Gmail SMTP connection যাচাই করা যায়নি। Vercel Runtime Logs দেখুন এবং Gmail App Password যাচাই করুন।",
+    };
+  }
 }
 
 function brandedHtml(message: EmailMessage, siteName: string) {
@@ -50,7 +83,7 @@ export async function sendEmail(message: EmailMessage) {
   }
   const settings = await getSettings();
   const siteName = settings.site_name || "IELTS Mock Test";
-  const from = process.env.EMAIL_FROM || settings.email_from || `${siteName} <${process.env.EMAIL_USER}>`;
+  const from = effectiveEmailFrom(siteName) || settings.email_from || `${siteName} <${process.env.EMAIL_USER}>`;
   const html = message.html || brandedHtml(message, siteName);
   return smtp.sendMail({ from, to: message.to, subject: message.subject, html, text: message.text || plainText(message.body || message.subject) });
 }
