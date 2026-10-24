@@ -1,101 +1,183 @@
 <div align="center">
+  <a href="#readme"><img src="./docs/assets/lhbd-readme-hero.svg" width="100%" alt="LHBD · IELTS Mock Test — Academic English practice platform" /></a>
 
-# LHBD · IELTS Mock Test
+  <br />
+  <br />
 
-### A Bengali-first online IELTS preparation and mock-exam platform
+  <a href="https://github.com/saadworkspacex2-pixel/IELTS-MOCK-TEST/actions/workflows/quality.yml"><img src="https://github.com/saadworkspacex2-pixel/IELTS-MOCK-TEST/actions/workflows/quality.yml/badge.svg" alt="Quality checks" /></a>
+  <img src="https://img.shields.io/badge/Next.js-16-111827?style=flat-square&logo=next.js" alt="Next.js 16" />
+  <img src="https://img.shields.io/badge/React-19-149ECA?style=flat-square&logo=react&logoColor=white" alt="React 19" />
+  <img src="https://img.shields.io/badge/TypeScript-Strict-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Bangla-first-E51A24?style=flat-square" alt="Bangla first" />
 
-[![Quality checks](https://github.com/saadworkspacex2-pixel/IELTS-MOCK-TEST/actions/workflows/quality.yml/badge.svg)](https://github.com/saadworkspacex2-pixel/IELTS-MOCK-TEST/actions/workflows/quality.yml)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-149eca?logo=react)](https://react.dev/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  <br />
+  <br />
 
-**Practice with confidence. Track progress. Improve for IELTS.**
+  <strong>A polished, Bengali-first workspace for original Academic English mock practice.</strong>
 
-[Features](#features) · [Quick start](#quick-start) · [Configuration](#configuration) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
+  <sub>Timed practice · insightful progress · secure admin operations · Bangladesh-ready payments</sub>
 
+  <br />
+  <br />
+
+  <a href="#quick-start">Quick start</a> &nbsp;•&nbsp;
+  <a href="#mock-library">Mock library</a> &nbsp;•&nbsp;
+  <a href="#mail-studio">Mail Studio</a> &nbsp;•&nbsp;
+  <a href="#configuration">Configuration</a> &nbsp;•&nbsp;
+  <a href="CONTRIBUTING.md">Contributing</a> &nbsp;•&nbsp;
+  <a href="SECURITY.md">Security</a>
 </div>
+
+<br />
+
+> [!IMPORTANT]
+> The mock content in this repository is **independently written Academic IELTS-style practice material**. It follows public module structures and target timings, but it is **not official IELTS content** and is not affiliated with IELTS, its owners, or its partners.
+
+## ✦ At a glance
+
+<table>
+  <tr>
+    <td width="33%" align="center">
+      <h3>🎓 Learners</h3>
+      <sub>Focused, timed practice in a Bengali-first interface.</sub>
+    </td>
+    <td width="33%" align="center">
+      <h3>🧭 Instructors</h3>
+      <sub>Writing review, results, learner history and moderation tools.</sub>
+    </td>
+    <td width="33%" align="center">
+      <h3>🛠️ Administrators</h3>
+      <sub>Content, Premium, SEO, email, brand and media controls.</sub>
+    </td>
+  </tr>
+</table>
+
+<br />
+
+| Area | What is included |
+| :-- | :-- |
+| **Practice engine** | Reading, Listening, Writing, MCQ and typed gap-fill workflows, question palette, review flags, keyboard-friendly forms and fullscreen entry. |
+| **Progress** | Auto-scored results where appropriate, approximate band conversion for Reading/Listening, profile history, printable reports and a moderated leaderboard. |
+| **Guidance** | Contextual Bangla tours for public flows, login/recovery and admin question management—never an intrusive homepage overlay. |
+| **Commercial controls** | Free/Premium content labels, editable three-tier Premium catalogue, Bangladesh Send Money methods, manual activation and receipt PDFs. |
+| **Operations** | Admin CRM, staff roles, grading, SEO Manager, Page Builder, Media Vault, Brand controls, analytics and Mail Studio. |
 
 ---
 
-## Overview
+## 🧪 Mock library
 
-**LHBD · IELTS Mock Test** is a responsive, Bengali-first practice platform for IELTS learners. It brings realistic timed tests, instant scoring where applicable, detailed results, learning resources, and an operational admin workspace into one application.
+<div align="center">
 
-The project is built with the Next.js App Router, TypeScript, PostgreSQL, and Drizzle ORM. It is designed for both learners and platform administrators, with clear premium-access controls and Bangladesh-friendly manual payment requests.
+| Module | Tests | Structure | Practice timing |
+| :-- | --: | :-- | :-- |
+| 📖 **Academic Reading** | **10** | 3 passages · 40 questions | **60 min** |
+| 🎧 **Listening** | **10** | 4 sections · 40 questions · custom audio | **32 min** computer-practice timer |
+| ✍️ **Academic Writing** | **10** | Task 1 report + Task 2 essay | **60 min** |
 
-> The interface and learner guidance are primarily in Bangla so students can focus on IELTS skills—not on navigating the product.
+</div>
 
-## Features
+### Reading
+
+- Three original passages per test and **40 auto-scored questions**.
+- MCQ, True / False / Not Given, matching-style selection and typed gap-fill practice.
+- Passage-side text selection, bold, italic and five highlight colours.
+- One 60-minute exam clock with question palette and review flags.
+
+### Listening
+
+- Four labelled sections and **40 auto-scored questions** per mock.
+- Ten custom English audio tracks are stored in `public/audio/ielts-listening/`.
+- Test mode hides transcripts and locks playback to a single normal-speed listen.
+- Form-completion, number and key-detail listening practice with answer validation.
+
+### Writing
+
+- Academic Task 1 visual-data/process prompts and Task 2 essay prompts.
+- Separate answer booklets for each task—answers are retained together for instructor review.
+- Task-by-task word counts: **150+ words** for Task 1 and **250+ words** for Task 2.
+- Suggested 20/40-minute split shown alongside the full 60-minute timer.
+
+> [!NOTE]
+> Listening audio is original studio-style practice audio. It is not an official IELTS recording. The product uses public IELTS-style module flow without copying official examination papers, recordings or answer keys.
+
+---
+
+## ✨ Product highlights
 
 <table>
   <tr>
     <td width="50%" valign="top">
       <h3>🎯 Learner experience</h3>
       <ul>
-        <li>Timed MCQ, Reading, Listening, Writing, and gap-fill practice flows</li>
-        <li>Question navigation, progress tracking, review states, and autosaved sessions</li>
-        <li>Direct-click fullscreen exam entry with a graceful fallback when fullscreen is unavailable</li>
-        <li>Instant scores for auto-gradable attempts and instructor evaluation support for writing</li>
-        <li>Personal profile, result history, printable reports, and leaderboard</li>
-        <li>Bengali first-visit guides that appear in the relevant workflow—not on the home page</li>
+        <li>Responsive exam workspace with fullscreen support and graceful browser fallback</li>
+        <li>Timed Reading, Listening, Writing, MCQ and gap-fill test flows</li>
+        <li>Auto-scoring, band conversion, answer explanations and result history</li>
+        <li>Gold Premium profile card and Premium leaderboard treatment</li>
+        <li>Bangla-first guided tours triggered only in relevant workflows</li>
+        <li>Secure OTP password recovery and account activity emails</li>
       </ul>
     </td>
     <td width="50%" valign="top">
-      <h3>🛠️ Admin workspace</h3>
+      <h3>🧰 Admin workspace</h3>
       <ul>
-        <li>Create and manage exams, sections, question types, resources, media, and results</li>
-        <li>Label exams and resources as <strong>Free</strong> or <strong>Premium</strong></li>
-        <li>Manage staff roles, learners, grading, site content, theme, branding, analytics, and leaderboard visibility</li>
-        <li>Contextual Bengali tours for the admin and question-management workflows</li>
-        <li>Per-page SEO manager for title, description, keywords, hashtags, canonical metadata, and search preview</li>
-        <li>Configurable Premium tiers, benefits, duration, price, payment instructions, and manual membership activation</li>
+        <li>Exam, section, question, resource, media, result and learner management</li>
+        <li>Staff roles, grading queue, leaderboard publish/unpublish/delete controls</li>
+        <li>Per-page SEO manager: title, description, keywords, hashtags and preview</li>
+        <li>Brand, favicon, theme, page builder, analytics and contact settings</li>
+        <li>Contextual admin and question-management tours</li>
+        <li>Safe runtime diagnostics for Premium database and Gmail SMTP readiness</li>
       </ul>
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <h3>💳 Premium & payments</h3>
+      <h3>💳 Premium &amp; payments</h3>
       <ul>
-        <li>Three configurable tiers: Starter, Plus, and Pro</li>
-        <li>bKash, Nagad, Rocket, and Upay send-money request flow</li>
-        <li>Transaction ID submission, admin approval/rejection inbox, and manual Premium activation</li>
-        <li>Downloadable approved-payment receipt PDF with buying code and verification token</li>
-        <li>No real wallet number or commercial price is hard-coded</li>
+        <li>Editable Starter, Plus and Pro placeholders—no invented commercial prices</li>
+        <li>bKash, Nagad, Rocket and Upay Send Money flow</li>
+        <li>Transaction submission, admin inbox, approval/rejection and manual membership grant</li>
+        <li>Approved-payment PDF receipt with buying code and verification token</li>
+        <li>Product/price membership lifecycle emails</li>
       </ul>
     </td>
     <td width="50%" valign="top">
-      <h3>✉️ Accounts & communication</h3>
+      <h3>🔐 Trust &amp; communication</h3>
       <ul>
-        <li>Registration, login, session, and password-reset flows</li>
-        <li>Secure email OTP password recovery with expiry and retry protection</li>
-        <li>Optional Gmail SMTP lifecycle emails for welcome, login, results, and recovery events</li>
-        <li>Admin Mail Studio with rich editable templates, logo/branding controls, image upload, dynamic variables, and safe test sends</li>
-        <li>SEO metadata, sitemap, robots rules, privacy, terms, and consent surfaces</li>
+        <li>Gmail SMTP via Nodemailer—no third-party mailer dependency</li>
+        <li>Welcome, login alert, password recovery, results, payment and Premium messages</li>
+        <li>Privacy, terms, sitemap, robots and consent surfaces</li>
+        <li>Admin-only generic email action; never a public relay</li>
+        <li>Editable global email brand plus per-event templates</li>
       </ul>
     </td>
   </tr>
 </table>
 
-## Technology
+---
 
-| Layer | Tools |
-| --- | --- |
-| Front end | Next.js 16, React 19, TypeScript, Tailwind CSS |
-| Motion & type | React Spring, Hind Siliguri, Manrope |
-| Database | PostgreSQL, Drizzle ORM, `pg` |
-| Email | Nodemailer with Gmail SMTP (optional runtime integration) |
-| Quality | TypeScript strict checking, ESLint, GitHub Actions |
+## 🖥️ Interface language & visual system
 
-## Quick start
+The application uses **Hind Siliguri** for Bangla readability and **Manrope** for Latin/English content. Its public/admin surfaces combine solid tactile cards with a subtle grid background and low-transparency navigation. The actual exam desk remains intentionally paper-clear and distraction-free.
 
-### 1. Prerequisites
+| Visual token | Purpose |
+| :-- | :-- |
+| <span style="color:#E51A24">●</span> **LHBD Red** | Primary action, alerts and highlighted moments |
+| <span style="color:#111827">●</span> **Ink Navy** | Exam hardware, high-contrast type and focused controls |
+| <span style="color:#21A567">●</span> **Success Green** | Completion, configured services and approved status |
+| `Manrope` + `Hind Siliguri` | Balanced English/Bangla hierarchy and readable UI type |
+
+---
+
+## 🚀 Quick start
+
+### 1 — Requirements
 
 - **Node.js 20.9+** and npm 10+
 - A running **PostgreSQL** instance
-- `psql` command-line client only if you want to load the optional sample-data seed
+- A strong development/admin password
 
-### 2. Clone and install
+### 2 — Clone & install
 
 ```bash
 git clone https://github.com/saadworkspacex2-pixel/IELTS-MOCK-TEST.git
@@ -103,17 +185,15 @@ cd IELTS-MOCK-TEST
 npm ci
 ```
 
-> If you are intentionally developing without the committed lockfile, use `npm install` instead.
-
-### 3. Create local environment settings
+### 3 — Add environment values
 
 ```bash
 cp .env.example .env.local
 ```
 
-Edit `.env.local` and at minimum set `DATABASE_URL` and a strong `ADMIN_PASSWORD`.
+At minimum, set `DATABASE_URL` and `ADMIN_PASSWORD` in `.env.local`.
 
-### 4. Create the database and install the original Academic mock library
+### 4 — Initialise the database & mock library
 
 ```bash
 # Example only — choose your own database name and credentials.
@@ -123,98 +203,134 @@ export DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5432/ielts_mock_te
 npm run db:migrate
 ```
 
-The migration creates the schema and installs the one-time **original Academic mock library**: 10 Reading, 10 Listening and 10 Writing tests. It is independently written IELTS-format practice material, not official IELTS content. To intentionally erase all current exams, attempts and sessions and rebuild this library, use `npm run db:seed`. Do not run that reset command against a production database unless a full fresh library replacement is intended.
+`db:migrate` applies the schema and installs the guarded original Academic mock library when it is not already present.
 
-### 5. Run the app
+> [!WARNING]
+> `npm run db:seed` is intentionally **destructive**. It clears all exams, questions, attempts and sessions before rebuilding the 10 Reading + 10 Listening + 10 Writing library. Use it only when a full fresh content reset is intended.
+
+### 5 — Run the application
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The admin sign-in is at [http://localhost:3000/admin/login](http://localhost:3000/admin/login).
-
-## Configuration
-
-Copy `.env.example` to `.env.local`. Never commit a real `.env*` file.
-
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `DATABASE_URL` | Yes | PostgreSQL connection string used by the application |
-| `ADMIN_PASSWORD` | Yes in production | Super-admin password; use a long, unique value |
-| `NEXT_PUBLIC_SITE_URL` | Recommended | Canonical public URL used in metadata and email links |
-| `EMAIL_USER` | Optional | Gmail account used by Nodemailer SMTP |
-| `EMAIL_PASS` | Optional | Google App Password for `EMAIL_USER` — never use a normal Gmail password |
-| `EMAIL_FROM` | Optional | Gmail account or approved alias display address, e.g. `LHBD <your-gmail@gmail.com>` |
-
-### Transactional email
-
-When `EMAIL_USER` and `EMAIL_PASS` are available, the platform sends branded messages through Gmail SMTP using Nodemailer. Create a Google App Password after enabling 2-Step Verification; do not use the Gmail account's normal password. Lifecycle delivery is awaited in serverless routes so the platform does not silently finish a request before Nodemailer has sent the message; password recovery reports a clear error if the OTP cannot be delivered.
-
-**Admin → Mail Studio** controls the global email header/logo, colors and footer plus each automated template: password-reset OTP, password-changed, welcome, login notice, exam result, payment request, Premium approved/rejected, and receipt. It includes a browser-based rich editor for bold, italic, text/highlight colors, font size, images uploaded to the Media Vault, dynamic placeholders, HTML-source editing, default restoration, preview, and an admin-only test-email action.
-
-The protected admin-only endpoint `POST /api/admin/send-email` accepts `to`, `subject`, and `html` or `text` for operational messages. It is intentionally not public, so the application cannot become an open email relay.
-
-## Useful commands
-
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the local development server |
-| `npm run build` | Produce an optimized production build |
-| `npm run start` | Serve the production build |
-| `npm run typecheck` | Run TypeScript strict checks without emitting files |
-| `npm run lint` | Run ESLint across the codebase |
-| `npm run db:migrate` | Apply schema changes and install the one-time original Academic mock library using `DATABASE_URL` |
-| `npm run db:seed` | **Destructive:** erase all exam content, attempts and sessions, then rebuild the Academic mock library |
-
-## Project structure
-
-```text
-src/
-├── app/                 # Pages, route handlers, metadata, and API endpoints
-│   ├── admin/           # Admin sign-in and management workspace
-│   ├── api/             # Authentication, exams, payments, results, settings, etc.
-│   ├── exams/           # Catalogue, exam start, and test-taking experience
-│   └── premium/         # Membership tiers and payment-request experience
-├── components/          # Reusable UI, payment flow, tours, gates, and navigation
-├── db/                  # PostgreSQL connection and Drizzle schema
-└── lib/                 # Authentication, email, settings, premium access, helpers
-scripts/
-├── schema.sql                 # Canonical database schema and safe additions
-├── migrate.mjs                # Schema + guarded library installer
-└── academic-mock-library.mjs  # Original 10 Reading, 10 Listening and 10 Writing mocks
-.github/
-└── workflows/           # Repository quality checks
-```
-
-## Production checklist
-
-Before a public launch:
-
-- [ ] Set a unique, strong `ADMIN_PASSWORD`; the development fallback must never be used in production.
-- [ ] Provision managed PostgreSQL and apply `scripts/schema.sql`.
-- [ ] Configure `NEXT_PUBLIC_SITE_URL` to the final HTTPS domain.
-- [ ] Add `EMAIL_USER` and a Google App Password in the hosting provider's environment settings before enabling production email.
-- [ ] Fill Premium tier prices, benefits, payment recipient numbers, and instructions in Admin → Payments.
-- [ ] Review contact, privacy, terms, and analytics settings in the admin workspace.
-- [ ] Back up the database and validate the restore process.
-- [ ] Run `npm run typecheck` and `npm run build` before every release.
-
-## Quality and CI
-
-GitHub Actions verifies type safety and production builds on pushes and pull requests to `main`. The workflow uses an isolated PostgreSQL service and applies the schema before building.
-
-The existing ESLint baseline contains legacy findings outside the current feature work. `npm run lint` remains available for incremental cleanup; the enforced CI checks are TypeScript and production build validation.
-
-## Contributing
-
-Contributions and maintenance changes are welcome. Please review [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Security concerns should follow [SECURITY.md](SECURITY.md) rather than being disclosed in a public issue.
-
-## License
-
-A license has not yet been selected for this repository. Do not assume permission for redistribution, commercial reuse, or relicensing until the project owner adds a `LICENSE` file.
+Open `http://localhost:3000` and sign in to the admin workspace at `/admin/login`.
 
 ---
 
+## ⚙️ Configuration
+
+Copy `.env.example` to `.env.local`. Never commit a real `.env*` file or App Password.
+
+| Variable | Required | Use |
+| :-- | :--: | :-- |
+| `DATABASE_URL` | ✅ | PostgreSQL connection string used by schema and application routes |
+| `ADMIN_PASSWORD` | ✅ Production | Strong super-admin password |
+| `NEXT_PUBLIC_SITE_URL` | Recommended | Public HTTPS URL used in metadata, receipt and email links |
+| `EMAIL_USER` | Optional | Gmail address used by Nodemailer SMTP |
+| `EMAIL_PASS` | Optional | Google **App Password** for `EMAIL_USER`—never a normal Gmail password |
+| `EMAIL_FROM` | Optional | Valid authenticated sender or approved alias, e.g. `IELTS Mock Test <hello@example.com>` |
+
+### Gmail SMTP checklist
+
+1. Enable Google 2-Step Verification.
+2. Create a dedicated Google App Password.
+3. Add `EMAIL_USER`, `EMAIL_PASS` and a valid `EMAIL_FROM` in the host's protected environment settings.
+4. Open **Admin → Premium Payments** and confirm the SMTP status is verified.
+5. Use **Admin → Mail Studio** to send a safe template test email.
+
+---
+
+## ✉️ Mail Studio
+
+**Admin → Mail Studio** is the visual control room for transactional email.
+
+| Control | Included |
+| :-- | :-- |
+| 🖼️ **Brand layer** | Logo URL/upload, header title, tagline, footer, accent and button colours |
+| ✍️ **Rich content editor** | Bold, italic, font size, text/highlight colours, images and HTML source mode |
+| 🧩 **Dynamic values** | `{{student_name}}`, `{{exam_title}}`, `{{result}}`, `{{product}}`, `{{total}}`, `{{expiry_label}}`, `{{otp_code}}`, `{{site_name}}` |
+| 📨 **Templates** | Welcome, login alert, reset OTP, password changed, result, payment request, Premium approved/rejected and receipt |
+| 🧪 **Safe testing** | Admin-only sample template send to a chosen recipient |
+
+The protected `POST /api/admin/send-email` endpoint accepts `to`, `subject`, plus `html` or `text` for operational messages. It is protected by admin authentication and is not a public relay.
+
+---
+
+## 🧱 Technology
+
+| Layer | Stack |
+| :-- | :-- |
+| 🎨 Web application | Next.js 16 · React 19 · TypeScript · Tailwind CSS |
+| 🧩 Interaction | React Spring · accessible guided tours · browser fullscreen API |
+| 🔤 Typography | Manrope · Hind Siliguri |
+| 🗃️ Data | PostgreSQL · Drizzle ORM · `pg` |
+| ✉️ Delivery | Nodemailer · Gmail SMTP · PDF-Lib receipts |
+| 🧪 Quality | TypeScript strict checking · ESLint · GitHub Actions |
+
+---
+
+## 🧰 Useful commands
+
+| Command | What it does |
+| :-- | :-- |
+| `npm run dev` | Start local development server |
+| `npm run build` | Apply guarded migration, then create a production build |
+| `npm run start` | Serve the production build |
+| `npm run typecheck` | Run TypeScript checks without emitting files |
+| `npm run lint` | Run ESLint across the repository |
+| `npm run db:migrate` | Apply schema changes and install the one-time Academic library if absent |
+| `npm run db:seed` | ⚠️ Destructively rebuild the entire Academic mock library |
+
+---
+
+## 🗂️ Repository map
+
+```text
+src/
+├── app/                 # Pages, metadata, layouts and API routes
+│   ├── admin/           # Admin sign-in and management workspace
+│   ├── api/             # Auth, exams, payments, email, results and settings endpoints
+│   ├── exams/           # Catalogue, start views and immersive test desk
+│   └── premium/         # Membership tiers and payment request experience
+├── components/          # Reusable UI, guided tours, audio and exam tools
+├── db/                  # Drizzle schema and PostgreSQL connection
+└── lib/                 # Auth, mail, Premium, SEO and domain helpers
+
+scripts/
+├── schema.sql                 # Canonical schema and additive updates
+├── migrate.mjs                # Schema + guarded library installer
+└── academic-mock-library.mjs  # Original 10 Reading, 10 Listening, 10 Writing content
+
+public/audio/ielts-listening/  # Original Listening practice audio tracks
+docs/assets/                   # README visual assets
+```
+
+---
+
+## ✅ Release checklist
+
+- [ ] Use a strong unique `ADMIN_PASSWORD`; never rely on the local fallback in production.
+- [ ] Configure production `DATABASE_URL` and confirm the migration completes.
+- [ ] Set `NEXT_PUBLIC_SITE_URL` to the final HTTPS domain.
+- [ ] Add Gmail App Password variables only through protected host settings.
+- [ ] Supply verified payment recipient numbers, Premium prices and benefit details in Admin → Payments.
+- [ ] Add real support contact and legal information before public launch.
+- [ ] Back up PostgreSQL and test a restore procedure.
+- [ ] Run `npm run typecheck` and `npm run build` before every release.
+
+---
+
+## 🤝 Contributing & security
+
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+- Report vulnerabilities privately according to [SECURITY.md](SECURITY.md).
+- This repository is currently **private**. A redistribution licence has not been selected by the owner; do not assume permission to redistribute, commercialise or relicense its contents.
+
+<br />
+
 <div align="center">
-  Built for focused IELTS practice in Bangladesh. 🇧🇩
+  <strong>Built for focused English practice in Bangladesh. 🇧🇩</strong>
+  <br />
+  <sub>Crafted with structure, clarity and learner confidence in mind.</sub>
 </div>
