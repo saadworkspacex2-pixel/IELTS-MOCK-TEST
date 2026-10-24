@@ -15,6 +15,7 @@ const NAV = [
   { href: "/admin/grading", label: "গ্রেডিং স্টুডিও", icon: "pen", area: "grading" },
   { href: "/admin/students", label: "স্টুডেন্ট CRM", icon: "users", area: "students" },
   { href: "/admin/analytics", label: "লাইভ অ্যানালিটিক্স", icon: "chart", area: "analytics" },
+  { href: "/admin/leaderboard", label: "লিডারবোর্ড", icon: "trophy", area: "analytics" },
   { href: "/admin/pages", label: "পেজ বিল্ডার", icon: "screen", area: "pages" },
   { href: "/admin/branding", label: "লোগো ও Favicon", icon: "screen", area: "theme" },
   { href: "/admin/theme", label: "থিম ও ফন্ট", icon: "bulb", area: "theme" },
@@ -22,7 +23,8 @@ const NAV = [
   { href: "/admin/resources", label: "রিসোর্স", icon: "book", area: "pages" },
   { href: "/admin/payments", label: "Premium পেমেন্ট", icon: "trophy", area: "all" },
   { href: "/admin/results", label: "ফলাফল", icon: "trophy", area: "exams" },
-  { href: "/admin/settings", label: "সেটিংস ও SEO", icon: "globe", area: "settings" },
+  { href: "/admin/seo", label: "SEO ম্যানেজার", icon: "globe", area: "settings" },
+  { href: "/admin/settings", label: "সাইট সেটিংস", icon: "screen", area: "settings" },
   { href: "/admin/staff", label: "স্টাফ ও রোল", icon: "shield", area: "staff" },
 ];
 

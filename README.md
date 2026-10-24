@@ -46,9 +46,10 @@ The project is built with the Next.js App Router, TypeScript, PostgreSQL, and Dr
       <ul>
         <li>Create and manage exams, sections, question types, resources, media, and results</li>
         <li>Label exams and resources as <strong>Free</strong> or <strong>Premium</strong></li>
-        <li>Manage staff roles, learners, grading, site content, theme, branding, and analytics</li>
+        <li>Manage staff roles, learners, grading, site content, theme, branding, analytics, and leaderboard visibility</li>
         <li>Contextual Bengali tours for the admin and question-management workflows</li>
-        <li>Configurable Premium tiers, benefits, duration, price, and payment instructions</li>
+        <li>Per-page SEO manager for title, description, keywords, hashtags, canonical metadata, and search preview</li>
+        <li>Configurable Premium tiers, benefits, duration, price, payment instructions, and manual membership activation</li>
       </ul>
     </td>
   </tr>
@@ -58,7 +59,8 @@ The project is built with the Next.js App Router, TypeScript, PostgreSQL, and Dr
       <ul>
         <li>Three configurable tiers: Starter, Plus, and Pro</li>
         <li>bKash, Nagad, Rocket, and Upay send-money request flow</li>
-        <li>Transaction ID submission and an admin approval/rejection inbox</li>
+        <li>Transaction ID submission, admin approval/rejection inbox, and manual Premium activation</li>
+        <li>Downloadable approved-payment receipt PDF with buying code and verification token</li>
         <li>No real wallet number or commercial price is hard-coded</li>
       </ul>
     </td>

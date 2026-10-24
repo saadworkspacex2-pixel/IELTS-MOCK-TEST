@@ -110,6 +110,7 @@ export const attempts = appSchema.table("attempts", {
   status: text("status").notNull().default("scored"),
   feedback: jsonb("feedback").notNull().default({}),
   ip: text("ip").notNull().default(""),
+  isPublished: boolean("is_published").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -184,6 +185,9 @@ export const paymentRequests = appSchema.table("payment_requests", {
   senderNumber: text("sender_number").notNull().default(""),
   status: text("status").notNull().default("pending"), // pending | approved | rejected
   adminNote: text("admin_note").notNull().default(""),
+  receiptCode: text("receipt_code").notNull().default(""),
+  receiptToken: text("receipt_token").notNull().default(""),
+  approvedAt: timestamp("approved_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

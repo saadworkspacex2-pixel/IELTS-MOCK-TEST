@@ -6,6 +6,7 @@ import InjectCode from "@/components/InjectCode";
 import VelocityCursor from "@/components/VelocityCursor";
 import InstructionTour from "@/components/InstructionTour";
 import { Analytics, CookieBanner } from "@/components/AnalyticsConsent";
+import { BrandSettingsProvider } from "@/components/BrandSettingsProvider";
 
 // Self-hosted fonts (bundled with the app, no external CDN requests).
 // This keeps Bangla + English typography working in every deploy environment.
@@ -58,17 +59,19 @@ export default async function RootLayout({
   return (
     <html lang="bn">
       <body className="bg-white text-[#1A1A1A] antialiased">
-        <style
-          id="lhbd-theme"
-          dangerouslySetInnerHTML={{ __html: buildThemeCss(s) }}
-        />
-        <InjectCode html={s.header_code ?? ""} target="head" />
-        {children}
-        <InstructionTour />
-        <CookieBanner />
-        <Analytics measurementId={s.analytics_measurement_id} />
-        <VelocityCursor />
-        <InjectCode html={s.footer_code ?? ""} target="body" />
+        <BrandSettingsProvider settings={s}>
+          <style
+            id="lhbd-theme"
+            dangerouslySetInnerHTML={{ __html: buildThemeCss(s) }}
+          />
+          <InjectCode html={s.header_code ?? ""} target="head" />
+          {children}
+          <InstructionTour />
+          <CookieBanner />
+          <Analytics measurementId={s.analytics_measurement_id} />
+          <VelocityCursor />
+          <InjectCode html={s.footer_code ?? ""} target="body" />
+        </BrandSettingsProvider>
       </body>
     </html>
   );

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import Donut from "@/components/Donut";
 import Icon from "@/components/Icon";
-import { LogoMark } from "@/components/Logo";
+import Logo from "@/components/Logo";
 import { currentUser } from "@/lib/userAuth";
 import { getProfileData } from "@/lib/profileData";
 import { formatDateBn, toBn } from "@/lib/bn";
@@ -36,15 +36,8 @@ export default async function ReportPage() {
         {/* letterhead */}
         <header className="flex items-center justify-between border-b-2 border-[#1A1A1A] pb-6">
           <div className="flex items-center gap-3">
-            <LogoMark size={46} />
-            <div>
-              <p className="text-xl font-extrabold tracking-tight text-[#1A1A1A]">
-                LHBD<span className="text-[#E51A24]">.</span>
-              </p>
-              <p className="text-[11px] font-semibold tracking-widest text-[#6C757D]">
-                প্রগ্রেস রিপোর্ট
-              </p>
-            </div>
+            <Logo href={null} />
+            <p className="border-l border-black/10 pl-3 text-[11px] font-semibold tracking-widest text-[#6C757D]">প্রগ্রেস রিপোর্ট</p>
           </div>
           <div className="text-right text-xs text-[#6C757D]">
             <p>তৈরির তারিখ</p>

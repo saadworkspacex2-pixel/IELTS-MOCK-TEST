@@ -64,7 +64,7 @@ export default async function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10 py-6 text-center text-xs text-white/40">
-        © {new Date().getFullYear()} LHBD। সবার জন্য ফ্রি প্রস্তুতি।
+        © {new Date().getFullYear()} {s.site_name || s.logo_text || "LHBD"}। সবার জন্য ফ্রি প্রস্তুতি।
         <span className="mx-2 text-white/20">|</span>
         <Link href="/terms" className="transition-colors hover:text-white/70">
           শর্তাবলি

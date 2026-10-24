@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS attempts (
   status text NOT NULL DEFAULT 'scored',
   feedback jsonb NOT NULL DEFAULT '{}',
   ip text NOT NULL DEFAULT '',
+  is_published boolean NOT NULL DEFAULT true,
   created_at timestamp NOT NULL DEFAULT now()
 );
 CREATE TABLE IF NOT EXISTS resources (
@@ -126,6 +127,7 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS membership_tier text NOT NULL DEFAULT
 ALTER TABLE users ADD COLUMN IF NOT EXISTS premium_until timestamp;
 ALTER TABLE attempts ADD COLUMN IF NOT EXISTS feedback jsonb NOT NULL DEFAULT '{}';
 ALTER TABLE attempts ADD COLUMN IF NOT EXISTS ip text NOT NULL DEFAULT '';
+ALTER TABLE attempts ADD COLUMN IF NOT EXISTS is_published boolean NOT NULL DEFAULT true;
 
 CREATE TABLE IF NOT EXISTS password_reset_tokens (
   id serial PRIMARY KEY,
@@ -146,8 +148,15 @@ CREATE TABLE IF NOT EXISTS payment_requests (
   sender_number text NOT NULL DEFAULT '',
   status text NOT NULL DEFAULT 'pending',
   admin_note text NOT NULL DEFAULT '',
+  receipt_code text NOT NULL DEFAULT '',
+  receipt_token text NOT NULL DEFAULT '',
+  approved_at timestamp,
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now()
 );
+
+ALTER TABLE payment_requests ADD COLUMN IF NOT EXISTS receipt_code text NOT NULL DEFAULT '';
+ALTER TABLE payment_requests ADD COLUMN IF NOT EXISTS receipt_token text NOT NULL DEFAULT '';
+ALTER TABLE payment_requests ADD COLUMN IF NOT EXISTS approved_at timestamp;
 
 COMMIT;

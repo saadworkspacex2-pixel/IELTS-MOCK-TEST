@@ -82,6 +82,17 @@ function getTourForPath(pathname: string): TourDefinition | null {
 
 type RectBox = { top: number; left: number; width: number; height: number };
 
+function visibleTarget(selector: string) {
+  if (typeof document === "undefined") return null;
+  return Array.from(document.querySelectorAll<HTMLElement>(selector)).find((element) => {
+    const rect = element.getBoundingClientRect();
+    const style = window.getComputedStyle(element);
+    return rect.width >= 4 && rect.height >= 4 && style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity || "1") > 0;
+  }) ?? null;
+}
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
 export function triggerGuidedTour() {
   if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("lhbd:start-tour"));
 }
@@ -89,7 +100,7 @@ export function triggerGuidedTour() {
 export default function InstructionTour() {
   const pathname = usePathname();
   const tour = useMemo(() => getTourForPath(pathname), [pathname]);
-  const storageKey = tour ? `lhbd_tour_v2_${tour.key}` : "";
+  const storageKey = tour ? `lhbd_tour_v3_${tour.key}` : "";
   const [open, setOpen] = useState(false);
   const [stepIdx, setStepIdx] = useState(0);
   const [spot, setSpot] = useState<RectBox | null>(null);
@@ -106,7 +117,7 @@ export default function InstructionTour() {
     return () => document.removeEventListener("click", onDocClick, true);
   }, []);
 
-  // The home page never opens a guide by itself. A Free Test action carries a one-time trigger to the next page.
+  // Home remains quiet. A Free Test click arms a single guide on the destination page.
   useEffect(() => {
     if (pathname === "/" || !tour || !storageKey) {
       const timer = window.setTimeout(() => setOpen(false), 0);
@@ -119,76 +130,136 @@ export default function InstructionTour() {
       return () => window.clearTimeout(timer);
     }
     if (forced) sessionStorage.removeItem("lhbd_force_tour_once");
-    const timer = window.setTimeout(() => { setStepIdx(0); setOpen(true); }, 420);
+    const timer = window.setTimeout(() => {
+      setSpot(null);
+      setStepIdx(0);
+      setOpen(true);
+    }, 260);
     return () => window.clearTimeout(timer);
   }, [pathname, storageKey, tour]);
 
   useEffect(() => {
-    const start = () => { if (tour) { setStepIdx(0); setOpen(true); } };
+    const start = () => {
+      if (!tour) return;
+      setSpot(null);
+      setStepIdx(0);
+      setOpen(true);
+    };
     window.addEventListener("lhbd:start-tour", start);
     return () => window.removeEventListener("lhbd:start-tour", start);
   }, [tour]);
 
   const measureTarget = useCallback(() => {
     if (typeof window === "undefined") return;
-    setVp({ w: window.innerWidth, h: window.innerHeight });
-    if (!open || !step?.selector) return setSpot(null);
-    const element = document.querySelector(step.selector);
-    if (!element) return setSpot(null);
+    const nextVp = { w: window.innerWidth, h: window.innerHeight };
+    setVp((current) => current.w === nextVp.w && current.h === nextVp.h ? current : nextVp);
+    if (!open || !step?.selector) {
+      setSpot(null);
+      return;
+    }
+    const element = visibleTarget(step.selector);
+    if (!element) {
+      setSpot(null);
+      return;
+    }
     const rect = element.getBoundingClientRect();
-    if (rect.width < 4 || rect.height < 4) return setSpot(null);
-    const pad = 8;
-    const top = Math.max(4, rect.top - pad);
-    const left = Math.max(4, rect.left - pad);
-    const right = Math.min(window.innerWidth - 4, rect.right + pad);
-    const bottom = Math.min(window.innerHeight - 4, Math.min(rect.bottom + pad, rect.top + Math.min(rect.height, window.innerHeight * 0.68) + pad));
-    setSpot({ top, left, width: Math.max(24, right - left), height: Math.max(24, bottom - top) });
+    const pad = 9;
+    const top = clamp(rect.top - pad, 4, nextVp.h - 4);
+    const left = clamp(rect.left - pad, 4, nextVp.w - 4);
+    const bottom = clamp(rect.bottom + pad, 4, nextVp.h - 4);
+    const right = clamp(rect.right + pad, 4, nextVp.w - 4);
+    if (bottom - top < 18 || right - left < 18) {
+      setSpot(null);
+      return;
+    }
+    const next = { top, left, width: right - left, height: bottom - top };
+    setSpot((current) => current && Math.abs(current.top - next.top) < 0.5 && Math.abs(current.left - next.left) < 0.5 && Math.abs(current.width - next.width) < 0.5 && Math.abs(current.height - next.height) < 0.5 ? current : next);
   }, [open, step]);
 
   useEffect(() => {
     if (!open || !step) return;
     if (step.beforeEnterEvent) window.dispatchEvent(new CustomEvent(step.beforeEnterEvent));
-    const timer = window.setTimeout(() => {
-      const element = step.selector ? document.querySelector(step.selector) : null;
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        if (rect.top < 70 || rect.top > window.innerHeight * 0.65) element.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    let cancelled = false;
+    let frame = 0;
+    let retry = 0;
+    let timeout = 0;
+    let observer: ResizeObserver | null = null;
+
+    const update = () => {
+      if (cancelled) return;
+      measureTarget();
+      const target = step.selector ? visibleTarget(step.selector) : null;
+      if (target) {
+        const rect = target.getBoundingClientRect();
+        if (rect.top < 78 || rect.bottom > window.innerHeight - 42) {
+          target.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+        }
+        observer?.disconnect();
+        observer = new ResizeObserver(() => requestAnimationFrame(measureTarget));
+        observer.observe(target);
+      } else if (retry < 12) {
+        retry += 1;
+        timeout = window.setTimeout(update, 90);
       }
-      window.setTimeout(measureTarget, 260);
-    }, 90);
-    window.addEventListener("resize", measureTarget);
-    window.addEventListener("scroll", measureTarget, true);
-    return () => { window.clearTimeout(timer); window.removeEventListener("resize", measureTarget); window.removeEventListener("scroll", measureTarget, true); };
+    };
+
+    frame = window.requestAnimationFrame(() => {
+      timeout = window.setTimeout(update, 60);
+    });
+    const onViewportChange = () => window.requestAnimationFrame(measureTarget);
+    window.addEventListener("resize", onViewportChange, { passive: true });
+    window.addEventListener("scroll", onViewportChange, { passive: true, capture: true });
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(timeout);
+      observer?.disconnect();
+      window.removeEventListener("resize", onViewportChange);
+      window.removeEventListener("scroll", onViewportChange, true);
+    };
   }, [measureTarget, open, step]);
 
-  const closeTour = () => { if (storageKey) localStorage.setItem(storageKey, "1"); setOpen(false); };
+  const closeTour = () => {
+    if (storageKey) localStorage.setItem(storageKey, "1");
+    setSpot(null);
+    setOpen(false);
+  };
+  const goToStep = (index: number) => {
+    setSpot(null);
+    setStepIdx(Math.max(0, Math.min((tour?.steps.length ?? 1) - 1, index)));
+  };
+
   if (!open || !tour || !step) return null;
 
   const total = tour.steps.length;
   const isLast = stepIdx >= total - 1;
-  const cardWidth = Math.min(390, vp.w - 24);
-  let cardTop = Math.max(16, (vp.h - 240) / 2);
+  const cardWidth = Math.min(396, vp.w - 24);
+  let cardTop = Math.max(18, (vp.h - 246) / 2);
   let cardLeft = Math.max(12, (vp.w - cardWidth) / 2);
   if (spot) {
     const spaceBelow = vp.h - (spot.top + spot.height);
-    cardTop = spaceBelow >= 225 ? spot.top + spot.height + 14 : spot.top >= 225 ? Math.max(12, spot.top - 215) : Math.max(12, vp.h - 235);
-    cardLeft = Math.min(Math.max(12, spot.left), Math.max(12, vp.w - cardWidth - 12));
+    cardTop = spaceBelow >= 238 ? spot.top + spot.height + 14 : spot.top >= 238 ? Math.max(12, spot.top - 226) : Math.max(12, vp.h - 248);
+    cardLeft = clamp(spot.left, 12, Math.max(12, vp.w - cardWidth - 12));
   }
-  const blurStyle = { backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", backgroundColor: "rgba(15,23,42,.52)" };
+  const blurStyle = { backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)", backgroundColor: "rgba(15,23,42,.46)" };
 
-  return <div className="fixed inset-0 z-[9500]" role="dialog" aria-modal="true" aria-label={tour.pageLabel}>
-    {spot ? <>
-      <div onClick={closeTour} style={{ ...blurStyle, position: "fixed", top: 0, left: 0, right: 0, height: spot.top }} />
-      <div onClick={closeTour} style={{ ...blurStyle, position: "fixed", top: spot.top + spot.height, left: 0, right: 0, bottom: 0 }} />
-      <div onClick={closeTour} style={{ ...blurStyle, position: "fixed", top: spot.top, left: 0, width: spot.left, height: spot.height }} />
-      <div onClick={closeTour} style={{ ...blurStyle, position: "fixed", top: spot.top, left: spot.left + spot.width, right: 0, height: spot.height }} />
-      <div aria-hidden="true" className="pointer-events-none fixed rounded-xl border-2 border-[#E51A24] transition-all duration-200" style={{ top: spot.top, left: spot.left, width: spot.width, height: spot.height, boxShadow: "0 0 0 4px rgba(255,255,255,.92),0 12px 32px rgba(0,0,0,.28)" }}><span className="absolute -top-3 left-3 rounded-full bg-[#E51A24] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">ধাপ {toBn(stepIdx + 1)} / {toBn(total)}</span></div>
-    </> : <div onClick={closeTour} className="fixed inset-0" style={blurStyle} />}
-    <div className="anim-pop card fixed z-[9510] rounded-2xl border border-black/15 bg-white p-5 shadow-2xl" style={{ top: cardTop, left: cardLeft, width: cardWidth }}>
+  return <div className="pointer-events-none fixed inset-0 z-[9500]" role="dialog" aria-label={tour.pageLabel}>
+    {spot && <>
+      <div aria-hidden="true" className="pointer-events-none fixed" style={{ ...blurStyle, top: 0, left: 0, right: 0, height: spot.top }} />
+      <div aria-hidden="true" className="pointer-events-none fixed" style={{ ...blurStyle, top: spot.top + spot.height, left: 0, right: 0, bottom: 0 }} />
+      <div aria-hidden="true" className="pointer-events-none fixed" style={{ ...blurStyle, top: spot.top, left: 0, width: spot.left, height: spot.height }} />
+      <div aria-hidden="true" className="pointer-events-none fixed" style={{ ...blurStyle, top: spot.top, left: spot.left + spot.width, right: 0, height: spot.height }} />
+      <div aria-hidden="true" className="pointer-events-none fixed rounded-xl border-2 border-[#E51A24] transition-[top,left,width,height] duration-150 ease-out" style={{ top: spot.top, left: spot.left, width: spot.width, height: spot.height, boxShadow: "0 0 0 4px rgba(255,255,255,.92),0 12px 32px rgba(0,0,0,.28)" }}>
+        <span className="absolute -top-3 left-3 rounded-full bg-[#E51A24] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">ধাপ {toBn(stepIdx + 1)} / {toBn(total)}</span>
+      </div>
+    </>}
+    <div className="pointer-events-auto anim-pop card fixed z-[9510] rounded-2xl border border-black/15 bg-white p-5 shadow-2xl" style={{ top: cardTop, left: cardLeft, width: cardWidth }}>
       <div className="flex items-center justify-between gap-2"><span className="rounded-full bg-red-50 px-3 py-1 text-[11px] font-bold text-[#E51A24]">{tour.pageLabel} · {toBn(stepIdx + 1)}/{toBn(total)}</span><button type="button" onClick={closeTour} className="skeuo-key rounded-md px-2.5 py-1 text-xs font-bold text-[#6C757D]">স্কিপ ✕</button></div>
+      {!spot && <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs font-medium text-slate-500" aria-live="polite">নির্দেশিত অংশটি প্রস্তুত হচ্ছে…</p>}
       <h3 className="mt-3 text-base font-extrabold text-[#1A1A1A]">{step.title}</h3><p className="mt-2 text-xs leading-relaxed text-[#6C757D] sm:text-sm">{step.description}</p>
-      <div className="mt-4 flex items-center gap-1.5">{tour.steps.map((_, index) => <button key={index} type="button" aria-label={`ধাপ ${index + 1}`} onClick={() => setStepIdx(index)} className={`h-1.5 rounded-full transition-all ${index === stepIdx ? "w-6 bg-[#E51A24]" : "w-2 bg-slate-200"}`} />)}</div>
-      <div className="mt-4 flex items-center justify-between gap-2 border-t border-black/[.08] pt-3.5"><button type="button" onClick={() => setStepIdx((index) => Math.max(0, index - 1))} disabled={stepIdx === 0} className="skeuo-key rounded-lg px-3.5 py-2 text-xs font-bold disabled:opacity-35">← আগের ধাপ</button>{isLast ? <button type="button" onClick={closeTour} className="btn-red rounded-lg px-5 py-2 text-xs font-bold">বুঝেছি ✓</button> : <button type="button" onClick={() => setStepIdx((index) => Math.min(total - 1, index + 1))} className="btn-red rounded-lg px-5 py-2 text-xs font-bold">পরের ধাপ →</button>}</div>
+      <div className="mt-4 flex items-center gap-1.5">{tour.steps.map((_, index) => <button key={index} type="button" aria-label={`ধাপ ${index + 1}`} onClick={() => goToStep(index)} className={`h-1.5 rounded-full transition-all ${index === stepIdx ? "w-6 bg-[#E51A24]" : "w-2 bg-slate-200"}`} />)}</div>
+      <div className="mt-4 flex items-center justify-between gap-2 border-t border-black/[.08] pt-3.5"><button type="button" onClick={() => goToStep(stepIdx - 1)} disabled={stepIdx === 0} className="skeuo-key rounded-lg px-3.5 py-2 text-xs font-bold disabled:opacity-35">← আগের ধাপ</button>{isLast ? <button type="button" onClick={closeTour} className="btn-red rounded-lg px-5 py-2 text-xs font-bold">বুঝেছি ✓</button> : <button type="button" onClick={() => goToStep(stepIdx + 1)} className="btn-red rounded-lg px-5 py-2 text-xs font-bold">পরের ধাপ →</button>}</div>
     </div>
   </div>;
 }

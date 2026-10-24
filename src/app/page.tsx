@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import SpringHeading from "@/components/SpringHeading";
 import Link from "next/link";
 import { db } from "@/db";
@@ -12,6 +13,11 @@ import Icon from "@/components/Icon";
 import LiveDemo from "@/components/LiveDemo";
 import { toBn } from "@/lib/bn";
 import { getSettings } from "@/lib/settings";
+import { pageMetadata } from "@/lib/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("home");
+}
 
 export const dynamic = "force-dynamic";
 
@@ -449,6 +455,19 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* ================= PREMIUM BUYER ================= */}
+      <section data-tour="home-premium-tiers" className="mx-auto max-w-5xl px-5 py-16 sm:px-8">
+        <Reveal>
+          <div className="relative overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-yellow-50 p-7 sm:p-9">
+            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-amber-200/35 blur-2xl" aria-hidden="true" />
+            <div className="relative flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+              <div className="max-w-2xl"><span className="rounded-full bg-amber-200/70 px-3 py-1 text-[11px] font-extrabold tracking-[.12em] text-amber-900">PREMIUM BUYER</span><SpringHeading as="h2" className="mt-4 text-2xl font-bold text-[#1A1A1A]">আরও বেশি প্র্যাকটিস, এক জায়গায় Premium অ্যাক্সেস</SpringHeading><p className="mt-2 text-sm leading-relaxed text-[#6C757D]">Premium কিনলে আপনার প্রোফাইলে golden membership card, অনুমোদনের ইমেইল এবং logo-সহ receipt PDF থাকবে। পেমেন্ট যাচাই শেষ হলেই Premium টেস্ট ও রিসোর্স খুলে যাবে।</p></div>
+              <div className="flex shrink-0 flex-wrap gap-3"><Link href="/premium" className="btn-red rounded-lg px-5 py-3 text-sm font-bold">Premium দেখুন</Link><Link href="/profile" className="skeuo-key rounded-lg px-5 py-3 text-sm font-bold">আমার Premium</Link></div>
+            </div>
+          </div>
+        </Reveal>
       </section>
 
       {/* ================= FAQ ================= */}

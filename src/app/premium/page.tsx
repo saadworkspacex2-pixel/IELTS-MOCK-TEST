@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PaymentFlow from "@/components/PaymentFlow";
@@ -7,7 +8,9 @@ import { getSettings } from "@/lib/settings";
 import type { PremiumTier } from "@/lib/premium";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Premium প্ল্যান", description: "তিনটি Premium প্ল্যান, প্রিমিয়াম কনটেন্ট এবং বাংলাদেশি Send Money পেমেন্ট রিকোয়েস্ট।" };
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("premium");
+}
 
 export default async function PremiumPage() {
   const [user, settings] = await Promise.all([currentUser(), getSettings()]);

@@ -5,7 +5,7 @@ import SpringHeading from "@/components/SpringHeading";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogoMark } from "@/components/Logo";
+import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
 
 export default function LoginPage() {
@@ -64,9 +64,9 @@ export default function LoginPage() {
     <div className="grid min-h-screen place-items-center bg-white px-4 py-10">
       <div data-tour="login-card" className="anim-pop card w-full max-w-md rounded-xl p-8">
         <div className="text-center">
-          <span className="mx-auto inline-block">
-            <LogoMark size={48} />
-          </span>
+          <div className="mx-auto w-fit">
+            <Logo />
+          </div>
           <SpringHeading as="h1" className="mt-4 text-2xl font-bold text-[#1A1A1A]">
             {mode === "login" ? "অ্যাকাউন্টে লগইন" : "নতুন অ্যাকাউন্ট খুলুন"}
           </SpringHeading>

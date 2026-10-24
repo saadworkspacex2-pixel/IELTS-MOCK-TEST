@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import SpringHeading from "@/components/SpringHeading";
 import { db } from "@/db";
-import { attempts, exams } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { attempts, exams, users } from "@/db/schema";
+import { and, desc, eq } from "drizzle-orm";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DynamicSections from "@/components/DynamicSections";
@@ -11,7 +12,9 @@ import { formatDateBn, formatDuration, toBn } from "@/lib/bn";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "লিডারবোর্ড", description: "IELTS Mock Test-এর সাম্প্রতিক সেরা ফলাফল ও স্কোর দেখুন।" };
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("leaderboard");
+}
 
 export default async function LeaderboardPage({
   searchParams,
@@ -26,19 +29,15 @@ export default async function LeaderboardPage({
     .from(exams)
     .orderBy(desc(exams.createdAt));
 
-  const baseQuery = db
-    .select({ attempt: attempts, examTitle: exams.title })
+  const rows = await db
+    .select({ attempt: attempts, examTitle: exams.title, membershipTier: users.membershipTier, premiumUntil: users.premiumUntil })
     .from(attempts)
-    .innerJoin(exams, eq(attempts.examId, exams.id));
-
-  const rows = examId
-    ? await baseQuery
-        .where(eq(attempts.examId, examId))
-        .orderBy(desc(attempts.score), desc(attempts.createdAt))
-        .limit(50)
-    : await baseQuery
-        .orderBy(desc(attempts.score), desc(attempts.createdAt))
-        .limit(50);
+    .innerJoin(exams, eq(attempts.examId, exams.id))
+    .leftJoin(users, eq(attempts.userId, users.id))
+    .where(examId ? and(eq(attempts.examId, examId), eq(attempts.isPublished, true)) : eq(attempts.isPublished, true))
+    .orderBy(desc(attempts.score), desc(attempts.createdAt))
+    .limit(50);
+  const premiumRows = rows.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-white">
@@ -82,7 +81,9 @@ export default async function LeaderboardPage({
           ))}
         </div>
 
-        <div className="mt-10 overflow-hidden rounded-lg border border-black/[0.07]">
+        {premiumRows.length > 0 && <section className="mt-10 grid gap-4 sm:grid-cols-3">{premiumRows.map((row, index) => { const premium = ["starter", "plus", "pro"].includes(row.membershipTier || ""); return <article key={row.attempt.id} className={`relative overflow-hidden rounded-2xl border p-5 ${premium ? "border-amber-300 bg-gradient-to-br from-amber-100 via-yellow-50 to-white shadow-[0_12px_28px_rgba(180,120,0,.17)]" : "border-black/[.08] bg-white"}`}><span className={`grid h-9 w-9 place-items-center rounded-full text-sm font-extrabold ${index === 0 ? "bg-amber-400 text-white" : index === 1 ? "bg-slate-300 text-slate-700" : "bg-orange-200 text-orange-700"}`}>{toBn(index + 1)}</span>{premium && <span className="absolute right-4 top-5 rounded-full bg-amber-400 px-2.5 py-1 text-[10px] font-extrabold text-amber-950">✦ PREMIUM</span>}<p className="mt-4 truncate font-bold text-[#1A1A1A]">{row.attempt.studentName}</p><p className="mt-1 truncate text-xs text-[#6C757D]">{row.examTitle}</p><p className="mt-4 text-xl font-extrabold text-[#E51A24]">{row.attempt.bandScore !== null ? `Band ${row.attempt.bandScore}` : toBn(row.attempt.score)}</p></article>; })}</section>}
+
+        <div className="mt-6 overflow-hidden rounded-lg border border-black/[0.07]">
           <table className="w-full text-sm">
             <thead className="bg-white text-left text-xs text-[#6C757D]">
               <tr>
@@ -99,10 +100,12 @@ export default async function LeaderboardPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
-              {rows.map((r, i) => (
+              {rows.map((r, i) => {
+                const premium = ["starter", "plus", "pro"].includes(r.membershipTier || "");
+                return (
                 <tr
                   key={r.attempt.id}
-                  className="transition-colors hover:bg-slate-50"
+                  className={`transition-colors hover:bg-slate-50 ${premium ? "bg-amber-50/55" : ""}`}
                 >
                   <td className="px-5 py-4">
                     <span
@@ -120,7 +123,7 @@ export default async function LeaderboardPage({
                     </span>
                   </td>
                   <td className="px-5 py-4 font-semibold">
-                    {r.attempt.studentName}
+                    <span className="inline-flex items-center gap-2">{r.attempt.studentName}{premium && <span className="rounded-full bg-amber-300 px-2 py-0.5 text-[9px] font-extrabold text-amber-950">✦ PREMIUM</span>}</span>
                   </td>
                   <td className="hidden px-5 py-4 text-[#6C757D] sm:table-cell">
                     {r.examTitle}
@@ -144,7 +147,8 @@ export default async function LeaderboardPage({
                     {formatDateBn(r.attempt.createdAt)}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
               {rows.length === 0 && (
                 <tr>
                   <td

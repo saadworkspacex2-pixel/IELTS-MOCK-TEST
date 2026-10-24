@@ -72,6 +72,16 @@ export const sendPaymentRequestEmail = (to: string, tier: string, siteUrl: strin
 export const sendMembershipStatusEmail = (to: string, tier: string, status: "approved" | "rejected", siteUrl: string) =>
   sendEmail({ to, subject: status === "approved" ? "Premium অ্যাক্সেস চালু হয়েছে" : "Premium রিকোয়েস্টের আপডেট", eyebrow: "PREMIUM STATUS", title: status === "approved" ? "অভিনন্দন! আপনার Premium অ্যাক্সেস চালু" : "আপনার পেমেন্ট রিকোয়েস্ট অনুমোদিত হয়নি", body: status === "approved" ? `আপনার <b>${escapeHtml(tier)}</b> সদস্যতা সক্রিয় হয়েছে। এখন Premium টেস্ট ও রিসোর্স ব্যবহার করতে পারবেন।` : "Transaction ID বা পেমেন্ট তথ্য যাচাই করা যায়নি। প্রয়োজন হলে সাপোর্টে যোগাযোগ করুন।", cta: { label: status === "approved" ? "Premium টেস্ট দেখুন" : "পেমেন্ট দেখুন", href: status === "approved" ? `${siteUrl}/exams` : `${siteUrl}/premium` } });
 
+export const sendPremiumReceiptEmail = (to: string, details: { product: string; total: string; receiptUrl: string; expiresLabel?: string }) =>
+  sendEmail({
+    to,
+    subject: `Premium অনুমোদিত — ${details.product}`,
+    eyebrow: "PREMIUM ACTIVATED",
+    title: "আপনার Premium অ্যাক্সেস প্রস্তুত",
+    body: `<p style="margin:0 0 12px">আপনার <b>${escapeHtml(details.product)}</b> সদস্যতা অ্যাডমিন অনুমোদন করেছেন।</p><div style="border:1px solid #f4d58d;border-radius:12px;background:#fffbeb;padding:16px"><div style="color:#8a5b00;font-size:12px;font-weight:700">PRODUCT</div><strong style="display:block;margin-top:3px;color:#1a1a1a">${escapeHtml(details.product)}</strong><div style="margin-top:12px;color:#8a5b00;font-size:12px;font-weight:700">TOTAL</div><strong style="display:block;margin-top:3px;color:#1a1a1a">${escapeHtml(details.total || "প্রযোজ্য মূল্য")}</strong>${details.expiresLabel ? `<div style="margin-top:12px;color:#64748b;font-size:13px">মেয়াদ: ${escapeHtml(details.expiresLabel)}</div>` : ""}</div><p style="margin:16px 0 0">আপনার receipt PDF, buying code ও verification token নিচের লিংকে নিরাপদে পাওয়া যাবে।</p>`,
+    cta: { label: "Receipt PDF দেখুন", href: details.receiptUrl },
+  });
+
 export function siteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 }

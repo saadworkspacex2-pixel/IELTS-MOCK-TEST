@@ -1,13 +1,15 @@
+import type { Metadata } from "next";
 import SpringHeading from "@/components/SpringHeading";
+import { pageMetadata } from "@/lib/seo";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DynamicSections from "@/components/DynamicSections";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "ব্যবহারের শর্তাবলি | LHBD",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("terms");
+}
 
 const SECTIONS = [
   {

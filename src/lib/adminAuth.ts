@@ -24,7 +24,8 @@ export type AdminContext = {
 };
 
 export function adminPassword(): string {
-  return process.env.ADMIN_PASSWORD || "admin123";
+  // A development fallback keeps local setup simple; production must always set ADMIN_PASSWORD.
+  return process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === "production" ? "" : "admin123");
 }
 
 export function sessionToken(): string {

@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import SpringHeading from "@/components/SpringHeading";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
@@ -8,16 +10,31 @@ import Icon from "@/components/Icon";
 import { currentUser } from "@/lib/userAuth";
 import { getProfileData } from "@/lib/profileData";
 import { formatDateBn, toBn } from "@/lib/bn";
+import { db } from "@/db";
+import { paymentRequests } from "@/db/schema";
+import { and, desc, eq } from "drizzle-orm";
+import { getSettings } from "@/lib/settings";
+import { isPremiumMember } from "@/lib/premium";
 import LogoutButton from "./LogoutButton";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("profile");
+}
 
 export default async function ProfilePage() {
   const user = await currentUser();
   if (!user) redirect("/login");
 
-  const { rows, moduleStats, overallPercent, overallBand, progress } =
-    await getProfileData(user.id);
+  const [profileData, [latestReceipt], settings] = await Promise.all([
+    getProfileData(user.id),
+    db.select().from(paymentRequests).where(and(eq(paymentRequests.userId, user.id), eq(paymentRequests.status, "approved"))).orderBy(desc(paymentRequests.approvedAt), desc(paymentRequests.createdAt)).limit(1),
+    getSettings(),
+  ]);
+  const { rows, moduleStats, overallPercent, overallBand, progress } = profileData;
+  const premiumActive = isPremiumMember(user);
+  const tierName = premiumActive ? settings[`premium_${user.membershipTier}_name`] || `Premium ${user.membershipTier}` : "Free সদস্য";
 
   return (
     <div className="min-h-screen bg-white">
@@ -62,12 +79,9 @@ export default async function ProfilePage() {
           </div>
         </div>
 
-        <div className="anim-fade-up delay-100 mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 p-5">
-          <div>
-            <p className="text-xs font-bold tracking-wide text-amber-800">MEMBERSHIP</p>
-            <p className="mt-1 font-bold text-[#1A1A1A]">{user.membershipTier === "free" ? "Free সদস্য" : `Premium ${user.membershipTier}`}</p>
-          </div>
-          <Link href="/premium" className="skeuo-key rounded-md px-4 py-2 text-sm font-bold">{user.membershipTier === "free" ? "Premium দেখুন" : "প্ল্যান দেখুন"}</Link>
+        <div className={`anim-fade-up delay-100 mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border p-5 ${premiumActive ? "border-amber-300 bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-50 shadow-[0_12px_30px_rgba(180,120,0,.15)]" : "border-slate-200 bg-slate-50"}`}>
+          <div className="flex items-center gap-3"><span className={`grid h-11 w-11 place-items-center rounded-xl text-lg ${premiumActive ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-white shadow" : "bg-slate-200 text-slate-500"}`}>{premiumActive ? "✦" : "○"}</span><div><p className={`text-xs font-bold tracking-[.12em] ${premiumActive ? "text-amber-800" : "text-slate-500"}`}>{premiumActive ? "PREMIUM ACTIVE" : "MEMBERSHIP"}</p><p className="mt-1 font-bold text-[#1A1A1A]">{tierName}</p>{premiumActive && <p className="mt-0.5 text-xs text-amber-900/75">{user.premiumUntil ? `মেয়াদ: ${formatDateBn(user.premiumUntil)}` : "সদস্যতা সক্রিয় আছে"}</p>}</div></div>
+          <div className="flex flex-wrap gap-2">{premiumActive && latestReceipt?.receiptCode && <a href={`/api/payments/${latestReceipt.id}/receipt`} className="rounded-md border border-amber-400 bg-white/80 px-4 py-2 text-sm font-bold text-amber-900">Receipt PDF</a>}<Link href="/premium" className="skeuo-key rounded-md px-4 py-2 text-sm font-bold">{premiumActive ? "প্ল্যান দেখুন" : "Premium দেখুন"}</Link></div>
         </div>
 
         {/* overall + module donuts */}

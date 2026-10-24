@@ -5,7 +5,7 @@ import SpringHeading from "@/components/SpringHeading";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
-import { LogoMark } from "@/components/Logo";
+import Logo from "@/components/Logo";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -38,9 +38,9 @@ export default function AdminLoginPage() {
       </div>
       <div data-tour="admin-login-card" className="anim-pop relative w-full max-w-md rounded-lg border border-black/[0.07] glass p-8">
         <div className="text-center">
-          <span className="mx-auto inline-block">
-            <LogoMark size={52} />
-          </span>
+          <div className="mx-auto w-fit">
+            <Logo />
+          </div>
           <SpringHeading as="h1" className="mt-5 text-2xl font-bold">অ্যাডমিন লগইন</SpringHeading>
           <p className="mt-2 text-sm text-[#6C757D]">
             পরীক্ষা, প্রশ্ন ও রিসোর্স পরিচালনার জন্য লগইন করুন
@@ -71,7 +71,7 @@ export default function AdminLoginPage() {
           {loading ? "যাচাই হচ্ছে…" : "লগইন করুন →"}
         </button>
         <p className="mt-4 rounded-md bg-slate-100 px-4 py-3 text-center text-xs text-[#6C757D]">
-          ডেমো পাসওয়ার্ড: <code className="text-[#E51A24]">admin123</code>
+          Super Admin হলে ইমেইল ফাঁকা রেখে আপনার নিরাপদ Administrator password ব্যবহার করুন।
         </p>
         <p className="mt-4 text-center text-xs">
           <Link href="/" className="text-[#6C757D] hover:text-[#E51A24]">

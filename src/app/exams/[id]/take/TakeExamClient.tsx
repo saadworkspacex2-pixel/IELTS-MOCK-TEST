@@ -4,7 +4,7 @@ import SpringHeading from "@/components/SpringHeading";
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LogoMark } from "@/components/Logo";
+import Logo from "@/components/Logo";
 import type { ExamRules } from "@/lib/examRules";
 import ExamSplit from "@/components/ExamSplit";
 import HighlightablePassage from "@/components/HighlightablePassage";
@@ -486,9 +486,7 @@ export default function TakeExamClient({ examId }: { examId: number }) {
       {/* ===== Brushed hardware exam console bar ===== */}
       <header className="skeuo-chassis z-30 flex h-16 shrink-0 items-center justify-between px-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="shrink-0">
-            <LogoMark size={32} />
-          </span>
+          <Logo href={null} dark showText={false} className="shrink-0" />
           <div className="min-w-0">
             <p className="truncate text-sm font-bold text-stone-100">{exam.title}</p>
             <p className="truncate text-[11px] font-medium text-stone-400">
