@@ -40,7 +40,7 @@ export default async function LeaderboardPage({
   const premiumRows = rows.slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 pt-28 pb-24 sm:px-6">
         <div className="anim-fade-up text-center">

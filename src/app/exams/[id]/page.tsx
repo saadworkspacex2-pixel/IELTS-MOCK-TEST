@@ -65,7 +65,7 @@ export default async function ExamDetailPage({
         : "MCQ";
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 pt-28 pb-24 sm:px-6">
         <div className="anim-fade-up">
@@ -98,7 +98,7 @@ export default async function ExamDetailPage({
                   ? [
                       { label: "মোট প্রশ্ন", value: toBn(qCount.c) },
                       { label: "সময়", value: `${toBn(exam.durationMinutes)} মি` },
-                      { label: "প্যাসেজ", value: toBn(secCount.c) },
+                      { label: exam.module === "listening" ? "সেকশন" : "প্যাসেজ", value: toBn(secCount.c) },
                       { label: "স্কোর", value: "ব্যান্ড" },
                     ]
                   : [
@@ -131,8 +131,10 @@ export default async function ExamDetailPage({
                 {isWriting ? (
                   <>
                     <li className="flex gap-3">
-                      <span className="text-[#E51A24]"></span> স্ক্রিনের বাঁ
-                      পাশে টাস্ক, ডান পাশে লেখার জায়গা — লাইভ শব্দগণনাসহ।
+                      <span className="text-[#E51A24]">1</span> Task 1-এর জন্য প্রায় ২০ মিনিটে কমপক্ষে ১৫০ শব্দ এবং Task 2-এর জন্য প্রায় ৪০ মিনিটে কমপক্ষে ২৫০ শব্দ লিখুন।
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="text-slate-600">↔</span> স্ক্রিনের বাঁ পাশে task prompt, ডান পাশে আলাদা লেখার জায়গা ও প্রতিটি task-এর live word count থাকবে।
                     </li>
                     <li className="flex gap-3">
                       <span className="text-slate-600"></span> সময় শেষ হলে লেখা
@@ -143,27 +145,19 @@ export default async function ExamDetailPage({
                       আপনার লেখা পড়ে মূল্যায়ন করবেন — শুধু নম্বর নয়, কারণসহ।
                     </li>
                   </>
+                ) : exam.module === "listening" ? (
+                  <>
+                    <li className="flex gap-3"><span className="text-[#E51A24]">▶</span> চারটি Listening section ও ৪০টি প্রশ্ন আছে। Audio একবার, স্বাভাবিক গতিতে চালানো যাবে।</li>
+                    <li className="flex gap-3"><span className="text-slate-600">◉</span> Test চলাকালে transcript দেখা যাবে না; প্রশ্নের সঙ্গে শুনে উত্তর দিন।</li>
+                    <li className="flex gap-3"><span className="text-slate-600">⌨</span> Form completion-এ NO MORE THAN THREE WORDS AND/OR A NUMBER নির্দেশনা মেনে উত্তর লিখুন।</li>
+                    <li className="flex gap-3"><span className="text-[#E51A24]">★</span> শেষ হলে raw score থেকে আনুমানিক band score দেখানো হবে।</li>
+                  </>
                 ) : isReading ? (
                   <>
-                    <li className="flex gap-3">
-                      <span className="text-[#E51A24]"></span> আসল
-                      কম্পিউটার-ডেলিভার্ড টেস্টের মতো স্ক্রিন — বাঁয়ে প্যাসেজ,
-                      ডানে প্রশ্ন, একই ঘড়ি।
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="text-slate-600">↔</span> নিচের নম্বর
-                      প্যালেট দিয়ে যেকোনো প্রশ্নে যান, রিভিউ ফ্ল্যাগ দিন।
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="text-slate-600"></span> MCQ,
-                      True/False/Not Given ও ফাঁকা পূরণ (টাইপ করা উত্তর) — সব
-                      ধরনের প্রশ্ন।
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="text-[#E51A24]"></span> জমা দেওয়ার
-                      সঙ্গে সঙ্গেই ব্যান্ড স্কোর — বানানের গ্রহণযোগ্য বিকল্পসহ
-                      মার্কিং।
-                    </li>
+                    <li className="flex gap-3"><span className="text-[#E51A24]">↔</span> কম্পিউটার-ডেলিভার্ড reading-style screen — বাঁয়ে passage, ডানে প্রশ্ন এবং একটি ৬০ মিনিটের ঘড়ি।</li>
+                    <li className="flex gap-3"><span className="text-slate-600">⌕</span> তিনটি passage জুড়ে MCQ, True/False/Not Given এবং typed gap-fill প্রশ্ন আছে।</li>
+                    <li className="flex gap-3"><span className="text-slate-600">⚑</span> Question palette দিয়ে যেকোনো প্রশ্নে যান এবং review flag দিন।</li>
+                    <li className="flex gap-3"><span className="text-[#E51A24]">★</span> জমা দেওয়ার সঙ্গে সঙ্গেই raw score থেকে আনুমানিক band score দেখানো হবে।</li>
                   </>
                 ) : (
                   <>

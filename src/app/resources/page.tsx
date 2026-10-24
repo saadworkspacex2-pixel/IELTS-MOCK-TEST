@@ -47,7 +47,7 @@ export default async function ResourcesPage({
     : rows;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       <Navbar />
       <main className="mx-auto max-w-7xl px-4 pt-28 pb-24 sm:px-6">
         <div className="anim-fade-up">

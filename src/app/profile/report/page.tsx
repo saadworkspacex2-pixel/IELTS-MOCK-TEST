@@ -19,7 +19,7 @@ export default async function ReportPage() {
     await getProfileData(user.id);
 
   return (
-    <div className="min-h-screen bg-white print:bg-white">
+    <div className="min-h-screen bg-transparent print:bg-white">
       {/* screen-only toolbar */}
       <div className="mx-auto flex max-w-4xl items-center justify-between px-5 pt-8 print:hidden">
         <Link

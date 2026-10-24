@@ -61,7 +61,7 @@ export default async function ResultPage({
       ? attempt.essayText.trim().split(/\s+/).length
       : 0;
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-transparent">
         <Navbar />
         <main className="mx-auto max-w-3xl px-4 pt-28 pb-24 sm:px-6">
           <div className="anim-pop rounded-lg border border-amber-200 card p-10 text-center">
@@ -108,7 +108,7 @@ export default async function ResultPage({
       gra: "Grammatical Range & Accuracy",
     };
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-transparent">
         <Navbar />
         <main className="mx-auto max-w-3xl px-5 pt-28 pb-24 sm:px-8">
           <div className="anim-pop card rounded-xl p-10 text-center">
@@ -161,7 +161,7 @@ export default async function ResultPage({
   const secTitle = new Map(secs.map((s) => [s.id, s.title]));
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       <Navbar />
       <ResultReveal>
       <main className="mx-auto max-w-4xl px-4 pt-28 pb-24 sm:px-6">

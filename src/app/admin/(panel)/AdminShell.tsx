@@ -96,7 +96,7 @@ export default function AdminShell({
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       {/* top bar */}
       <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between border-b border-black/[0.07] glass px-4 lg:pl-72">
         <button

@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
+import { applyAcademicMockLibrary } from "./academic-mock-library.mjs";
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -18,6 +19,7 @@ const pool = new Pool({ connectionString: databaseUrl });
 try {
   await pool.query(schemaSql);
   console.log("✓ Database schema is up to date.");
+  await applyAcademicMockLibrary(pool);
 } finally {
   await pool.end();
 }

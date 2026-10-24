@@ -14,14 +14,18 @@ export default function ExamAudio({
   src,
   unrestricted = false,
   compact = false,
+  onePlay = false,
 }: {
   src: string;
   unrestricted?: boolean;
   compact?: boolean;
+  onePlay?: boolean;
 }) {
   const audio = useRef<HTMLAudioElement>(null);
   const furthest = useRef(0);
+  const hasStarted = useRef(false);
   const [playing, setPlaying] = useState(false);
+  const [hasStartedState, setHasStartedState] = useState(false);
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
   const [maxHeard, setMaxHeard] = useState(0);
@@ -29,23 +33,33 @@ export default function ExamAudio({
 
   useEffect(() => {
     furthest.current = 0;
-    setPlaying(false);
-    setCurrent(0);
-    setDuration(0);
-    setMaxHeard(0);
+    hasStarted.current = false;
+    const reset = window.setTimeout(() => {
+      setHasStartedState(false);
+      setPlaying(false);
+      setCurrent(0);
+      setDuration(0);
+      setMaxHeard(0);
+    }, 0);
+    return () => window.clearTimeout(reset);
   }, [src]);
 
   const togglePlay = () => {
     const el = audio.current;
     if (!el) return;
     if (el.paused) {
-      el.play().catch(() => {});
-    } else {
+      if (onePlay && hasStarted.current) return;
+      el.play().then(() => {
+        hasStarted.current = true;
+        setHasStartedState(true);
+      }).catch(() => {});
+    } else if (!onePlay) {
       el.pause();
     }
   };
 
   const rewindFive = () => {
+    if (onePlay) return;
     const el = audio.current;
     if (!el) return;
     const next = Math.max(0, el.currentTime - 5);
@@ -54,6 +68,7 @@ export default function ExamAudio({
   };
 
   const onScrub = (nextValue: number) => {
+    if (onePlay) return;
     const el = audio.current;
     if (!el) return;
     const clamped = unrestricted
@@ -186,22 +201,23 @@ export default function ExamAudio({
           <button
             type="button"
             onClick={togglePlay}
-            aria-label={playing ? "Pause audio" : "Play audio"}
-            className={`inline-flex h-9 items-center gap-1.5 rounded-md px-3.5 text-xs font-bold ${
+            aria-label={playing ? (onePlay ? "Audio playing" : "Pause audio") : "Play audio"}
+            disabled={onePlay && hasStartedState}
+            className={`inline-flex h-9 items-center gap-1.5 rounded-md px-3.5 text-xs font-bold disabled:cursor-not-allowed disabled:opacity-75 ${
               playing ? "btn-red" : "skeuo-key text-[#1A1A1A]"
             }`}
           >
             <span>{playing ? "❚❚" : "▶"}</span>
-            <span>{playing ? "PAUSE" : "PLAY"}</span>
+            <span>{playing ? "PLAYING" : onePlay && hasStartedState ? "PLAYED" : "PLAY ONCE"}</span>
           </button>
-          <button
+          {!onePlay && <button
             type="button"
             onClick={rewindFive}
             title="৫ সেকেন্ড পেছনে যান"
             className="skeuo-key h-9 rounded-md px-2.5 font-mono text-[11px] font-bold text-[#1A1A1A]"
           >
             ↺ -5s
-          </button>
+          </button>}
         </div>
 
         {/* Recessed fader slot with heard-range indicator */}
@@ -224,7 +240,8 @@ export default function ExamAudio({
             value={current}
             aria-label="Audio position"
             onChange={(e) => onScrub(Number(e.target.value))}
-            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+            disabled={onePlay}
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
           />
         </div>
 
@@ -250,7 +267,7 @@ export default function ExamAudio({
 
       {!unrestricted && !compact && (
         <p className="mt-2.5 text-[11px] text-stone-400">
-          অডিও এগিয়ে নেওয়া বা playback speed বদলানো যাবে না। শোনা অংশ আবার শুনতে পারবেন।
+          {onePlay ? "এই পরীক্ষার অডিও একবারই চালানো যাবে এবং rewind, pause বা speed change করা যাবে না।" : "অডিও এগিয়ে নেওয়া বা playback speed বদলানো যাবে না। শোনা অংশ আবার শুনতে পারবেন।"}
         </p>
       )}
     </div>

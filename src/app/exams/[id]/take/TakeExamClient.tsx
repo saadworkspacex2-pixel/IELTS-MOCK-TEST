@@ -47,13 +47,13 @@ export default function TakeExamClient({ examId }: { examId: number }) {
   const [flags, setFlags] = useState<Record<number, boolean>>({});
   const [activePart, setActivePart] = useState(0);
   const [activeQ, setActiveQ] = useState<number | null>(null);
-  const [essay, setEssay] = useState("");
+  const [essays, setEssays] = useState<Record<number, string>>({});
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [error, setError] = useState("");
-  const startTime = useRef<number>(Date.now());
+  const startTime = useRef<number>(0);
   const submitted = useRef(false);
   const qRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const sessionToken = useRef<string>(
@@ -148,7 +148,7 @@ export default function TakeExamClient({ examId }: { examId: number }) {
           examId,
           studentName,
           answers,
-          essayText: essay,
+          essayText: parts.map((part, index) => `${part.sec?.title || `Task ${index + 1}`}\n${essays[part.sec?.id || index] || ""}`).join("\n\n"),
           sessionToken: sessionToken.current,
           timeTakenSeconds: Math.round((Date.now() - startTime.current) / 1000),
         }),
@@ -161,7 +161,7 @@ export default function TakeExamClient({ examId }: { examId: number }) {
       setSubmitting(false);
       setError("জমা দেওয়া যায়নি। সংযোগ দেখে আবার চেষ্টা করুন।");
     }
-  }, [answers, essay, examId, router, studentName]);
+  }, [answers, essays, examId, parts, router, studentName]);
 
   useEffect(() => {
     if (secondsLeft === null) return;
@@ -205,21 +205,28 @@ export default function TakeExamClient({ examId }: { examId: number }) {
   // Optional per-section timer
   const sectionMinutes = exam?.rules?.sectionTimeMinutes ?? 0;
   useEffect(() => {
-    if (sectionMinutes > 0) setSectionSeconds(sectionMinutes * 60);
+    if (sectionMinutes <= 0) return;
+    const reset = window.setTimeout(() => setSectionSeconds(sectionMinutes * 60), 0);
+    return () => window.clearTimeout(reset);
   }, [activePart, sectionMinutes]);
   useEffect(() => {
     if (sectionMinutes <= 0 || sectionSeconds === null) return;
     if (sectionSeconds <= 0) {
-      if (activePart < parts.length - 1) setActivePart((p) => p + 1);
-      else submit();
-      return;
+      const advance = window.setTimeout(() => {
+        if (activePart < parts.length - 1) setActivePart((p) => p + 1);
+        else void submit();
+      }, 0);
+      return () => window.clearTimeout(advance);
     }
     const t = setTimeout(() => setSectionSeconds((s) => (s ?? 1) - 1), 1000);
     return () => clearTimeout(t);
   }, [sectionSeconds, sectionMinutes, activePart, parts.length, submit]);
 
   useEffect(() => {
-    if (window.matchMedia("(min-width: 1024px)").matches) setPaletteOpen(true);
+    const timer = window.setTimeout(() => {
+      if (window.matchMedia("(min-width: 1024px)").matches) setPaletteOpen(true);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const jumpTo = (q: Q) => {
@@ -294,7 +301,10 @@ export default function TakeExamClient({ examId }: { examId: number }) {
     const v = answers[Number(k)];
     return !(typeof v === "string" && v.trim() === "");
   }).length;
-  const wordCount = essay.trim() ? essay.trim().split(/\s+/).length : 0;
+  const writingKey = part.sec?.id ?? activePart;
+  const activeEssay = essays[writingKey] || "";
+  const writingTarget = activePart === 0 ? 150 : 250;
+  const wordCount = activeEssay.trim() ? activeEssay.trim().split(/\s+/).length : 0;
 
   const renderQuestion = (q: Q) => {
     const num = flatNumber[q.id];
@@ -598,16 +608,16 @@ export default function TakeExamClient({ examId }: { examId: number }) {
                     </p>
                     <p
                       className={`skeuo-well rounded px-3 py-1 font-mono text-xs font-bold ${
-                        wordCount >= 150 ? "text-emerald-700" : "text-[#6C757D]"
+                        wordCount >= writingTarget ? "text-emerald-700" : "text-[#6C757D]"
                       }`}
                     >
-                      WORDS: {wordCount}
+                      WORDS: {wordCount} / {writingTarget}
                     </p>
                   </div>
                   <textarea
-                    value={essay}
-                    onChange={(e) => setEssay(e.target.value)}
-                    placeholder="এখানে লিখুন… (জমা দেওয়ার পর ইনস্ট্রাক্টর মূল্যায়ন করবেন)"
+                    value={activeEssay}
+                    onChange={(e) => setEssays((current) => ({ ...current, [writingKey]: e.target.value }))}
+                    placeholder={`এখানে Writing Task ${activePart + 1} লিখুন… (জমা দেওয়ার পর ইনস্ট্রাক্টর মূল্যায়ন করবেন)`}
                     className="mt-3 min-h-0 flex-1 resize-none rounded-xl p-6 leading-8 outline-none"
                   />
                 </div>
@@ -644,15 +654,22 @@ export default function TakeExamClient({ examId }: { examId: number }) {
                         </SpringHeading>
                         {part.sec.audioUrl && (
                           <div className="mt-4">
-                            <ExamAudio src={part.sec.audioUrl} />
+                            <ExamAudio src={part.sec.audioUrl} onePlay={exam.module === "listening"} />
                           </div>
                         )}
-                        <div className="mt-5">
-                          <HighlightablePassage
-                            key={part.sec.id}
-                            text={part.sec.passageText}
-                          />
-                        </div>
+                        {exam.module === "listening" ? (
+                          <div className="skeuo-well mt-5 rounded-xl p-5 text-sm leading-7 text-[#4b5563]">
+                            <b className="block text-[#1A1A1A]">Listening test mode</b>
+                            Audio plays once at normal speed. The transcript is intentionally hidden during the test, as in an exam-style listening practice. Read the questions and use the answer boxes while listening.
+                          </div>
+                        ) : (
+                          <div className="mt-5">
+                            <HighlightablePassage
+                              key={part.sec.id}
+                              text={part.sec.passageText}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : (

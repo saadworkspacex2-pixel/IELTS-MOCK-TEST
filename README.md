@@ -113,7 +113,7 @@ cp .env.example .env.local
 
 Edit `.env.local` and at minimum set `DATABASE_URL` and a strong `ADMIN_PASSWORD`.
 
-### 4. Create the database and load the starter data
+### 4. Create the database and install the original Academic mock library
 
 ```bash
 # Example only — choose your own database name and credentials.
@@ -121,11 +121,9 @@ createdb ielts_mock_test
 
 export DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5432/ielts_mock_test'
 npm run db:migrate
-# Optional: load sample practice data into a local database only.
-psql "$DATABASE_URL" -f scripts/seed.sql
 ```
 
-The seed file provides sample practice content. Do not run it against a production database unless you intentionally want the sample data.
+The migration creates the schema and installs the one-time **original Academic mock library**: 10 Reading, 10 Listening and 10 Writing tests. It is independently written IELTS-format practice material, not official IELTS content. To intentionally erase all current exams, attempts and sessions and rebuild this library, use `npm run db:seed`. Do not run that reset command against a production database unless a full fresh library replacement is intended.
 
 ### 5. Run the app
 
@@ -165,8 +163,8 @@ The protected admin-only endpoint `POST /api/admin/send-email` accepts `to`, `su
 | `npm run start` | Serve the production build |
 | `npm run typecheck` | Run TypeScript strict checks without emitting files |
 | `npm run lint` | Run ESLint across the codebase |
-| `npm run db:migrate` | Apply the idempotent `scripts/schema.sql` migration using `DATABASE_URL` |
-| `npm run db:seed` | Load sample data using `DATABASE_URL` (requires `psql`) |
+| `npm run db:migrate` | Apply schema changes and install the one-time original Academic mock library using `DATABASE_URL` |
+| `npm run db:seed` | **Destructive:** erase all exam content, attempts and sessions, then rebuild the Academic mock library |
 
 ## Project structure
 
@@ -181,9 +179,9 @@ src/
 ├── db/                  # PostgreSQL connection and Drizzle schema
 └── lib/                 # Authentication, email, settings, premium access, helpers
 scripts/
-├── schema.sql           # Canonical database schema and safe additions
-├── seed.sql             # Sample content for local development
-└── ielts-library.sql    # Extended IELTS practice library
+├── schema.sql                 # Canonical database schema and safe additions
+├── migrate.mjs                # Schema + guarded library installer
+└── academic-mock-library.mjs  # Original 10 Reading, 10 Listening and 10 Writing mocks
 .github/
 └── workflows/           # Repository quality checks
 ```

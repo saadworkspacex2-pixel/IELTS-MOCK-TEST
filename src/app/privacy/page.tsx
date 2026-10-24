@@ -44,7 +44,7 @@ const SECTIONS = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       <Navbar />
       <main className="mx-auto max-w-3xl px-5 pt-32 pb-24 sm:px-8">
         <div className="anim-fade-up">

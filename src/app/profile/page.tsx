@@ -46,7 +46,7 @@ export default async function ProfilePage() {
   const tierName = premiumActive ? settings[`premium_${user.membershipTier}_name`] || `Premium ${user.membershipTier}` : "Free সদস্য";
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       <Navbar />
       <main className="mx-auto max-w-5xl px-5 pt-28 pb-24 sm:px-8">
         {/* header card */}

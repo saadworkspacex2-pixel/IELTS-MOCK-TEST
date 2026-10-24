@@ -31,7 +31,7 @@
     "typecheck": "tsc --noEmit",
     "db:migrate": "node scripts/migrate.mjs",
     "db:schema": "npm run db:migrate",
-    "db:seed": "psql \"$DATABASE_URL\" -f scripts/seed.sql"
+    "db:seed": "RESET_ACADEMIC_LIBRARY=1 node scripts/migrate.mjs"
   },
   "dependencies": {
     "@fontsource/hind-siliguri": "^5.3.0",
