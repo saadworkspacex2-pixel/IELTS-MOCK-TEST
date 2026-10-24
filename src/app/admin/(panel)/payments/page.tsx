@@ -24,9 +24,11 @@ export default function AdminPaymentsPage() {
     try {
       const response = await fetch("/api/admin/payments");
       const data = await response.json().catch(() => ({}));
-      if (!response.ok || !Array.isArray(data)) throw new Error(data.error || "পেমেন্ট ইনবক্স লোড করা যায়নি");
-      setRows(data);
-      setNotes(Object.fromEntries(data.map((row) => [row.payment.id, row.payment.adminNote])));
+      const paymentRows = Array.isArray(data) ? data : data.rows;
+      if (!response.ok || !Array.isArray(paymentRows)) throw new Error(data.error || "পেমেন্ট ইনবক্স লোড করা যায়নি");
+      setRows(paymentRows);
+      setNotes(Object.fromEntries(paymentRows.map((row: Row) => [row.payment.id, row.payment.adminNote])));
+      if (data.warning) setNotice(data.warning);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "পেমেন্ট ইনবক্স লোড করা যায়নি");
     } finally {
@@ -47,7 +49,7 @@ export default function AdminPaymentsPage() {
     const response = await fetch(`/api/admin/payments/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status, adminNote: notes[id] ?? "" }) });
     const data = await response.json().catch(() => ({}));
     setBusy(null);
-    setNotice(response.ok ? status === "approved" ? "Premium অনুমোদন, receipt ও email workflow সম্পন্ন হয়েছে।" : "রিকোয়েস্ট প্রত্যাখ্যান করা হয়েছে।" : data.error || "পেমেন্ট আপডেট করা যায়নি।");
+    setNotice(response.ok ? status === "approved" ? data.warning ? `Premium অনুমোদিত হয়েছে। ${data.warning}` : "Premium অনুমোদন, receipt ও email workflow সম্পন্ন হয়েছে।" : "রিকোয়েস্ট প্রত্যাখ্যান করা হয়েছে।" : data.error || "পেমেন্ট আপডেট করা যায়নি।");
     if (response.ok) await load();
   };
 

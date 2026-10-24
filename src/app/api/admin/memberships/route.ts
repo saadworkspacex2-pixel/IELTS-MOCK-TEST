@@ -6,37 +6,23 @@ import { isAdmin } from "@/lib/adminAuth";
 import { isPremiumTier } from "@/lib/premium";
 import { getSettings } from "@/lib/settings";
 import { receiptIdentity, tierSettings } from "@/lib/membership";
-import { sendPremiumReceiptEmail, siteUrl } from "@/lib/email";
-import { ensurePremiumOperationsSchema } from "@/lib/premiumSchema";
+import { sendPremiumActivationEmail, sendPremiumReceiptEmail, siteUrl } from "@/lib/email";
+import { premiumSchemaCapabilities, premiumSchemaWarning } from "@/lib/premiumSchema";
 
 export async function GET(req: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  try {
-    await ensurePremiumOperationsSchema();
-  } catch (error) {
-    console.error("Membership schema sync failed", error);
-    return NextResponse.json({ error: "Premium ডেটাবেস প্রস্তুত করা যায়নি।" }, { status: 500 });
-  }
   const query = new URL(req.url).searchParams.get("q")?.trim() || "";
-  const where = query
-    ? or(ilike(users.email, `%${query}%`), ilike(users.nameBn, `%${query}%`), ilike(users.nameEn, `%${query}%`), ilike(users.phone, `%${query}%`))
-    : undefined;
+  const where = query ? or(ilike(users.email, `%${query}%`), ilike(users.nameBn, `%${query}%`), ilike(users.nameEn, `%${query}%`), ilike(users.phone, `%${query}%`)) : undefined;
   const rows = await db.select({ id: users.id, email: users.email, nameBn: users.nameBn, nameEn: users.nameEn, phone: users.phone, membershipTier: users.membershipTier, premiumUntil: users.premiumUntil }).from(users).where(where).orderBy(desc(users.createdAt)).limit(25);
   return NextResponse.json(rows);
 }
 
 export async function POST(req: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  try {
-    await ensurePremiumOperationsSchema();
-  } catch (error) {
-    console.error("Membership schema sync failed", error);
-    return NextResponse.json({ error: "Premium ডেটাবেস প্রস্তুত করা যায়নি।" }, { status: 500 });
-  }
   const body = await req.json().catch(() => ({}));
   const userId = Number(body.userId);
   const tier = String(body.tier ?? "free");
-  const adminNote = String(body.adminNote ?? "ম্যানুয়াল Premium আপডেট");
+  const adminNote = String(body.adminNote ?? "ম্যানুয়াল পেমেন্ট/অফলাইন অনুমোদন");
   if (!Number.isInteger(userId)) return NextResponse.json({ error: "Invalid user" }, { status: 400 });
   const [member] = await db.select().from(users).where(eq(users.id, userId));
   if (!member) return NextResponse.json({ error: "Student not found" }, { status: 404 });
@@ -49,20 +35,42 @@ export async function POST(req: Request) {
 
   const settings = await getSettings();
   const details = tierSettings(tier, settings);
-  const [pendingReceipt] = await db.insert(paymentRequests).values({
-    userId,
-    tier,
-    paymentMethod: "admin-manual",
-    transactionId: `ADMIN-${Date.now()}`,
-    senderNumber: "",
-    status: "approved",
-    adminNote,
-    approvedAt: new Date(),
-  }).returning();
-  const receipt = receiptIdentity(pendingReceipt.id);
-  const [payment] = await db.update(paymentRequests).set({ ...receipt, updatedAt: new Date() }).where(eq(paymentRequests.id, pendingReceipt.id)).returning();
   const [user] = await db.update(users).set({ membershipTier: tier, premiumUntil: details.expiresAt }).where(eq(users.id, userId)).returning();
   const total = details.price ? `${details.price} BDT` : "মূল্য অ্যাডমিন সেটিংসে নির্ধারিত";
-  void sendPremiumReceiptEmail(member.email, { product: details.name, total, receiptUrl: `${siteUrl()}/api/payments/${payment.id}/receipt`, expiresLabel: details.duration || "মেয়াদ নির্ধারিত নয়" }).catch((error) => console.error("Manual premium email failed", error));
-  return NextResponse.json({ user, payment });
+  const profileUrl = `${siteUrl()}/profile`;
+  let paymentId: number | null = null;
+  let receiptReady = false;
+  let warning = "";
+
+  try {
+    const capabilities = await premiumSchemaCapabilities();
+    warning = premiumSchemaWarning(capabilities);
+    if (capabilities.paymentTable) {
+      const [payment] = await db.insert(paymentRequests).values({
+        userId,
+        tier,
+        paymentMethod: "admin-manual",
+        transactionId: `ADMIN-${Date.now()}`,
+        senderNumber: "",
+        status: "approved",
+        adminNote,
+      }).returning({ id: paymentRequests.id });
+      paymentId = payment.id;
+      if (capabilities.receiptReady) {
+        const receipt = receiptIdentity(payment.id);
+        await db.update(paymentRequests).set({ ...receipt, approvedAt: new Date(), updatedAt: new Date() }).where(eq(paymentRequests.id, payment.id));
+        receiptReady = true;
+      }
+    }
+  } catch (error) {
+    console.error("Manual payment record skipped", error);
+    warning = "Premium access চালু হয়েছে, তবে payment record/receipt database migration সম্পন্ন না হওয়ায় পরে তৈরি হবে।";
+  }
+
+  if (receiptReady && paymentId) {
+    void sendPremiumReceiptEmail(member.email, { product: details.name, total, receiptUrl: `${siteUrl()}/api/payments/${paymentId}/receipt`, expiresLabel: details.duration || "মেয়াদ নির্ধারিত নয়" }).catch((error) => console.error("Manual premium email failed", error));
+  } else {
+    void sendPremiumActivationEmail(member.email, { product: details.name, total, expiresLabel: details.duration || "মেয়াদ নির্ধারিত নয়", profileUrl }).catch((error) => console.error("Manual premium activation email failed", error));
+  }
+  return NextResponse.json({ user, payment: paymentId ? { id: paymentId } : null, warning });
 }

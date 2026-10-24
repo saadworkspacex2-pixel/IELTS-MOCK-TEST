@@ -1,32 +1,30 @@
 import { pool } from "@/db";
 
-// Safe, additive migration for payment/admin endpoints. It self-heals a database
-// when a hosting build did not run the normal schema migration before an API call.
-export async function ensurePremiumOperationsSchema() {
-  await pool.query(`
-    CREATE SCHEMA IF NOT EXISTS lhbd_app;
-    ALTER TABLE lhbd_app.exams ADD COLUMN IF NOT EXISTS access_level text NOT NULL DEFAULT 'free';
-    ALTER TABLE lhbd_app.resources ADD COLUMN IF NOT EXISTS access_level text NOT NULL DEFAULT 'free';
-    ALTER TABLE lhbd_app.users ADD COLUMN IF NOT EXISTS membership_tier text NOT NULL DEFAULT 'free';
-    ALTER TABLE lhbd_app.users ADD COLUMN IF NOT EXISTS premium_until timestamp;
-    ALTER TABLE lhbd_app.attempts ADD COLUMN IF NOT EXISTS is_published boolean NOT NULL DEFAULT true;
-    CREATE TABLE IF NOT EXISTS lhbd_app.payment_requests (
-      id serial PRIMARY KEY,
-      user_id integer NOT NULL REFERENCES lhbd_app.users(id) ON DELETE CASCADE,
-      tier text NOT NULL,
-      payment_method text NOT NULL,
-      transaction_id text NOT NULL,
-      sender_number text NOT NULL DEFAULT '',
-      status text NOT NULL DEFAULT 'pending',
-      admin_note text NOT NULL DEFAULT '',
-      receipt_code text NOT NULL DEFAULT '',
-      receipt_token text NOT NULL DEFAULT '',
-      approved_at timestamp,
-      created_at timestamp NOT NULL DEFAULT now(),
-      updated_at timestamp NOT NULL DEFAULT now()
-    );
-    ALTER TABLE lhbd_app.payment_requests ADD COLUMN IF NOT EXISTS receipt_code text NOT NULL DEFAULT '';
-    ALTER TABLE lhbd_app.payment_requests ADD COLUMN IF NOT EXISTS receipt_token text NOT NULL DEFAULT '';
-    ALTER TABLE lhbd_app.payment_requests ADD COLUMN IF NOT EXISTS approved_at timestamp;
+export type PremiumSchemaCapabilities = {
+  paymentTable: boolean;
+  receiptReady: boolean;
+};
+
+// Read-only capability check. It keeps core Premium operations available on a
+// production database that has the earlier payment table but has not yet run
+// the optional receipt-column migration.
+export async function premiumSchemaCapabilities(): Promise<PremiumSchemaCapabilities> {
+  const result = await pool.query<{ table_name: string; column_name: string }>(`
+    SELECT table_name, column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'lhbd_app'
+      AND table_name IN ('payment_requests', 'users')
   `);
+  const paymentColumns = new Set(result.rows.filter((row) => row.table_name === "payment_requests").map((row) => row.column_name));
+  return {
+    paymentTable: paymentColumns.size > 0,
+    receiptReady: paymentColumns.has("receipt_code") && paymentColumns.has("receipt_token") && paymentColumns.has("approved_at"),
+  };
 }
+
+export const premiumSchemaWarning = (capabilities: PremiumSchemaCapabilities) =>
+  !capabilities.paymentTable
+    ? "Payment inbox database table এখনও তৈরি হয়নি; Manual Premium activation ব্যবহার করা যাবে, তবে payment request inbox পেতে scripts/schema.sql migration চালান।"
+    : !capabilities.receiptReady
+      ? "Premium access চালু করা যাবে, কিন্তু receipt PDF চালুর জন্য scripts/schema.sql migration এখনও বাকি।"
+      : "";

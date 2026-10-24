@@ -31,7 +31,7 @@ export default function ManualMembershipPanel({ onUpdated }: { onUpdated: () => 
     const data = await response.json().catch(() => ({}));
     setBusy(false);
     if (!response.ok) return setNotice(data.error || "Membership আপডেট করা যায়নি");
-    setNotice(tier === "free" ? "Premium অ্যাক্সেস বন্ধ করা হয়েছে।" : "Premium সক্রিয় হয়েছে; product, price ও receipt-সহ ইমেইল পাঠানোর চেষ্টা করা হয়েছে।");
+    setNotice(tier === "free" ? "Premium অ্যাক্সেস বন্ধ করা হয়েছে।" : data.warning ? `Premium সক্রিয় হয়েছে। ${data.warning}` : "Premium সক্রিয় হয়েছে; product, price ও receipt-সহ ইমেইল পাঠানোর চেষ্টা করা হয়েছে।");
     onUpdated();
     await search();
   };
