@@ -34,20 +34,20 @@
 > [!IMPORTANT]
 > The mock content in this repository is **independently written Academic IELTS-style practice material**. It follows public module structures and target timings, but it is **not official IELTS content** and is not affiliated with IELTS, its owners, or its partners.
 
-## ✦ At a glance
+## At a glance
 
 <table>
   <tr>
     <td width="33%" align="center">
-      <h3>🎓 Learners</h3>
+      <h3><img src="./docs/assets/icons/learner.svg" width="24" alt="" /> Learners</h3>
       <sub>Focused, timed practice in a Bengali-first interface.</sub>
     </td>
     <td width="33%" align="center">
-      <h3>🧭 Instructors</h3>
+      <h3><img src="./docs/assets/icons/instructor.svg" width="24" alt="" /> Instructors</h3>
       <sub>Writing review, results, learner history and moderation tools.</sub>
     </td>
     <td width="33%" align="center">
-      <h3>🛠️ Administrators</h3>
+      <h3><img src="./docs/assets/icons/admin.svg" width="24" alt="" /> Administrators</h3>
       <sub>Content, Premium, SEO, email, brand and media controls.</sub>
     </td>
   </tr>
@@ -65,15 +65,15 @@
 
 ---
 
-## 🧪 Mock library
+## Mock library
 
 <div align="center">
 
 | Module | Tests | Structure | Practice timing |
 | :-- | --: | :-- | :-- |
-| 📖 **Academic Reading** | **10** | 3 passages · 40 questions | **60 min** |
-| 🎧 **Listening** | **10** | 4 sections · 40 questions · custom audio | **32 min** computer-practice timer |
-| ✍️ **Academic Writing** | **10** | Task 1 report + Task 2 essay | **60 min** |
+| <img src="./docs/assets/icons/book.svg" width="18" alt="" /> **Academic Reading** | **10** | 3 passages · 40 questions | **60 min** |
+| <img src="./docs/assets/icons/headphones.svg" width="18" alt="" /> **Listening** | **10** | 4 sections · 40 questions · custom audio | **32 min** computer-practice timer |
+| <img src="./docs/assets/icons/pen.svg" width="18" alt="" /> **Academic Writing** | **10** | Task 1 report + Task 2 essay | **60 min** |
 
 </div>
 
@@ -103,12 +103,12 @@
 
 ---
 
-## ✨ Product highlights
+## Product highlights
 
 <table>
   <tr>
     <td width="50%" valign="top">
-      <h3>🎯 Learner experience</h3>
+      <h3><img src="./docs/assets/icons/learner.svg" width="24" alt="" /> Learner experience</h3>
       <ul>
         <li>Responsive exam workspace with fullscreen support and graceful browser fallback</li>
         <li>Timed Reading, Listening, Writing, MCQ and gap-fill test flows</li>
@@ -119,7 +119,7 @@
       </ul>
     </td>
     <td width="50%" valign="top">
-      <h3>🧰 Admin workspace</h3>
+      <h3><img src="./docs/assets/icons/admin.svg" width="24" alt="" /> Admin workspace</h3>
       <ul>
         <li>Exam, section, question, resource, media, result and learner management</li>
         <li>Staff roles, grading queue, leaderboard publish/unpublish/delete controls</li>
@@ -132,7 +132,7 @@
   </tr>
   <tr>
     <td width="50%" valign="top">
-      <h3>💳 Premium &amp; payments</h3>
+      <h3><img src="./docs/assets/icons/payment.svg" width="24" alt="" /> Premium &amp; payments</h3>
       <ul>
         <li>Editable Starter, Plus and Pro placeholders—no invented commercial prices</li>
         <li>bKash, Nagad, Rocket and Upay Send Money flow</li>
@@ -142,7 +142,7 @@
       </ul>
     </td>
     <td width="50%" valign="top">
-      <h3>🔐 Trust &amp; communication</h3>
+      <h3><img src="./docs/assets/icons/security.svg" width="24" alt="" /> Trust &amp; communication</h3>
       <ul>
         <li>Gmail SMTP via Nodemailer—no third-party mailer dependency</li>
         <li>Welcome, login alert, password recovery, results, payment and Premium messages</li>
@@ -156,7 +156,7 @@
 
 ---
 
-## 🖥️ Interface language & visual system
+## Interface language & visual system
 
 The application uses **Hind Siliguri** for Bangla readability and **Manrope** for Latin/English content. Its public/admin surfaces combine solid tactile cards with a subtle grid background and low-transparency navigation. The actual exam desk remains intentionally paper-clear and distraction-free.
 
@@ -169,7 +169,7 @@ The application uses **Hind Siliguri** for Bangla readability and **Manrope** fo
 
 ---
 
-## 🚀 Quick start
+## Quick start
 
 ### 1 — Requirements
 
@@ -218,14 +218,14 @@ Open `http://localhost:3000` and sign in to the admin workspace at `/admin/login
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 Copy `.env.example` to `.env.local`. Never commit a real `.env*` file or App Password.
 
 | Variable | Required | Use |
 | :-- | :--: | :-- |
-| `DATABASE_URL` | ✅ | PostgreSQL connection string used by schema and application routes |
-| `ADMIN_PASSWORD` | ✅ Production | Strong super-admin password |
+| `DATABASE_URL` | Yes | PostgreSQL connection string used by schema and application routes |
+| `ADMIN_PASSWORD` | Yes in production | Strong super-admin password |
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Public HTTPS URL used in metadata, receipt and email links |
 | `EMAIL_USER` | Optional | Gmail address used by Nodemailer SMTP |
 | `EMAIL_PASS` | Optional | Google **App Password** for `EMAIL_USER`—never a normal Gmail password |
@@ -241,36 +241,36 @@ Copy `.env.example` to `.env.local`. Never commit a real `.env*` file or App Pas
 
 ---
 
-## ✉️ Mail Studio
+## <img src="./docs/assets/icons/mail.svg" width="25" alt="" /> Mail Studio
 
 **Admin → Mail Studio** is the visual control room for transactional email.
 
 | Control | Included |
 | :-- | :-- |
-| 🖼️ **Brand layer** | Logo URL/upload, header title, tagline, footer, accent and button colours |
-| ✍️ **Rich content editor** | Bold, italic, font size, text/highlight colours, images and HTML source mode |
-| 🧩 **Dynamic values** | `{{student_name}}`, `{{exam_title}}`, `{{result}}`, `{{product}}`, `{{total}}`, `{{expiry_label}}`, `{{otp_code}}`, `{{site_name}}` |
-| 📨 **Templates** | Welcome, login alert, reset OTP, password changed, result, payment request, Premium approved/rejected and receipt |
-| 🧪 **Safe testing** | Admin-only sample template send to a chosen recipient |
+| <img src="./docs/assets/icons/admin.svg" width="18" alt="" /> **Brand layer** | Logo URL/upload, header title, tagline, footer, accent and button colours |
+| <img src="./docs/assets/icons/pen.svg" width="18" alt="" /> **Rich content editor** | Bold, italic, font size, text/highlight colours, images and HTML source mode |
+| <img src="./docs/assets/icons/terminal.svg" width="18" alt="" /> **Dynamic values** | `{{student_name}}`, `{{exam_title}}`, `{{result}}`, `{{product}}`, `{{total}}`, `{{expiry_label}}`, `{{otp_code}}`, `{{site_name}}` |
+| <img src="./docs/assets/icons/mail.svg" width="18" alt="" /> **Templates** | Welcome, login alert, reset OTP, password changed, result, payment request, Premium approved/rejected and receipt |
+| <img src="./docs/assets/icons/check.svg" width="18" alt="" /> **Safe testing** | Admin-only sample template send to a chosen recipient |
 
 The protected `POST /api/admin/send-email` endpoint accepts `to`, `subject`, plus `html` or `text` for operational messages. It is protected by admin authentication and is not a public relay.
 
 ---
 
-## 🧱 Technology
+## Technology
 
 | Layer | Stack |
 | :-- | :-- |
-| 🎨 Web application | Next.js 16 · React 19 · TypeScript · Tailwind CSS |
-| 🧩 Interaction | React Spring · accessible guided tours · browser fullscreen API |
-| 🔤 Typography | Manrope · Hind Siliguri |
-| 🗃️ Data | PostgreSQL · Drizzle ORM · `pg` |
-| ✉️ Delivery | Nodemailer · Gmail SMTP · PDF-Lib receipts |
-| 🧪 Quality | TypeScript strict checking · ESLint · GitHub Actions |
+| <img src="./docs/assets/icons/admin.svg" width="18" alt="" /> Web application | Next.js 16 · React 19 · TypeScript · Tailwind CSS |
+| <img src="./docs/assets/icons/learner.svg" width="18" alt="" /> Interaction | React Spring · accessible guided tours · browser fullscreen API |
+| <img src="./docs/assets/icons/pen.svg" width="18" alt="" /> Typography | Manrope · Hind Siliguri |
+| <img src="./docs/assets/icons/book.svg" width="18" alt="" /> Data | PostgreSQL · Drizzle ORM · `pg` |
+| <img src="./docs/assets/icons/mail.svg" width="18" alt="" /> Delivery | Nodemailer · Gmail SMTP · PDF-Lib receipts |
+| <img src="./docs/assets/icons/check.svg" width="18" alt="" /> Quality | TypeScript strict checking · ESLint · GitHub Actions |
 
 ---
 
-## 🧰 Useful commands
+## Useful commands
 
 | Command | What it does |
 | :-- | :-- |
@@ -280,11 +280,11 @@ The protected `POST /api/admin/send-email` endpoint accepts `to`, `subject`, plu
 | `npm run typecheck` | Run TypeScript checks without emitting files |
 | `npm run lint` | Run ESLint across the repository |
 | `npm run db:migrate` | Apply schema changes and install the one-time Academic library if absent |
-| `npm run db:seed` | ⚠️ Destructively rebuild the entire Academic mock library |
+| `npm run db:seed` | **Destructive:** rebuild the entire Academic mock library |
 
 ---
 
-## 🗂️ Repository map
+## Repository map
 
 ```text
 src/
@@ -308,7 +308,7 @@ docs/assets/                   # README visual assets
 
 ---
 
-## ✅ Release checklist
+## <img src="./docs/assets/icons/check.svg" width="25" alt="" /> Release checklist
 
 - [ ] Use a strong unique `ADMIN_PASSWORD`; never rely on the local fallback in production.
 - [ ] Configure production `DATABASE_URL` and confirm the migration completes.
@@ -321,7 +321,7 @@ docs/assets/                   # README visual assets
 
 ---
 
-## 🤝 Contributing & security
+## <img src="./docs/assets/icons/security.svg" width="25" alt="" /> Contributing & security
 
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 - Report vulnerabilities privately according to [SECURITY.md](SECURITY.md).
@@ -330,7 +330,7 @@ docs/assets/                   # README visual assets
 <br />
 
 <div align="center">
-  <strong>Built for focused English practice in Bangladesh. 🇧🇩</strong>
+  <strong>Built for focused English practice in Bangladesh.</strong>
   <br />
   <sub>Crafted with structure, clarity and learner confidence in mind.</sub>
 </div>
