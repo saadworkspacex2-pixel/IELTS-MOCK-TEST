@@ -23,8 +23,8 @@ Please avoid accessing, downloading, or sharing learner data while validating a 
 Before public deployment:
 
 - Set a long, unique `ADMIN_PASSWORD`. The code contains a development fallback and it must not be used in production.
-- Keep `DATABASE_URL`, `RESEND_API_KEY`, and all sender credentials in the hosting provider's secret manager or `.env.local` only.
-- Use a verified Resend sender domain before enabling delivery.
+- Keep `DATABASE_URL`, `EMAIL_USER`, `EMAIL_PASS`, and all sender credentials in the hosting provider's secret manager or `.env.local` only.
+- Use a Google App Password with 2-Step Verification for Gmail SMTP; never use the Gmail account's normal password.
 - Terminate traffic over HTTPS and set `NEXT_PUBLIC_SITE_URL` to the final HTTPS URL.
 - Restrict PostgreSQL network access, create backups, and test restoration.
 - Review staff accounts and payment-request access regularly.
@@ -32,4 +32,4 @@ Before public deployment:
 
 ## Secret-handling rule
 
-Never commit `.env` files, Resend credentials, database backups, personal data, payment wallet credentials, or session tokens. The repository's `.gitignore` deliberately permits only `.env.example`, which contains placeholders only.
+Never commit `.env` files, Gmail App Passwords, database backups, personal data, payment wallet credentials, or session tokens. The repository's `.gitignore` deliberately permits only `.env.example`, which contains placeholders only.

@@ -69,7 +69,7 @@ The project is built with the Next.js App Router, TypeScript, PostgreSQL, and Dr
       <ul>
         <li>Registration, login, session, and password-reset flows</li>
         <li>Secure email OTP password recovery with expiry and retry protection</li>
-        <li>Optional Resend lifecycle emails for welcome, login, results, and recovery events</li>
+        <li>Optional Gmail SMTP lifecycle emails for welcome, login, results, and recovery events</li>
         <li>SEO metadata, sitemap, robots rules, privacy, terms, and consent surfaces</li>
       </ul>
     </td>
@@ -83,7 +83,7 @@ The project is built with the Next.js App Router, TypeScript, PostgreSQL, and Dr
 | Front end | Next.js 16, React 19, TypeScript, Tailwind CSS |
 | Motion & type | React Spring, Hind Siliguri, Manrope |
 | Database | PostgreSQL, Drizzle ORM, `pg` |
-| Email | Resend (optional runtime integration) |
+| Email | Nodemailer with Gmail SMTP (optional runtime integration) |
 | Quality | TypeScript strict checking, ESLint, GitHub Actions |
 
 ## Quick start
@@ -143,12 +143,15 @@ Copy `.env.example` to `.env.local`. Never commit a real `.env*` file.
 | `DATABASE_URL` | Yes | PostgreSQL connection string used by the application |
 | `ADMIN_PASSWORD` | Yes in production | Super-admin password; use a long, unique value |
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Canonical public URL used in metadata and email links |
-| `RESEND_API_KEY` | Optional | Enables transactional email delivery through Resend |
-| `EMAIL_FROM` | Optional | A verified Resend sender, e.g. `LHBD <hello@example.com>` |
+| `EMAIL_USER` | Optional | Gmail account used by Nodemailer SMTP |
+| `EMAIL_PASS` | Optional | Google App Password for `EMAIL_USER` — never use a normal Gmail password |
+| `EMAIL_FROM` | Optional | Gmail account or approved alias display address, e.g. `LHBD <your-gmail@gmail.com>` |
 
 ### Transactional email
 
-When `RESEND_API_KEY` and a verified `EMAIL_FROM` are available, the platform can send branded messages for welcome, login notification, result delivery, and password recovery. Email failures are intentionally non-blocking so an unavailable email provider does not prevent a learner from using the application.
+When `EMAIL_USER` and `EMAIL_PASS` are available, the platform sends branded messages through Gmail SMTP using Nodemailer. Create a Google App Password after enabling 2-Step Verification; do not use the Gmail account's normal password. Email failures are intentionally non-blocking so an unavailable provider does not prevent a learner from using the application.
+
+The protected admin-only endpoint `POST /api/admin/send-email` accepts `to`, `subject`, and `html` or `text` for operational messages. It is intentionally not public, so the application cannot become an open email relay.
 
 ## Useful commands
 
@@ -189,7 +192,7 @@ Before a public launch:
 - [ ] Set a unique, strong `ADMIN_PASSWORD`; the development fallback must never be used in production.
 - [ ] Provision managed PostgreSQL and apply `scripts/schema.sql`.
 - [ ] Configure `NEXT_PUBLIC_SITE_URL` to the final HTTPS domain.
-- [ ] Verify the Resend sender domain before enabling production email.
+- [ ] Add `EMAIL_USER` and a Google App Password in the hosting provider's environment settings before enabling production email.
 - [ ] Fill Premium tier prices, benefits, payment recipient numbers, and instructions in Admin → Payments.
 - [ ] Review contact, privacy, terms, and analytics settings in the admin workspace.
 - [ ] Back up the database and validate the restore process.
