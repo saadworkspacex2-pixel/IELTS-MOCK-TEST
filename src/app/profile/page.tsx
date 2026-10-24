@@ -27,11 +27,20 @@ export default async function ProfilePage() {
   const user = await currentUser();
   if (!user) redirect("/login");
 
-  const [profileData, [latestReceipt], settings] = await Promise.all([
-    getProfileData(user.id),
-    db.select().from(paymentRequests).where(and(eq(paymentRequests.userId, user.id), eq(paymentRequests.status, "approved"))).orderBy(desc(paymentRequests.approvedAt), desc(paymentRequests.createdAt)).limit(1),
-    getSettings(),
-  ]);
+  const [profileData, settings] = await Promise.all([getProfileData(user.id), getSettings()]);
+  // Keep the core profile available even while a deployment is applying the
+  // optional receipt columns to an older production database.
+  let latestReceipt: { id: number; receiptCode: string } | undefined;
+  try {
+    [latestReceipt] = await db
+      .select({ id: paymentRequests.id, receiptCode: paymentRequests.receiptCode })
+      .from(paymentRequests)
+      .where(and(eq(paymentRequests.userId, user.id), eq(paymentRequests.status, "approved")))
+      .orderBy(desc(paymentRequests.createdAt))
+      .limit(1);
+  } catch (error) {
+    console.error("Profile receipt lookup skipped:", error);
+  }
   const { rows, moduleStats, overallPercent, overallBand, progress } = profileData;
   const premiumActive = isPremiumMember(user);
   const tierName = premiumActive ? settings[`premium_${user.membershipTier}_name`] || `Premium ${user.membershipTier}` : "Free সদস্য";

@@ -10,9 +10,26 @@ export type ModuleStat = {
   avgPercent: number;
 };
 
+// Explicit columns keep the profile independent from leaderboard-only schema additions.
 export async function getProfileData(userId: number) {
   const rows = await db
-    .select({ attempt: attempts, exam: exams })
+    .select({
+      attempt: {
+        id: attempts.id,
+        studentName: attempts.studentName,
+        score: attempts.score,
+        bandScore: attempts.bandScore,
+        correctCount: attempts.correctCount,
+        wrongCount: attempts.wrongCount,
+        skippedCount: attempts.skippedCount,
+        totalQuestions: attempts.totalQuestions,
+        timeTakenSeconds: attempts.timeTakenSeconds,
+        status: attempts.status,
+        ip: attempts.ip,
+        createdAt: attempts.createdAt,
+      },
+      exam: { id: exams.id, title: exams.title, module: exams.module },
+    })
     .from(attempts)
     .innerJoin(exams, eq(attempts.examId, exams.id))
     .where(eq(attempts.userId, userId))
@@ -25,67 +42,33 @@ export async function getProfileData(userId: number) {
     writing: { label: "Writing", rows: [] },
     mcq: { label: "Grammar/MCQ", rows: [] },
   };
-  for (const r of rows) {
-    (mods[r.exam.module] ?? mods.mcq).rows.push(r);
-  }
+  for (const row of rows) (mods[row.exam.module] ?? mods.mcq).rows.push(row);
 
-  const moduleStats: ModuleStat[] = Object.entries(mods).map(([m, v]) => {
-    const scored = v.rows.filter((r) => r.attempt.status === "scored");
-    const bands = scored
-      .map((r) => r.attempt.bandScore)
-      .filter((b): b is number => b !== null);
-    const percents = scored
-      .filter((r) => r.attempt.totalQuestions > 0)
-      .map(
-        (r) =>
-          (r.attempt.correctCount / Math.max(1, r.attempt.totalQuestions)) *
-          100,
-      );
+  const moduleStats: ModuleStat[] = Object.entries(mods).map(([module, value]) => {
+    const scored = value.rows.filter((row) => row.attempt.status === "scored");
+    const bands = scored.map((row) => row.attempt.bandScore).filter((band): band is number => band !== null);
+    const percents = scored.filter((row) => row.attempt.totalQuestions > 0).map((row) => (row.attempt.correctCount / Math.max(1, row.attempt.totalQuestions)) * 100);
     return {
-      module: m,
-      label: v.label,
-      attempts: v.rows.length,
+      module,
+      label: value.label,
+      attempts: value.rows.length,
       bestBand: bands.length ? Math.max(...bands) : null,
-      avgPercent: percents.length
-        ? Math.round(percents.reduce((a, b) => a + b, 0) / percents.length)
-        : 0,
+      avgPercent: percents.length ? Math.round(percents.reduce((sum, value) => sum + value, 0) / percents.length) : 0,
     };
   });
 
-  const scoredAll = rows.filter(
-    (r) => r.attempt.status === "scored" && r.attempt.totalQuestions > 0,
-  );
+  const scoredAll = rows.filter((row) => row.attempt.status === "scored" && row.attempt.totalQuestions > 0);
   const overallPercent = scoredAll.length
-    ? Math.round(
-        scoredAll.reduce(
-          (a, r) =>
-            a +
-            (r.attempt.correctCount / Math.max(1, r.attempt.totalQuestions)) *
-              100,
-          0,
-        ) / scoredAll.length,
-      )
+    ? Math.round(scoredAll.reduce((sum, row) => sum + (row.attempt.correctCount / Math.max(1, row.attempt.totalQuestions)) * 100, 0) / scoredAll.length)
     : 0;
-  const allBands = rows
-    .map((r) => r.attempt.bandScore)
-    .filter((b): b is number => b !== null);
-  const overallBand = allBands.length
-    ? Math.round((allBands.reduce((a, b) => a + b, 0) / allBands.length) * 2) /
-      2
-    : null;
-
-  // progress: oldest -> newest percent per scored attempt (max 12 points)
-  const progress = [...scoredAll]
-    .reverse()
-    .slice(-12)
-    .map((r) => ({
-      label: r.exam.title,
-      percent: Math.round(
-        (r.attempt.correctCount / Math.max(1, r.attempt.totalQuestions)) * 100,
-      ),
-      band: r.attempt.bandScore,
-      date: r.attempt.createdAt,
-    }));
+  const allBands = rows.map((row) => row.attempt.bandScore).filter((band): band is number => band !== null);
+  const overallBand = allBands.length ? Math.round((allBands.reduce((sum, value) => sum + value, 0) / allBands.length) * 2) / 2 : null;
+  const progress = [...scoredAll].reverse().slice(-12).map((row) => ({
+    label: row.exam.title,
+    percent: Math.round((row.attempt.correctCount / Math.max(1, row.attempt.totalQuestions)) * 100),
+    band: row.attempt.bandScore,
+    date: row.attempt.createdAt,
+  }));
 
   return { rows, moduleStats, overallPercent, overallBand, progress };
 }
