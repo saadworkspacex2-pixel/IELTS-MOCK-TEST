@@ -18,9 +18,9 @@ export default function ManualMembershipPanel({ onUpdated }: { onUpdated: () => 
   const search = async () => {
     setBusy(true); setNotice("");
     const response = await fetch(`/api/admin/memberships?q=${encodeURIComponent(query)}`);
-    const data = await response.json().catch(() => []);
+    const data = await response.json().catch(() => ({}));
     setBusy(false);
-    if (!response.ok) return setNotice("শিক্ষার্থী খোঁজা যায়নি");
+    if (!response.ok) return setNotice(data.error || "শিক্ষার্থী খোঁজা যায়নি");
     setStudents(data); setSelectedId(data[0] ? String(data[0].id) : "");
     if (!data.length) setNotice("কোনো শিক্ষার্থী পাওয়া যায়নি");
   };
@@ -28,8 +28,9 @@ export default function ManualMembershipPanel({ onUpdated }: { onUpdated: () => 
     if (!selectedId) return setNotice("আগে একজন শিক্ষার্থী নির্বাচন করুন");
     setBusy(true); setNotice("");
     const response = await fetch("/api/admin/memberships", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: Number(selectedId), tier, adminNote: note }) });
+    const data = await response.json().catch(() => ({}));
     setBusy(false);
-    if (!response.ok) return setNotice("Membership আপডেট করা যায়নি");
+    if (!response.ok) return setNotice(data.error || "Membership আপডেট করা যায়নি");
     setNotice(tier === "free" ? "Premium অ্যাক্সেস বন্ধ করা হয়েছে।" : "Premium সক্রিয় হয়েছে; product, price ও receipt-সহ ইমেইল পাঠানোর চেষ্টা করা হয়েছে।");
     onUpdated();
     await search();

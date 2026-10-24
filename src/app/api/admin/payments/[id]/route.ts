@@ -7,12 +7,19 @@ import { isPremiumTier, planLabels } from "@/lib/premium";
 import { sendMembershipStatusEmail, sendPremiumReceiptEmail, siteUrl } from "@/lib/email";
 import { getSettings } from "@/lib/settings";
 import { receiptIdentity, tierSettings } from "@/lib/membership";
+import { ensurePremiumOperationsSchema } from "@/lib/premiumSchema";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function PUT(req: Request, { params }: Params) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
+  try {
+    await ensurePremiumOperationsSchema();
+  } catch (error) {
+    console.error("Payment approval schema sync failed", error);
+    return NextResponse.json({ error: "পেমেন্ট ডেটাবেস প্রস্তুত করা যায়নি।" }, { status: 500 });
+  }
   const body = await req.json().catch(() => ({}));
   const status = String(body.status ?? "");
   const adminNote = String(body.adminNote ?? "");

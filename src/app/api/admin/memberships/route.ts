@@ -7,9 +7,16 @@ import { isPremiumTier } from "@/lib/premium";
 import { getSettings } from "@/lib/settings";
 import { receiptIdentity, tierSettings } from "@/lib/membership";
 import { sendPremiumReceiptEmail, siteUrl } from "@/lib/email";
+import { ensurePremiumOperationsSchema } from "@/lib/premiumSchema";
 
 export async function GET(req: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    await ensurePremiumOperationsSchema();
+  } catch (error) {
+    console.error("Membership schema sync failed", error);
+    return NextResponse.json({ error: "Premium ডেটাবেস প্রস্তুত করা যায়নি।" }, { status: 500 });
+  }
   const query = new URL(req.url).searchParams.get("q")?.trim() || "";
   const where = query
     ? or(ilike(users.email, `%${query}%`), ilike(users.nameBn, `%${query}%`), ilike(users.nameEn, `%${query}%`), ilike(users.phone, `%${query}%`))
@@ -20,6 +27,12 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    await ensurePremiumOperationsSchema();
+  } catch (error) {
+    console.error("Membership schema sync failed", error);
+    return NextResponse.json({ error: "Premium ডেটাবেস প্রস্তুত করা যায়নি।" }, { status: 500 });
+  }
   const body = await req.json().catch(() => ({}));
   const userId = Number(body.userId);
   const tier = String(body.tier ?? "free");

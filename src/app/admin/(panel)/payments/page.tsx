@@ -9,6 +9,7 @@ type Row = {
   payment: { id: number; tier: string; paymentMethod: string; transactionId: string; senderNumber: string; status: string; adminNote: string; receiptCode: string; createdAt: string };
   user: { id: number; nameBn: string; nameEn: string; email: string; phone: string };
 };
+type EmailStatus = { configured: boolean; hasApiKey: boolean; hasSender: boolean; sender: string };
 
 export default function AdminPaymentsPage() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -16,18 +17,44 @@ export default function AdminPaymentsPage() {
   const [busy, setBusy] = useState<number | null>(null);
   const [notes, setNotes] = useState<Record<number, string>>({});
   const [notice, setNotice] = useState("");
-  const load = useCallback(() => fetch("/api/admin/payments").then((response) => response.json()).then((data: Row[]) => { setRows(data); setNotes(Object.fromEntries(data.map((row) => [row.payment.id, row.payment.adminNote]))); }).catch(() => setNotice("পেমেন্ট ইনবক্স লোড করা যায়নি")).finally(() => setLoading(false)), []);
-  useEffect(() => { void load(); }, [load]);
+  const [emailStatus, setEmailStatus] = useState<EmailStatus | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/admin/payments");
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !Array.isArray(data)) throw new Error(data.error || "পেমেন্ট ইনবক্স লোড করা যায়নি");
+      setRows(data);
+      setNotes(Object.fromEntries(data.map((row) => [row.payment.id, row.payment.adminNote])));
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "পেমেন্ট ইনবক্স লোড করা যায়নি");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(timer);
+  }, [load]);
+  useEffect(() => {
+    fetch("/api/admin/email-status").then((response) => response.ok ? response.json() : null).then((data) => setEmailStatus(data)).catch(() => {});
+  }, []);
+
   const update = async (id: number, status: "approved" | "rejected") => {
     setBusy(id); setNotice("");
     const response = await fetch(`/api/admin/payments/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status, adminNote: notes[id] ?? "" }) });
+    const data = await response.json().catch(() => ({}));
     setBusy(null);
-    setNotice(response.ok ? status === "approved" ? "Premium অনুমোদন, receipt ও email workflow সম্পন্ন হয়েছে।" : "রিকোয়েস্ট প্রত্যাখ্যান করা হয়েছে।" : "পেমেন্ট আপডেট করা যায়নি।");
-    await load();
+    setNotice(response.ok ? status === "approved" ? "Premium অনুমোদন, receipt ও email workflow সম্পন্ন হয়েছে।" : "রিকোয়েস্ট প্রত্যাখ্যান করা হয়েছে।" : data.error || "পেমেন্ট আপডেট করা যায়নি।");
+    if (response.ok) await load();
   };
 
   return <div><div className="anim-fade-up"><SpringHeading as="h1" className="text-2xl font-bold">Premium ও পেমেন্ট</SpringHeading><p className="mt-1 text-sm text-[#6C757D]">টায়ার, বাংলাদেশি Send Money নম্বর, manual membership এবং payment receipt এক জায়গা থেকে নিয়ন্ত্রণ করুন।</p></div>
-    {notice && <p className={`mt-4 rounded-lg px-4 py-3 text-sm font-semibold ${notice.includes("যায়নি") ? "bg-rose-50 text-rose-700" : "bg-emerald-50 text-emerald-700"}`}>{notice}</p>}
+    {emailStatus && !emailStatus.configured && <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"><b>Transactional email এখন প্রস্তুত নয়।</b> {!emailStatus.hasApiKey ? "Vercel Environment Variables-এ RESEND_API_KEY যোগ করুন।" : "EMAIL_FROM বা Admin Settings-এর verified sender দিন।"} Resend-এ sender domain verify করাও জরুরি।</div>}
+    {emailStatus?.configured && <p className="mt-4 rounded-lg bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-800">Transactional email configured · sender: {emailStatus.sender}</p>}
+    {notice && <p className={`mt-4 rounded-lg px-4 py-3 text-sm font-semibold ${notice.includes("যায়নি") || notice.includes("ব্যর্থ") || notice.includes("প্রস্তুত") ? "bg-rose-50 text-rose-700" : "bg-emerald-50 text-emerald-700"}`}>{notice}</p>}
     <PremiumSettingsPanel />
     <ManualMembershipPanel onUpdated={() => { void load(); }} />
     <section data-tour="admin-payment-inbox" className="mt-8"><div className="flex flex-wrap items-center justify-between gap-3"><div><SpringHeading as="h2" className="text-lg font-bold">পেমেন্ট রিকোয়েস্ট ইনবক্স</SpringHeading><p className="mt-1 text-xs text-[#6C757D]">Approve করলে membership চালু, receipt code/token তৈরি এবং product-price email পাঠানোর চেষ্টা হবে।</p></div><span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">{rows.filter((row) => row.payment.status === "pending").length} অপেক্ষমাণ</span></div>

@@ -7,12 +7,19 @@ import { currentUser } from "@/lib/userAuth";
 import { isAdmin } from "@/lib/adminAuth";
 import { getSettings } from "@/lib/settings";
 import { isPremiumTier, planLabels } from "@/lib/premium";
+import { ensurePremiumOperationsSchema } from "@/lib/premiumSchema";
 
 type Params = { params: Promise<{ id: string }> };
 
 const money = (value: string) => value ? `${value} BDT` : "Amount configured by administrator";
 
 export async function GET(req: Request, { params }: Params) {
+  try {
+    await ensurePremiumOperationsSchema();
+  } catch (error) {
+    console.error("Receipt schema sync failed", error);
+    return NextResponse.json({ error: "Receipt database is not ready" }, { status: 500 });
+  }
   const { id } = await params;
   const paymentId = Number(id);
   const [payment] = await db.select().from(paymentRequests).where(eq(paymentRequests.id, paymentId));
