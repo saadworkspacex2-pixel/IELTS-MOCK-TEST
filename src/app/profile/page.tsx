@@ -16,7 +16,6 @@ import { and, desc, eq } from "drizzle-orm";
 import { getSettings } from "@/lib/settings";
 import { isPremiumMember } from "@/lib/premium";
 import LogoutButton from "./LogoutButton";
-import ProfileEditor from "./ProfileEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -79,15 +78,12 @@ export default async function ProfilePage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2.5">
-            <ProfileEditor
-              user={{
-                nameBn: user.nameBn,
-                nameEn: user.nameEn,
-                phone: user.phone,
-                avatar: user.avatar,
-                email: user.email,
-              }}
-            />
+            <Link
+              href="/profile/edit"
+              className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 transition hover:border-[#E51A24] hover:text-[#B50C16]"
+            >
+              <Icon name="edit" size={15} /> প্রোফাইল সম্পাদনা
+            </Link>
             <Link
               href="/profile/report"
               className="btn-red inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-bold"
