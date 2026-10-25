@@ -2,7 +2,7 @@ import SpringHeading from "@/components/SpringHeading";
 import Link from "next/link";
 import { db } from "@/db";
 import { exams, questions } from "@/db/schema";
-import { count, desc, eq } from "drizzle-orm";
+import { asc, count, desc, eq } from "drizzle-orm";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DynamicSections from "@/components/DynamicSections";
@@ -31,7 +31,7 @@ export default async function ExamsPage({
     .leftJoin(questions, eq(questions.examId, exams.id))
     .where(eq(exams.isLive, true))
     .groupBy(exams.id)
-    .orderBy(desc(exams.createdAt));
+    .orderBy(asc(exams.sortOrder), desc(exams.createdAt));
 
   const categories = Array.from(new Set(rows.map((r) => r.exam.category)));
   const filtered = category

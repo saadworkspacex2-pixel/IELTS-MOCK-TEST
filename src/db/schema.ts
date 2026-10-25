@@ -21,6 +21,7 @@ export const exams = appSchema.table("exams", {
   marksPerQuestion: real("marks_per_question").notNull().default(1),
   negativeMark: real("negative_mark").notNull().default(0),
   isLive: boolean("is_live").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
   accessLevel: text("access_level").notNull().default("free"), // free | premium
   rules: jsonb("rules").notNull().default({}),
   createdAt: timestamp("created_at").notNull().defaultNow(),

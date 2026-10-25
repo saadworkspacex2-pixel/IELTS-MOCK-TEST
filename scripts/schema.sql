@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS exams (
   marks_per_question real NOT NULL DEFAULT 1,
   negative_mark real NOT NULL DEFAULT 0,
   is_live boolean NOT NULL DEFAULT true,
+  sort_order integer NOT NULL DEFAULT 0,
   rules jsonb NOT NULL DEFAULT '{}',
   created_at timestamp NOT NULL DEFAULT now()
 );
@@ -121,6 +122,7 @@ CREATE TABLE IF NOT EXISTS exam_sessions (
 );
 
 ALTER TABLE exams ADD COLUMN IF NOT EXISTS rules jsonb NOT NULL DEFAULT '{}';
+ALTER TABLE exams ADD COLUMN IF NOT EXISTS sort_order integer NOT NULL DEFAULT 0;
 ALTER TABLE exams ADD COLUMN IF NOT EXISTS access_level text NOT NULL DEFAULT 'free';
 ALTER TABLE resources ADD COLUMN IF NOT EXISTS access_level text NOT NULL DEFAULT 'free';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS membership_tier text NOT NULL DEFAULT 'free';

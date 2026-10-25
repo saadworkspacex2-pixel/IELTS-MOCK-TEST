@@ -3,7 +3,7 @@ import SpringHeading from "@/components/SpringHeading";
 import Link from "next/link";
 import { db } from "@/db";
 import { attempts, exams, questions, resources } from "@/db/schema";
-import { count, desc, eq } from "drizzle-orm";
+import { asc, count, desc, eq } from "drizzle-orm";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DynamicSections from "@/components/DynamicSections";
@@ -143,7 +143,7 @@ export default async function HomePage() {
         .select()
         .from(exams)
         .where(eq(exams.isLive, true))
-        .orderBy(desc(exams.createdAt))
+        .orderBy(asc(exams.sortOrder), desc(exams.createdAt))
         .limit(6),
       db.select({ c: count() }).from(exams),
       db.select({ c: count() }).from(questions),

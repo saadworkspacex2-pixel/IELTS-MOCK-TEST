@@ -49,6 +49,8 @@ export async function POST(req: Request) {
   if (!body?.exam?.title) {
     return NextResponse.json({ error: "exam.title প্রয়োজন" }, { status: 400 });
   }
+  const current = await db.select({ sortOrder: exams.sortOrder }).from(exams);
+  const nextSortOrder = Math.max(0, ...current.map((exam) => exam.sortOrder)) + 1;
   const [exam] = await db
     .insert(exams)
     .values({
@@ -60,6 +62,7 @@ export async function POST(req: Request) {
       marksPerQuestion: body.exam.marksPerQuestion ?? 1,
       negativeMark: body.exam.negativeMark ?? 0,
       isLive: body.exam.isLive ?? true,
+      sortOrder: nextSortOrder,
       rules: body.exam.rules ?? {},
     })
     .returning();

@@ -20,6 +20,25 @@ try {
   await pool.query(schemaSql);
   console.log("✓ Database schema is up to date.");
   await applyAcademicMockLibrary(pool);
+  // Existing installations and the guarded mock-library installer may have
+  // rows created before exam ordering existed. Give only unnumbered rows a
+  // stable initial position without overwriting an admin's chosen order.
+  await pool.query(`
+    WITH current_max AS (
+      SELECT COALESCE(MAX(sort_order), 0) AS position
+      FROM lhbd_app.exams
+      WHERE sort_order > 0
+    ),
+    unordered AS (
+      SELECT id, row_number() OVER (ORDER BY created_at DESC, id DESC) AS position
+      FROM lhbd_app.exams
+      WHERE sort_order = 0
+    )
+    UPDATE lhbd_app.exams
+    SET sort_order = current_max.position + unordered.position
+    FROM current_max, unordered
+    WHERE exams.id = unordered.id
+  `);
 } finally {
   await pool.end();
 }
