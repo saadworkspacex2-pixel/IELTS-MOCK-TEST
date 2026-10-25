@@ -62,7 +62,7 @@ export default async function EditExamPage({
           />
         </section>
 
-        <section>
+        <section id="question-order" tabIndex={-1} className="scroll-mt-28">
           <SpringHeading as="h2" className="mb-4 text-lg font-semibold text-slate-700">
             {exam.module === "writing"
               ? "টাস্ক ব্যবস্থাপনা"

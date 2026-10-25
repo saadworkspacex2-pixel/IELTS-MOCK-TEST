@@ -63,7 +63,7 @@ export default function AdminExamsPage() {
         <div>
           <SpringHeading as="h1" className="text-2xl font-bold">পরীক্ষা ম্যানেজ</SpringHeading>
           <p className="mt-1 text-sm text-[#6C757D]">
-            পরীক্ষা তৈরি, সম্পাদনা, লাইভ/অফ ও প্রশ্ন ব্যবস্থাপনা
+            পরীক্ষা তৈরি, সম্পাদনা, লাইভ/অফ, প্রশ্নের ক্রম ও প্রশ্ন ব্যবস্থাপনা
           </p>
         </div>
         <Link
@@ -128,7 +128,13 @@ export default function AdminExamsPage() {
                     </button>
                   </td>
                   <td className="px-5 py-4 text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <Link
+                        href={`/admin/exams/${e.id}#question-order`}
+                        className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-[#B50C16] transition hover:border-red-300 hover:bg-red-100"
+                      >
+                        প্রশ্ন সাজান
+                      </Link>
                       <Link
                         href={`/admin/exams/${e.id}`}
                         className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-800 transition hover:bg-slate-200"
