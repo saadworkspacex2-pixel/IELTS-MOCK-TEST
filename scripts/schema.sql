@@ -83,6 +83,25 @@ CREATE TABLE IF NOT EXISTS attempts (
   is_published boolean NOT NULL DEFAULT true,
   created_at timestamp NOT NULL DEFAULT now()
 );
+CREATE TABLE IF NOT EXISTS visitor_logs (
+  id serial PRIMARY KEY,
+  session_id text NOT NULL UNIQUE,
+  ip text NOT NULL DEFAULT '',
+  country text NOT NULL DEFAULT '',
+  region text NOT NULL DEFAULT '',
+  city text NOT NULL DEFAULT '',
+  browser text NOT NULL DEFAULT '',
+  device text NOT NULL DEFAULT '',
+  operating_system text NOT NULL DEFAULT '',
+  user_agent text NOT NULL DEFAULT '',
+  entry_path text NOT NULL DEFAULT '/',
+  last_path text NOT NULL DEFAULT '/',
+  page_views integer NOT NULL DEFAULT 1,
+  first_seen timestamp NOT NULL DEFAULT now(),
+  last_seen timestamp NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS visitor_logs_last_seen_idx ON visitor_logs(last_seen DESC);
+
 CREATE TABLE IF NOT EXISTS resources (
   id serial PRIMARY KEY,
   title text NOT NULL,

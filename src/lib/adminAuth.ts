@@ -15,6 +15,7 @@ export type AdminArea =
   | "media"
   | "students"
   | "analytics"
+  | "visitors"
   | "staff";
 
 export type AdminContext = {
@@ -74,6 +75,7 @@ const AREA_ROLES: Record<AdminArea, AdminRole[]> = {
   media: ["super", "content", "exam"],
   students: ["super", "evaluator"],
   analytics: ["super", "exam", "evaluator"],
+  visitors: ["super", "exam", "evaluator"],
   staff: ["super"],
 };
 

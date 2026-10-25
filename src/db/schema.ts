@@ -156,6 +156,26 @@ export const examSessions = appSchema.table("exam_sessions", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Anonymous, consented public browsing sessions. The id is generated per tab/session,
+// not a cross-site tracking identifier.
+export const visitorLogs = appSchema.table("visitor_logs", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id").notNull().unique(),
+  ip: text("ip").notNull().default(""),
+  country: text("country").notNull().default(""),
+  region: text("region").notNull().default(""),
+  city: text("city").notNull().default(""),
+  browser: text("browser").notNull().default(""),
+  device: text("device").notNull().default(""),
+  operatingSystem: text("operating_system").notNull().default(""),
+  userAgent: text("user_agent").notNull().default(""),
+  entryPath: text("entry_path").notNull().default("/"),
+  lastPath: text("last_path").notNull().default("/"),
+  pageViews: integer("page_views").notNull().default(1),
+  firstSeen: timestamp("first_seen").notNull().defaultNow(),
+  lastSeen: timestamp("last_seen").notNull().defaultNow(),
+});
+
 export const resources = appSchema.table("resources", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -201,6 +221,7 @@ export type Exam = typeof exams.$inferSelect;
 export type Section = typeof sections.$inferSelect;
 export type Question = typeof questions.$inferSelect;
 export type Attempt = typeof attempts.$inferSelect;
+export type VisitorLog = typeof visitorLogs.$inferSelect;
 export type Resource = typeof resources.$inferSelect;
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type PaymentRequest = typeof paymentRequests.$inferSelect;

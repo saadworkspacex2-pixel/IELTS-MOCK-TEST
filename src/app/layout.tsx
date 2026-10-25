@@ -6,6 +6,7 @@ import InjectCode from "@/components/InjectCode";
 import VelocityCursor from "@/components/VelocityCursor";
 import InstructionTour from "@/components/InstructionTour";
 import { Analytics, CookieBanner } from "@/components/AnalyticsConsent";
+import VisitorTracker from "@/components/VisitorTracker";
 import { BrandSettingsProvider } from "@/components/BrandSettingsProvider";
 import { LocaleProvider } from "@/components/LocaleProvider";
 import InterfaceTranslationLayer from "@/components/InterfaceTranslationLayer";
@@ -77,6 +78,7 @@ export default async function RootLayout({
           />
           <InjectCode html={s.header_code ?? ""} target="head" />
           {children}
+          <VisitorTracker />
           <InstructionTour />
           <CookieBanner />
           <Analytics measurementId={s.analytics_measurement_id} />

@@ -24,7 +24,7 @@ export function CookieBanner() {
     <div className="fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-xl rounded-xl border border-black/10 bg-white p-4 shadow-2xl sm:bottom-5 sm:p-5" role="dialog" aria-label="Cookie consent">
       <p className="font-semibold text-[#1A1A1A]">কুকি পছন্দ</p>
       <p className="mt-1 text-xs leading-relaxed text-[#6C757D]">
-        সাইট চালাতে জরুরি কুকি ব্যবহার করা হয়। আপনি অনুমতি দিলে ভিজিটর ব্যবহারের তথ্য বিশ্লেষণেও সাহায্য করবে। বিস্তারিত আমাদের প্রাইভেসি পলিসিতে আছে।
+        সাইট চালাতে জরুরি কুকি ব্যবহার করা হয়। আপনি অনুমতি দিলে আমরা সম্মতিপ্রাপ্ত পাবলিক ভিজিটের browser, device, পূর্ণ IP ও hosting header থেকে পাওয়া আনুমানিক location ডায়াগনস্টিকের জন্য রেকর্ড করতে পারি। বিস্তারিত প্রাইভেসি পলিসিতে আছে।
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button onClick={() => choose("accepted")} className="btn-red rounded-md px-4 py-2 text-xs font-bold">সব গ্রহণ করুন</button>

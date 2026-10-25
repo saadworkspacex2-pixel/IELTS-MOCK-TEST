@@ -16,6 +16,7 @@ const NAV = [
   { href: "/admin/grading", label: "গ্রেডিং স্টুডিও", icon: "pen", area: "grading" },
   { href: "/admin/students", label: "স্টুডেন্ট CRM", icon: "users", area: "students" },
   { href: "/admin/analytics", label: "লাইভ অ্যানালিটিক্স", icon: "chart", area: "analytics" },
+  { href: "/admin/visitors", label: "ভিজিটর মনিটরিং", icon: "eye", area: "visitors" },
   { href: "/admin/leaderboard", label: "লিডারবোর্ড", icon: "trophy", area: "analytics" },
   { href: "/admin/pages", label: "পেজ বিল্ডার", icon: "screen", area: "pages" },
   { href: "/admin/branding", label: "লোগো ও Favicon", icon: "screen", area: "theme" },
@@ -31,9 +32,9 @@ const NAV = [
 ];
 
 const ROLE_AREAS: Record<string, string[]> = {
-  super: ["all", "exams", "grading", "students", "analytics", "pages", "theme", "media", "settings", "staff"],
-  exam: ["all", "exams", "media", "analytics"],
-  evaluator: ["all", "grading", "students", "analytics"],
+  super: ["all", "exams", "grading", "students", "analytics", "visitors", "pages", "theme", "media", "settings", "staff"],
+  exam: ["all", "exams", "media", "analytics", "visitors"],
+  evaluator: ["all", "grading", "students", "analytics", "visitors"],
   content: ["all", "pages", "theme", "media", "settings"],
 };
 
