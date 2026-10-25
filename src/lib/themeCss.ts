@@ -17,6 +17,9 @@ export function buildThemeCss(s: Record<string, string>): string {
   const headingFamily = s.font_heading_family || "";
   const accentFamily = s.font_accent_family || "";
   const styleFamily = s.font_style_family || "";
+  const banglaFamily = s.font_bangla_family || "Hind Siliguri";
+  const englishFamily = s.font_english_family || "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', Manrope, sans-serif";
+  const englishDisplayFamily = s.font_english_display_family || "Iowan Old Style, Baskerville, Times New Roman, serif";
 
   const logoX = Number(s.logo_x || 0);
   const logoY = Number(s.logo_y || 0);
@@ -29,6 +32,9 @@ ${fontFace("LHBDCustomBody", s.font_body_url || "")}
 ${fontFace("LHBDCustomHeading", s.font_heading_url || "")}
 ${fontFace("LHBDCustomAccent", s.font_accent_url || "")}
 ${fontFace("LHBDCustomStyle", s.font_style_url || "")}
+${fontFace("LHBDCustomBangla", s.font_bangla_url || "")}
+${fontFace("LHBDCustomEnglish", s.font_english_url || "")}
+${fontFace("LHBDCustomEnglishDisplay", s.font_english_display_url || "")}
 :root{
   --lhbd-red:${red};
   --lhbd-red-dark:${red};
@@ -37,6 +43,9 @@ ${fontFace("LHBDCustomStyle", s.font_style_url || "")}
   --lhbd-ink:${ink};
   --lhbd-muted:${muted};
   --lhbd-border:${border};
+  --font-bangla:'${banglaFamily}', 'LHBDCustomBangla', 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  --font-english:${englishFamily};
+  --font-english-display:${englishDisplayFamily};
 }
 body{background:${s.color_gradient || bg}!important;color:${ink}!important;}
 .card,.glass{background-color:${surface}!important;border-color:${border}!important;}
@@ -68,5 +77,8 @@ ${
 ${boldEnabled ? "" : "body,body *{font-weight:400!important;}"}
 ${boldEnabled && boldVersionMode ? "b,strong,h1,h2,h3,h4,h5,h6,.font-semibold,.font-bold,.font-extrabold{font-weight:800!important;}" : ""}
 ${italicEnabled ? "" : "i,em,blockquote,.italic,.font-style-custom{font-style:normal!important;}"}
+html[lang="bn"] body,html[lang="bn"] input,html[lang="bn"] textarea,html[lang="bn"] select,html[lang="bn"] button{font-family:var(--font-bangla)!important;}
+html[lang="en"] body,html[lang="en"] input,html[lang="en"] textarea,html[lang="en"] select,html[lang="en"] button{font-family:var(--font-english),var(--font-bangla),sans-serif!important;}
+html[lang="en"] h1,html[lang="en"] h2,html[lang="en"] h3,html[lang="en"] h4,html[lang="en"] h5,html[lang="en"] h6{font-family:var(--font-english-display),var(--font-english),serif!important;font-style:italic;}
 `;
 }

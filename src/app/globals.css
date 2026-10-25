@@ -16,6 +16,8 @@
   --lhbd-paper: #ffffff;
   --font-latin: "Manrope", sans-serif;
   --font-bangla: "Hind Siliguri", "Noto Sans Bengali", sans-serif;
+  --font-english: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", "Manrope", sans-serif;
+  --font-english-display: "Iowan Old Style", "Baskerville", "Times New Roman", serif;
 
   /* Clean neutral skeuomorphic elevation tokens */
   --skeuo-raised:
@@ -44,7 +46,7 @@ html {
 }
 
 body {
-  font-family: var(--font-latin), var(--font-bangla), sans-serif;
+  font-family: var(--font-bangla), var(--font-english), sans-serif;
   color: var(--lhbd-ink);
   background-color: #edf0f4;
   background-image:
@@ -56,6 +58,35 @@ body {
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Language-aware typography: Bangla is the default, while English uses an
+   Apple/SF Pro system stack when it is available on the visitor's device. */
+html[lang="bn"] body,
+html[lang="bn"] input,
+html[lang="bn"] textarea,
+html[lang="bn"] select,
+html[lang="bn"] button {
+  font-family: var(--font-bangla), var(--font-english), sans-serif;
+}
+
+html[lang="en"] body,
+html[lang="en"] input,
+html[lang="en"] textarea,
+html[lang="en"] select,
+html[lang="en"] button {
+  font-family: var(--font-english), var(--font-bangla), sans-serif;
+}
+
+html[lang="en"] h1,
+html[lang="en"] h2,
+html[lang="en"] h3,
+html[lang="en"] h4,
+html[lang="en"] h5,
+html[lang="en"] h6 {
+  font-family: var(--font-english-display), var(--font-english), serif;
+  font-style: italic;
+  letter-spacing: -0.018em;
 }
 
 /* The assessment workspace intentionally stays paper-clear and distraction-free. */

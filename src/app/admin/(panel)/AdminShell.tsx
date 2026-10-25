@@ -8,6 +8,7 @@ import { useState, type ReactNode } from "react";
 import Logo from "@/components/Logo";
 import Icon from "@/components/Icon";
 import { triggerGuidedTour } from "@/components/InstructionTour";
+import LanguageToggle from "@/components/LanguageToggle";
 
 const NAV = [
   { href: "/admin", label: "ড্যাশবোর্ড", icon: "chart", area: "all" },
@@ -110,6 +111,7 @@ export default function AdminShell({
           অ্যাডমিন <span className="text-[#E51A24]">প্যানেল</span>
         </SpringHeading>
         <div className="flex items-center gap-3">
+          <LanguageToggle compact />
           <button type="button" onClick={triggerGuidedTour} className="skeuo-key rounded-md px-3 py-1.5 text-xs font-bold">গাইড</button>
           <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-[#E51A24]" title={adminName}>
             ● অনলাইন

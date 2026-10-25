@@ -14,11 +14,20 @@ const COLOR_FIELDS = [
 ];
 
 const FONT_SLOTS = [
-  { key: "body", label: "Body Text (p, span, inputs)" },
-  { key: "heading", label: "Headlines (h1, h2, h3)" },
+  { key: "bangla", label: "Bangla interface (default: Hind Siliguri)" },
+  { key: "english", label: "English interface (default: SF Pro system stack)" },
+  { key: "english_display", label: "English italic headings / display" },
+  { key: "body", label: "Legacy all-site body override" },
+  { key: "heading", label: "Legacy all-site heading override" },
   { key: "accent", label: "Brand Red Accents / CTA" },
   { key: "style", label: "Modern / Italic / Quotes" },
 ];
+
+const LANGUAGE_FONT_DEFAULTS: Record<string, string> = {
+  bangla: "Hind Siliguri",
+  english: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', Manrope, sans-serif",
+  english_display: "Iowan Old Style, Baskerville, Times New Roman, serif",
+};
 
 export default function AdminThemePage() {
   const [v, setV] = useState<Record<string, string>>({});
@@ -52,8 +61,10 @@ export default function AdminThemePage() {
       return;
     }
     set(`font_${slot}_url`, d.url);
-    if (!v[`font_${slot}_family`]) {
-      set(`font_${slot}_family`, `LHBDCustom${slot[0].toUpperCase()}${slot.slice(1)}`);
+    const familyKey = `font_${slot}_family`;
+    const customFamily = `LHBDCustom${slot[0].toUpperCase()}${slot.slice(1)}`;
+    if (!v[familyKey] || v[familyKey] === LANGUAGE_FONT_DEFAULTS[slot]) {
+      set(familyKey, customFamily);
     }
     setSuccess("ফন্ট আপলোড হয়েছে। সংরক্ষণ করলে সাইটে কার্যকর হবে।");
   };
@@ -124,7 +135,7 @@ export default function AdminThemePage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <SpringHeading as="h2" className="font-bold">Font Style Controls</SpringHeading>
-            <p className="mt-1 text-sm text-[#6C757D]">Bold, Italic এবং Bold Version Mode আলাদাভাবে চালু/বন্ধ করুন</p>
+            <p className="mt-1 text-sm text-[#6C757D]">Bangla ও English-এর জন্য আলাদা ফন্ট সেট করুন। English mode-এ শিরোনাম italic display style পাবে; SF Pro শুধু Apple ডিভাইসে system font হিসেবে ব্যবহার হয়।</p>
           </div>
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-[#6C757D]">সাইট-wide</span>
         </div>

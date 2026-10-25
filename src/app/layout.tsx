@@ -7,6 +7,9 @@ import VelocityCursor from "@/components/VelocityCursor";
 import InstructionTour from "@/components/InstructionTour";
 import { Analytics, CookieBanner } from "@/components/AnalyticsConsent";
 import { BrandSettingsProvider } from "@/components/BrandSettingsProvider";
+import { LocaleProvider } from "@/components/LocaleProvider";
+import InterfaceTranslationLayer from "@/components/InterfaceTranslationLayer";
+import { getLocale } from "@/lib/locale";
 
 // Self-hosted fonts (bundled with the app, no external CDN requests).
 // This keeps Bangla + English typography working in every deploy environment.
@@ -61,11 +64,13 @@ export default async function RootLayout({
 }: {
   children: ReactNode;
 }) {
-  const s = await getSettings();
+  const [s, locale] = await Promise.all([getSettings(), getLocale()]);
   return (
-    <html lang="bn">
+    <html lang={locale}>
       <body className="bg-white text-[#1A1A1A] antialiased">
-        <BrandSettingsProvider settings={s}>
+        <LocaleProvider initialLocale={locale}>
+          <InterfaceTranslationLayer />
+          <BrandSettingsProvider settings={s}>
           <style
             id="lhbd-theme"
             dangerouslySetInnerHTML={{ __html: buildThemeCss(s) }}
@@ -77,7 +82,8 @@ export default async function RootLayout({
           <Analytics measurementId={s.analytics_measurement_id} />
           <VelocityCursor />
           <InjectCode html={s.footer_code ?? ""} target="body" />
-        </BrandSettingsProvider>
+          </BrandSettingsProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

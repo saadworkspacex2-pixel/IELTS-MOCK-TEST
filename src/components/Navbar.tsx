@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 import Logo from "./Logo";
 import MobileStickyCTA from "./MobileStickyCTA";
 import { triggerGuidedTour } from "./InstructionTour";
+import LanguageToggle from "./LanguageToggle";
+import { useLocale } from "./LocaleProvider";
+import { translateBnText } from "@/lib/interfaceTranslations";
 
 const links = [
   { href: "/", label: "হোম" },
@@ -17,6 +20,8 @@ const links = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { locale } = useLocale();
+  const text = (value: string) => translateBnText(value, locale);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -45,26 +50,28 @@ export default function Navbar() {
                   data-tour={link.href === "/exams" ? "nav-tests" : link.href === "/premium" ? "nav-premium" : undefined}
                   className={`relative whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-semibold transition-all xl:px-4 xl:text-sm ${active ? "skeuo-key text-[#E51A24]" : "text-[#212529] hover:text-[#1A1A1A]"}`}
                 >
-                  {link.label}
+                  {text(link.label)}
                 </Link>
               );
             })}
           </div>
 
           <div data-tour="nav-actions" className="hidden shrink-0 items-center gap-2 min-[1180px]:flex">
-            <button type="button" onClick={triggerGuidedTour} className="hidden skeuo-key whitespace-nowrap rounded-full px-3 py-2 text-xs font-bold 2xl:inline-flex">গাইড</button>
-            <Link href="/login" data-tour="nav-login" className="skeuo-key whitespace-nowrap rounded-full px-3 py-2 text-[13px] font-semibold xl:px-4 xl:text-sm">লগইন</Link>
-            <Link href="/profile" className="skeuo-key hidden whitespace-nowrap rounded-full px-3 py-2 text-[13px] font-semibold 2xl:inline-flex xl:px-4 xl:text-sm">প্রোফাইল</Link>
-            <Link href="/admin" className="skeuo-key hidden whitespace-nowrap rounded-full px-3 py-2 text-[13px] font-semibold 2xl:inline-flex xl:px-4 xl:text-sm">অ্যাডমিন</Link>
-            <Link href="/exams" data-free-test-start="true" className="btn-red whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-bold xl:px-5 xl:text-sm">ফ্রি টেস্ট দিন</Link>
+            <LanguageToggle />
+            <button type="button" onClick={triggerGuidedTour} className="hidden skeuo-key whitespace-nowrap rounded-full px-3 py-2 text-xs font-bold 2xl:inline-flex">{text("গাইড")}</button>
+            <Link href="/login" data-tour="nav-login" className="skeuo-key whitespace-nowrap rounded-full px-3 py-2 text-[13px] font-semibold xl:px-4 xl:text-sm">{text("লগইন")}</Link>
+            <Link href="/profile" className="skeuo-key hidden whitespace-nowrap rounded-full px-3 py-2 text-[13px] font-semibold 2xl:inline-flex xl:px-4 xl:text-sm">{text("প্রোফাইল")}</Link>
+            <Link href="/admin" className="skeuo-key hidden whitespace-nowrap rounded-full px-3 py-2 text-[13px] font-semibold 2xl:inline-flex xl:px-4 xl:text-sm">{text("অ্যাডমিন")}</Link>
+            <Link href="/exams" data-free-test-start="true" className="btn-red whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-bold xl:px-5 xl:text-sm">{text("ফ্রি টেস্ট দিন")}</Link>
           </div>
 
           <div className="flex shrink-0 items-center gap-2 min-[1180px]:hidden">
+            <LanguageToggle compact />
             <button
               type="button"
               onClick={() => setOpen((value) => !value)}
               className="skeuo-key grid h-10 w-10 place-items-center rounded-xl text-[#1A1A1A]"
-              aria-label={open ? "মেনু বন্ধ করুন" : "মেনু খুলুন"}
+              aria-label={text(open ? "মেনু বন্ধ করুন" : "মেনু খুলুন")}
               aria-expanded={open}
             >
               <span className="relative block h-3.5 w-5">
@@ -86,13 +93,13 @@ export default function Navbar() {
                   onClick={closeMenu}
                   className="rounded-lg px-3 py-2.5 text-sm font-semibold text-[#212529] transition hover:bg-black/[0.04]"
                 >
-                  {link.label}
+                  {text(link.label)}
                 </Link>
               ))}
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
-              <button type="button" onClick={() => { closeMenu(); triggerGuidedTour(); }} className="skeuo-key rounded-lg px-3 py-2.5 text-xs font-bold">গাইড দেখুন</button>
-              <Link href="/exams" data-free-test-start="true" onClick={closeMenu} className="btn-red flex-1 whitespace-nowrap rounded-lg px-3 py-3 text-center text-sm font-bold">ফ্রি টেস্ট দিন</Link>
+              <button type="button" onClick={() => { closeMenu(); triggerGuidedTour(); }} className="skeuo-key rounded-lg px-3 py-2.5 text-xs font-bold">{text("গাইড দেখুন")}</button>
+              <Link href="/exams" data-free-test-start="true" onClick={closeMenu} className="btn-red flex-1 whitespace-nowrap rounded-lg px-3 py-3 text-center text-sm font-bold">{text("ফ্রি টেস্ট দিন")}</Link>
             </div>
           </div>
         )}
