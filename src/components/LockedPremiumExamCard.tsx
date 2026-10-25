@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 type LockedPremiumExamCardProps = {
   id: number;
@@ -52,41 +52,90 @@ function PadlockMark() {
 
 type ChainLink = { x: number; y: number; angle: number };
 
+type SteelLinkProps = {
+  link: ChainLink;
+  metalId: string;
+  highlightId: string;
+};
+
+function SteelLink({ link, metalId, highlightId }: SteelLinkProps) {
+  return (
+    <g
+      className="premium-chain-link"
+      transform={`translate(${link.x} ${link.y}) rotate(${link.angle})`}
+    >
+      {/* Dark tube edge, polished steel face, then small wear/highlight details. */}
+      <ellipse rx="23" ry="11.4" fill="none" stroke="#0b1118" strokeWidth="10" opacity="0.94" />
+      <ellipse rx="22.6" ry="11" fill="none" stroke={`url(#${metalId})`} strokeWidth="7.35" />
+      <ellipse rx="18.65" ry="7.1" fill="none" stroke="#071019" strokeWidth="1.35" opacity="0.86" />
+      <path
+        d="M-15.6 -6.15C-9.4 -9.35 8.8 -9.35 15.6 -6.15"
+        fill="none"
+        stroke={`url(#${highlightId})`}
+        strokeWidth="1.85"
+        strokeLinecap="round"
+        opacity="0.94"
+      />
+      <path
+        d="M-15.2 6.2C-8 9.45 8 9.45 15.4 6.15"
+        fill="none"
+        stroke="#2b3640"
+        strokeWidth="1.55"
+        strokeLinecap="round"
+        opacity="0.9"
+      />
+      <path d="M-21 -1.9C-22.3 0 -22.3 2 -21 3.7" fill="none" stroke="#e9f3f7" strokeWidth="1.1" opacity="0.55" />
+    </g>
+  );
+}
+
 function ChainOverlay() {
-  // Each route is built from visible, alternating oval links rather than a
-  // dotted stroke. The rings overlap just like a physical chain around a lock.
+  const instanceId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const metalId = `premiumSteel-${instanceId}`;
+  const highlightId = `premiumSteelHighlight-${instanceId}`;
+  const shadowId = `premiumChainShadow-${instanceId}`;
+
+  // Six independent, physical-looking routes converge under the lock. Links
+  // intentionally alternate direction, so the chain reads as interlocked metal
+  // rather than a painted/dashed line.
   const chains: ChainLink[][] = [
-    [{ x: -10, y: 23, angle: -28 }, { x: 38, y: 44, angle: 58 }, { x: 87, y: 69, angle: -28 }, { x: 136, y: 99, angle: 60 }, { x: 185, y: 132, angle: -28 }, { x: 233, y: 163, angle: 60 }, { x: 285, y: 190, angle: -28 }],
-    [{ x: -8, y: 168, angle: 0 }, { x: 45, y: 174, angle: 90 }, { x: 98, y: 181, angle: 0 }, { x: 151, y: 188, angle: 90 }, { x: 204, y: 194, angle: 0 }, { x: 257, y: 199, angle: 90 }, { x: 309, y: 203, angle: 0 }],
-    [{ x: -8, y: 376, angle: 25 }, { x: 44, y: 355, angle: -62 }, { x: 95, y: 331, angle: 25 }, { x: 146, y: 301, angle: -62 }, { x: 196, y: 266, angle: 25 }, { x: 247, y: 232, angle: -62 }, { x: 296, y: 211, angle: 25 }],
-    [{ x: 610, y: 22, angle: 28 }, { x: 561, y: 46, angle: -58 }, { x: 512, y: 74, angle: 28 }, { x: 463, y: 107, angle: -58 }, { x: 415, y: 141, angle: 28 }, { x: 366, y: 172, angle: -58 }, { x: 316, y: 195, angle: 28 }],
-    [{ x: 610, y: 202, angle: 0 }, { x: 557, y: 203, angle: 90 }, { x: 504, y: 204, angle: 0 }, { x: 451, y: 204, angle: 90 }, { x: 398, y: 205, angle: 0 }, { x: 345, y: 205, angle: 90 }, { x: 293, y: 205, angle: 0 }],
-    [{ x: 610, y: 382, angle: -25 }, { x: 558, y: 358, angle: 62 }, { x: 507, y: 333, angle: -25 }, { x: 456, y: 302, angle: 62 }, { x: 405, y: 267, angle: -25 }, { x: 354, y: 233, angle: 62 }, { x: 305, y: 211, angle: -25 }],
+    [{ x: -22, y: 16, angle: -27 }, { x: 26, y: 36, angle: 61 }, { x: 75, y: 60, angle: -27 }, { x: 123, y: 88, angle: 61 }, { x: 170, y: 120, angle: -27 }, { x: 216, y: 153, angle: 61 }, { x: 260, y: 181, angle: -27 }, { x: 293, y: 199, angle: 61 }],
+    [{ x: -20, y: 167, angle: 2 }, { x: 33, y: 173, angle: 91 }, { x: 87, y: 180, angle: 2 }, { x: 141, y: 187, angle: 91 }, { x: 195, y: 193, angle: 2 }, { x: 248, y: 198, angle: 91 }, { x: 297, y: 202, angle: 2 }],
+    [{ x: -20, y: 391, angle: 26 }, { x: 31, y: 369, angle: -61 }, { x: 82, y: 344, angle: 26 }, { x: 132, y: 315, angle: -61 }, { x: 181, y: 280, angle: 26 }, { x: 229, y: 245, angle: -61 }, { x: 274, y: 218, angle: 26 }, { x: 302, y: 206, angle: -61 }],
+    [{ x: 622, y: 15, angle: 27 }, { x: 574, y: 38, angle: -61 }, { x: 526, y: 64, angle: 27 }, { x: 478, y: 95, angle: -61 }, { x: 431, y: 128, angle: 27 }, { x: 384, y: 160, angle: -61 }, { x: 339, y: 185, angle: 27 }, { x: 308, y: 199, angle: -61 }],
+    [{ x: 622, y: 202, angle: -2 }, { x: 568, y: 202, angle: 89 }, { x: 514, y: 203, angle: -2 }, { x: 460, y: 203, angle: 89 }, { x: 406, y: 204, angle: -2 }, { x: 352, y: 204, angle: 89 }, { x: 303, y: 204, angle: -2 }],
+    [{ x: 622, y: 391, angle: -26 }, { x: 570, y: 368, angle: 61 }, { x: 519, y: 343, angle: -26 }, { x: 468, y: 313, angle: 61 }, { x: 418, y: 279, angle: -26 }, { x: 370, y: 245, angle: 61 }, { x: 325, y: 218, angle: -26 }, { x: 299, y: 206, angle: 61 }],
   ];
 
   return (
     <svg className="premium-chain-art" viewBox="0 0 600 408" preserveAspectRatio="none" aria-hidden="true">
       <defs>
-        <linearGradient id="premiumChainMetal" x1="-18" y1="-8" x2="18" y2="8" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#ffd3d5" />
-          <stop offset="0.18" stopColor="#ec5960" />
-          <stop offset="0.46" stopColor="#a30a15" />
-          <stop offset="0.72" stopColor="#ef6970" />
-          <stop offset="1" stopColor="#71030c" />
+        <linearGradient id={metalId} x1="0" y1="0" x2="0.82" y2="1">
+          <stop stopColor="#f8ffff" />
+          <stop offset="0.12" stopColor="#bfcbd2" />
+          <stop offset="0.34" stopColor="#596875" />
+          <stop offset="0.55" stopColor="#e2edf1" />
+          <stop offset="0.71" stopColor="#71818c" />
+          <stop offset="1" stopColor="#1b2630" />
         </linearGradient>
-        <filter id="premiumChainShadow" x="-25%" y="-35%" width="150%" height="170%">
-          <feDropShadow dx="0" dy="3" stdDeviation="2.8" floodColor="#390107" floodOpacity="0.62" />
+        <linearGradient id={highlightId} x1="0" y1="0" x2="1" y2="0">
+          <stop stopColor="#8fa2ac" stopOpacity="0" />
+          <stop offset="0.26" stopColor="#ffffff" />
+          <stop offset="0.7" stopColor="#dceaf0" />
+          <stop offset="1" stopColor="#8fa2ac" stopOpacity="0" />
+        </linearGradient>
+        <filter id={shadowId} x="-35%" y="-45%" width="170%" height="190%">
+          <feDropShadow dx="0" dy="3" stdDeviation="2.65" floodColor="#071019" floodOpacity="0.7" />
+          <feDropShadow dx="0" dy="0.7" stdDeviation="0.45" floodColor="#ffffff" floodOpacity="0.35" />
         </filter>
       </defs>
       {chains.map((chain, chainIndex) => (
-        <g key={chainIndex} className={`premium-chain premium-chain-${chainIndex + 1}`} filter="url(#premiumChainShadow)">
-          {chain.map((link, linkIndex) => (
-            <g key={`${link.x}-${link.y}`} className="premium-chain-link" transform={`translate(${link.x} ${link.y}) rotate(${link.angle})`}>
-              <ellipse rx="18" ry="7.6" fill="none" stroke="#5e040d" strokeWidth="6.8" />
-              <ellipse rx="18" ry="7.6" fill="none" stroke="url(#premiumChainMetal)" strokeWidth="4.3" />
-              <path d="M-11 -3.6C-5 -6.5 5 -6.5 11 -3.6" fill="none" stroke="#ffe6e7" strokeWidth="1.25" strokeLinecap="round" opacity="0.88" />
-              {linkIndex % 2 === 1 && <ellipse rx="11.5" ry="3.4" fill="none" stroke="#78050e" strokeWidth="1.2" opacity="0.72" />}
-            </g>
+        <g key={chainIndex} className={`premium-chain premium-chain-${chainIndex + 1}`} filter={`url(#${shadowId})`}>
+          {chain.filter((_, index) => index % 2 === 0).map((link) => (
+            <SteelLink key={`${link.x}-${link.y}`} link={link} metalId={metalId} highlightId={highlightId} />
+          ))}
+          {chain.filter((_, index) => index % 2 === 1).map((link) => (
+            <SteelLink key={`${link.x}-${link.y}`} link={link} metalId={metalId} highlightId={highlightId} />
           ))}
         </g>
       ))}
