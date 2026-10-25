@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useState } from "react";
+import { useState } from "react";
 
 type LockedPremiumExamCardProps = {
   id: number;
@@ -50,126 +50,6 @@ function PadlockMark() {
   );
 }
 
-type ChainLink = { x: number; y: number; angle: number };
-
-type ChainRoute = {
-  from: [number, number];
-  to: [number, number];
-  sway: number;
-  phase: number;
-};
-
-type SteelLinkProps = {
-  link: ChainLink;
-  metalId: string;
-  highlightId: string;
-  isFrontLink: boolean;
-};
-
-function SteelLink({ link, metalId, highlightId, isFrontLink }: SteelLinkProps) {
-  return (
-    <g
-      className="premium-chain-link"
-      transform={`translate(${link.x} ${link.y}) rotate(${link.angle})`}
-    >
-      {/* A long, dark-edged forged link: the silhouette and overlap match a real hanging chain. */}
-      <ellipse rx="11.6" ry="22.8" fill="none" stroke="#060708" strokeWidth="9.2" opacity="0.98" />
-      <ellipse rx="11.25" ry="22.45" fill="none" stroke={`url(#${metalId})`} strokeWidth="6.45" />
-      <ellipse rx="7.75" ry="18.8" fill="none" stroke="#07090a" strokeWidth="1.2" opacity="0.9" />
-      <path
-        d="M-7.4 -15.6C-10 -10 -10.1 8.2 -7.5 15.5"
-        fill="none"
-        stroke={`url(#${highlightId})`}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        opacity="0.98"
-      />
-      <path
-        d="M7.45 -15.4C10.2 -8.4 10.2 8.5 7.4 15.5"
-        fill="none"
-        stroke="#1e2020"
-        strokeWidth="2.05"
-        strokeLinecap="round"
-        opacity="0.88"
-      />
-      <path d="M-5.3 -20.2C-1.6 -22.3 2.3 -22.3 5.5 -20.1" fill="none" stroke="#f4f2e9" strokeWidth="1.15" opacity="0.67" />
-      {isFrontLink && <path d="M-9.1 0C-4.2 2.6 4.4 2.6 9.1 0" fill="none" stroke="#d5d2c8" strokeWidth="1.05" opacity="0.68" />}
-    </g>
-  );
-}
-
-function makeChain({ from, to, sway, phase }: ChainRoute): ChainLink[] {
-  const linkCount = 12;
-  const dx = to[0] - from[0];
-  const dy = to[1] - from[1];
-  const length = Math.hypot(dx, dy) || 1;
-  const normalX = -dy / length;
-  const normalY = dx / length;
-  const routeAngle = (Math.atan2(dx, dy) * 180) / Math.PI;
-
-  return Array.from({ length: linkCount }, (_, index) => {
-    const t = index / (linkCount - 1);
-    // A restrained serpentine motion avoids ruler-straight links and gives the
-    // chain the same weight and natural hand-drawn rhythm as the reference.
-    const wave = Math.sin(t * Math.PI) * sway + Math.sin((t * 3.2 + phase) * Math.PI) * 2.25;
-    return {
-      x: from[0] + dx * t + normalX * wave,
-      y: from[1] + dy * t + normalY * wave,
-      angle: routeAngle + (index % 2 === 0 ? -4.2 : 4.2),
-    };
-  });
-}
-
-function ChainOverlay() {
-  const instanceId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
-  const metalId = `premiumForgedSteel-${instanceId}`;
-  const highlightId = `premiumForgedHighlight-${instanceId}`;
-  const shadowId = `premiumChainShadow-${instanceId}`;
-
-  // The six routes enter from each required side and converge behind the lock.
-  const chains = [
-    makeChain({ from: [-14, -24], to: [298, 200], sway: 8, phase: 0.08 }),
-    makeChain({ from: [-16, 157], to: [298, 202], sway: 5, phase: 0.28 }),
-    makeChain({ from: [-14, 430], to: [301, 207], sway: -9, phase: 0.53 }),
-    makeChain({ from: [614, -24], to: [305, 200], sway: -8, phase: 0.76 }),
-    makeChain({ from: [616, 157], to: [304, 202], sway: -5, phase: 0.46 }),
-    makeChain({ from: [614, 430], to: [303, 207], sway: 9, phase: 0.19 }),
-  ];
-
-  return (
-    <svg className="premium-chain-art" viewBox="0 0 600 408" preserveAspectRatio="none" aria-hidden="true">
-      <defs>
-        <linearGradient id={metalId} x1="0" y1="0" x2="1" y2="0.86">
-          <stop stopColor="#fbfaf2" />
-          <stop offset="0.13" stopColor="#9f9e98" />
-          <stop offset="0.34" stopColor="#25282a" />
-          <stop offset="0.53" stopColor="#d7d5cc" />
-          <stop offset="0.72" stopColor="#555754" />
-          <stop offset="1" stopColor="#111314" />
-        </linearGradient>
-        <linearGradient id={highlightId} x1="0" y1="0" x2="0" y2="1">
-          <stop stopColor="#ffffff" stopOpacity="0.25" />
-          <stop offset="0.45" stopColor="#ffffff" />
-          <stop offset="1" stopColor="#a8a79e" stopOpacity="0" />
-        </linearGradient>
-        <filter id={shadowId} x="-40%" y="-35%" width="180%" height="170%">
-          <feDropShadow dx="0" dy="3.15" stdDeviation="2.45" floodColor="#070707" floodOpacity="0.78" />
-          <feDropShadow dx="0" dy="0.6" stdDeviation="0.3" floodColor="#ffffff" floodOpacity="0.3" />
-        </filter>
-      </defs>
-      {chains.map((chain, chainIndex) => (
-        <g key={chainIndex} className={`premium-chain premium-chain-${chainIndex + 1}`} filter={`url(#${shadowId})`}>
-          {chain.filter((_, index) => index % 2 === 0).map((link) => (
-            <SteelLink key={`${link.x}-${link.y}`} link={link} metalId={metalId} highlightId={highlightId} isFrontLink={false} />
-          ))}
-          {chain.filter((_, index) => index % 2 === 1).map((link) => (
-            <SteelLink key={`${link.x}-${link.y}`} link={link} metalId={metalId} highlightId={highlightId} isFrontLink />
-          ))}
-        </g>
-      ))}
-    </svg>
-  );
-}
 
 export default function LockedPremiumExamCard({
   id,
@@ -213,7 +93,6 @@ export default function LockedPremiumExamCard({
       </div>
 
       <div className="premium-red-blur" aria-hidden="true" />
-      <ChainOverlay />
       <div className="premium-lock-stage">
         <button
           type="button"

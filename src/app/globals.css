@@ -847,34 +847,13 @@ html {
   z-index: 2;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 52%, rgba(255, 252, 252, 0.42) 0 17%, rgba(237, 77, 85, 0.1) 42%, rgba(116, 8, 17, 0.22) 100%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(162, 13, 25, 0.16));
-  backdrop-filter: blur(2.75px) saturate(0.93);
-  -webkit-backdrop-filter: blur(2.75px) saturate(0.93);
+    radial-gradient(circle at 50% 52%, rgba(255, 252, 252, 0.5) 0 18%, rgba(237, 77, 85, 0.13) 46%, rgba(116, 8, 17, 0.24) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(162, 13, 25, 0.18));
+  backdrop-filter: blur(5.5px) saturate(0.88);
+  -webkit-backdrop-filter: blur(5.5px) saturate(0.88);
   pointer-events: none;
 }
 
-.premium-chain-art {
-  position: absolute;
-  z-index: 5;
-  inset: -2% -6%;
-  width: 112%;
-  height: 104%;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.premium-chain {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: premiumChainSettle 760ms cubic-bezier(0.18, 0.9, 0.22, 1) both;
-}
-
-.premium-chain-2 { animation-delay: 50ms; }
-.premium-chain-3 { animation-delay: 110ms; }
-.premium-chain-4 { animation-delay: 80ms; }
-.premium-chain-5 { animation-delay: 130ms; }
-.premium-chain-6 { animation-delay: 170ms; }
 
 .premium-lock-stage {
   position: absolute;
@@ -936,20 +915,6 @@ html {
   pointer-events: none;
 }
 
-@keyframes premiumChainSettle {
-  0% {
-    opacity: 0;
-    transform: scale(1.17);
-  }
-  65% {
-    opacity: 1;
-    transform: scale(0.985);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
 
 @keyframes premiumLockShake {
   0%, 100% { transform: rotate(0) translateX(0); }
