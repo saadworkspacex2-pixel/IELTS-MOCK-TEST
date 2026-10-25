@@ -124,6 +124,7 @@ export async function POST(req: Request) {
   let skipped = 0;
   let hasEssay = false;
   const cleanAnswers: Record<string, number | string> = {};
+  const reviewOnly = Boolean(rules.reviewRequired);
 
   for (const q of qs) {
     const picked = answers[String(q.id)];
@@ -134,6 +135,13 @@ export async function POST(req: Request) {
       (typeof picked === "number" && picked < 0)
     ) {
       skipped++;
+      continue;
+    }
+
+    if (reviewOnly) {
+      // Course-source questions may have no supplied answer key. Retain the
+      // candidate response exactly, but never manufacture a machine score.
+      cleanAnswers[String(q.id)] = typeof picked === "string" ? picked : Number(picked);
       continue;
     }
 
@@ -153,6 +161,11 @@ export async function POST(req: Request) {
       cleanAnswers[String(q.id)] = order;
       if (order === q.acceptedAnswers.replace(/\s/g, "")) correct++;
       else wrong++;
+    } else if (q.qtype === "multiple") {
+      const selected = String(picked).replace(/\s/g, "");
+      cleanAnswers[String(q.id)] = selected;
+      if (q.acceptedAnswers && selected === q.acceptedAnswers.replace(/\s/g, "")) correct++;
+      else if (q.acceptedAnswers) wrong++;
     } else {
       // mcq, tfng and matching all use an option index
       const idx = Number(picked);

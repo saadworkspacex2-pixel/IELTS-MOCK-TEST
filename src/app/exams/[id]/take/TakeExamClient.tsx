@@ -394,6 +394,45 @@ export default function TakeExamClient({ examId }: { examId: number }) {
             placeholder="আপনার উত্তর লিখুন… ইনস্ট্রাক্টর মূল্যায়ন করবেন"
             className="mt-4 w-full rounded-lg px-4 py-3 text-sm leading-relaxed outline-none"
           />
+        ) : q.qtype === "multiple" ? (
+          <div className="mt-4 space-y-2.5">
+            <p className="text-xs font-medium text-[#6C757D]">একাধিক উত্তর নির্বাচন করা যায়</p>
+            {q.options.filter(Boolean).map((opt, index) => {
+              const selected = typeof val === "string" && val.split(",").map(Number).includes(index);
+              return (
+                <label
+                  key={index}
+                  className={`flex cursor-pointer items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-all ${
+                    selected ? "btn-ink" : "skeuo-key"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => setAnswers((current) => {
+                      const selectedIndexes = typeof current[q.id] === "string" && current[q.id]
+                        ? String(current[q.id]).split(",").map(Number).filter(Number.isFinite)
+                        : [];
+                      const next = selected
+                        ? selectedIndexes.filter((item) => item !== index)
+                        : [...selectedIndexes, index].sort((a, b) => a - b);
+                      return { ...current, [q.id]: next.join(",") };
+                    })}
+                    className="sr-only"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className={`grid h-4 w-4 shrink-0 place-items-center rounded border ${
+                      selected ? "border-emerald-300 bg-emerald-400/20" : "border-stone-400 bg-stone-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.25)]"
+                    }`}
+                  >
+                    {selected && <span className="h-2 w-2 rounded-sm bg-emerald-400" />}
+                  </span>
+                  <span className="font-medium">{opt}</span>
+                </label>
+              );
+            })}
+          </div>
         ) : q.qtype === "dnd" ? (
           <div className="mt-4 space-y-2.5">
             <p className="text-xs font-medium text-[#6C757D]">
@@ -487,8 +526,10 @@ export default function TakeExamClient({ examId }: { examId: number }) {
                         <span className="h-2 w-2 rounded-full bg-emerald-400" />
                       )}
                     </span>
-                    {q.qtype === "tfng" ? (
+                    {q.qtype === "tfng" || q.qtype === "ynng" ? (
                       <span className="font-semibold tracking-wide">{opt}</span>
+                    ) : q.qtype === "matching" ? (
+                      <span className="font-medium">{opt}</span>
                     ) : (
                       <span>
                         <b className="mr-1.5">{OPTION_LABELS[orig]}</b>

@@ -4,6 +4,8 @@ export type ExamRules = {
   shuffleOptions?: boolean;
   showExplanations?: boolean;
   hideResults?: boolean;
+  // Source imports without supplied answer keys stay review-only instead of receiving invented scores.
+  reviewRequired?: boolean;
   sectionTimeMinutes?: number;
 };
 

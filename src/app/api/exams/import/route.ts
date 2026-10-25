@@ -14,6 +14,7 @@ type ImportQuestion = {
   correctOption?: number;
   acceptedAnswers?: string;
   explanation?: string;
+  choices?: string[];
   sortOrder?: number;
 };
 type ImportSection = {
@@ -101,6 +102,7 @@ export async function POST(req: Request) {
       correctOption: q.correctOption ?? 0,
       acceptedAnswers: q.acceptedAnswers ?? "",
       explanation: q.explanation ?? "",
+      choices: Array.isArray(q.choices) ? q.choices.map(String).filter(Boolean) : [],
       sortOrder: q.sortOrder ?? i,
     });
     created++;

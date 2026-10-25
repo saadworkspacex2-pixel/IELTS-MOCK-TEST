@@ -52,6 +52,7 @@ export async function GET(
       correctOption: q.correctOption,
       acceptedAnswers: q.acceptedAnswers,
       explanation: q.explanation,
+      choices: q.choices,
       sortOrder: q.sortOrder,
     })),
   });

@@ -401,7 +401,7 @@ export default function QuestionManager({
       setError("প্রশ্নটি লিখুন");
       return;
     }
-    if ((qForm.qtype === "mcq" || qForm.qtype === "matching" || qForm.qtype === "dnd") && (!qForm.optionA.trim() || !qForm.optionB.trim())) {
+    if ((qForm.qtype === "mcq" || qForm.qtype === "matching" || qForm.qtype === "multiple" || qForm.qtype === "dnd") && (!qForm.optionA.trim() || !qForm.optionB.trim())) {
       setError("MCQ-এর জন্য অন্তত A ও B অপশন দিন");
       return;
     }
@@ -945,6 +945,8 @@ export default function QuestionManager({
                       <option value="dnd">Drag-and-Drop Ordering</option>
                       <option value="essay">Essay Writing</option>
                       <option value="tfng">TRUE / FALSE / NOT GIVEN</option>
+                      <option value="ynng">YES / NO / NOT GIVEN</option>
+                      <option value="multiple">Multiple choice (একাধিক উত্তর)</option>
                       <option value="gap">ফাঁকা পূরণ (টাইপ করা উত্তর)</option>
                     </select>
                   </div>
@@ -1001,7 +1003,7 @@ export default function QuestionManager({
                   className={input}
                 />
 
-                {(qForm.qtype === "mcq" || qForm.qtype === "matching" || qForm.qtype === "dnd") && (
+                {(qForm.qtype === "mcq" || qForm.qtype === "matching" || qForm.qtype === "multiple" || qForm.qtype === "dnd") && (
                   <div data-tour="qm-options-box" className="mt-4 grid gap-4 sm:grid-cols-2">
                     {OPTION_KEYS.map((key, i) => (
                       <div key={key}>
@@ -1035,13 +1037,13 @@ export default function QuestionManager({
                   </div>
                 )}
 
-                {qForm.qtype === "tfng" && (
+                {(qForm.qtype === "tfng" || qForm.qtype === "ynng") && (
                   <div className="mt-4">
                     <label className="text-sm font-medium text-slate-700">
                       সঠিক উত্তর
                     </label>
                     <div className="mt-2 flex gap-2">
-                      {TFNG.map((t, i) => (
+                      {(qForm.qtype === "ynng" ? ["YES", "NO", "NOT GIVEN"] : TFNG).map((t, i) => (
                         <button
                           key={t}
                           type="button"
@@ -1160,7 +1162,11 @@ export default function QuestionManager({
                         ? "ফাঁকা পূরণ"
                         : q.qtype === "tfng"
                           ? "T/F/NG"
-                          : q.qtype === "dnd"
+                          : q.qtype === "ynng"
+                            ? "Y/N/NG"
+                            : q.qtype === "multiple"
+                              ? "Multiple"
+                              : q.qtype === "dnd"
                             ? "Drag-Drop"
                             : q.qtype === "matching"
                               ? "Matching"
@@ -1208,9 +1214,9 @@ export default function QuestionManager({
                   <p className="mt-3 text-sm font-medium text-green-700">
                     গ্রহণযোগ্য উত্তর: {q.acceptedAnswers.split("|").join(" / ")}
                   </p>
-                ) : q.qtype === "tfng" ? (
+                ) : q.qtype === "tfng" || q.qtype === "ynng" ? (
                   <p className="mt-3 text-sm font-medium text-green-700">
-                    সঠিক: {TFNG[q.correctOption]}
+                    সঠিক: {(q.qtype === "ynng" ? ["YES", "NO", "NOT GIVEN"] : TFNG)[q.correctOption]}
                   </p>
                 ) : (
                   <div className="mt-3 grid gap-2 text-sm sm:grid-cols-2">

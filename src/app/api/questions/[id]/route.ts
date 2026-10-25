@@ -33,6 +33,11 @@ export async function PUT(req: Request, { params }: Params) {
       ...(body.explanation !== undefined && {
         explanation: String(body.explanation),
       }),
+      ...(body.choices !== undefined && {
+        choices: Array.isArray(body.choices)
+          ? body.choices.map(String).filter(Boolean)
+          : [],
+      }),
       ...(body.sortOrder !== undefined && {
         sortOrder: Number(body.sortOrder),
       }),

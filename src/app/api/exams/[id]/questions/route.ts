@@ -44,7 +44,11 @@ export async function GET(req: Request, { params }: Params) {
     options:
       q.qtype === "tfng"
         ? ["TRUE", "FALSE", "NOT GIVEN"]
-        : [q.optionA, q.optionB, q.optionC, q.optionD],
+        : q.qtype === "ynng"
+          ? ["YES", "NO", "NOT GIVEN"]
+          : Array.isArray(q.choices) && q.choices.length > 0
+            ? q.choices
+            : [q.optionA, q.optionB, q.optionC, q.optionD],
   }));
   return NextResponse.json({ exam, sections: secs, questions: sanitized });
 }
@@ -72,6 +76,7 @@ export async function POST(req: Request, { params }: Params) {
       correctOption: Number(body.correctOption ?? 0),
       acceptedAnswers: String(body.acceptedAnswers ?? ""),
       explanation: String(body.explanation ?? ""),
+      choices: Array.isArray(body.choices) ? body.choices.map(String).filter(Boolean) : [],
       sortOrder: Number(body.sortOrder ?? 0),
     })
     .returning();

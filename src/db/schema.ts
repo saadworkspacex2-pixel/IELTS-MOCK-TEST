@@ -69,6 +69,8 @@ export const questions = appSchema.table("questions", {
   correctOption: integer("correct_option").notNull().default(0),
   acceptedAnswers: text("accepted_answers").notNull().default(""),
   explanation: text("explanation").notNull().default(""),
+  // Supports full IELTS option lists such as A–G and i–viii (beyond the legacy A–D fields).
+  choices: jsonb("choices").$type<string[]>().notNull().default([]),
   sortOrder: integer("sort_order").notNull().default(0),
 });
 
