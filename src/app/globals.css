@@ -809,8 +809,12 @@ html {
   min-height: 255px;
   border-color: rgba(172, 18, 31, 0.3);
   background:
-    radial-gradient(circle at 50% 51%, rgba(255, 236, 237, 0.8), transparent 24%),
+    linear-gradient(rgba(130, 10, 24, 0.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(130, 10, 24, 0.075) 1px, transparent 1px),
+    radial-gradient(circle at 50% 51%, rgba(255, 236, 237, 0.84), transparent 28%),
     #ffffff;
+  background-size: 24px 24px, 24px 24px, auto, auto;
+  background-position: center;
   box-shadow:
     0 15px 32px rgba(117, 7, 17, 0.16),
     var(--skeuo-raised);
