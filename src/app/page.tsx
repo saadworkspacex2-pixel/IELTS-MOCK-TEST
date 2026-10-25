@@ -152,8 +152,21 @@ export default async function HomePage() {
     ]);
 
   return (
-    <div className="min-h-screen bg-transparent">
-      <Navbar />
+    <div className="home-video-page min-h-screen">
+      <div className="home-video-backdrop" aria-hidden="true">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster="/hero/ielts-study-background.png"
+        >
+          <source src="/hero/ielts-study-background.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div className="relative z-10">
+        <Navbar />
 
       {/* ================= HERO ================= */}
       <section className="relative overflow-hidden pt-28 pb-20 sm:pt-36">
@@ -516,8 +529,9 @@ export default async function HomePage() {
         </Reveal>
       </section>
 
-      <DynamicSections page="home" />
-      <Footer />
+        <DynamicSections page="home" />
+        <Footer />
+      </div>
     </div>
   );
 }
