@@ -52,90 +52,118 @@ function PadlockMark() {
 
 type ChainLink = { x: number; y: number; angle: number };
 
+type ChainRoute = {
+  from: [number, number];
+  to: [number, number];
+  sway: number;
+  phase: number;
+};
+
 type SteelLinkProps = {
   link: ChainLink;
   metalId: string;
   highlightId: string;
+  isFrontLink: boolean;
 };
 
-function SteelLink({ link, metalId, highlightId }: SteelLinkProps) {
+function SteelLink({ link, metalId, highlightId, isFrontLink }: SteelLinkProps) {
   return (
     <g
       className="premium-chain-link"
       transform={`translate(${link.x} ${link.y}) rotate(${link.angle})`}
     >
-      {/* Dark tube edge, polished steel face, then small wear/highlight details. */}
-      <ellipse rx="23" ry="11.4" fill="none" stroke="#0b1118" strokeWidth="10" opacity="0.94" />
-      <ellipse rx="22.6" ry="11" fill="none" stroke={`url(#${metalId})`} strokeWidth="7.35" />
-      <ellipse rx="18.65" ry="7.1" fill="none" stroke="#071019" strokeWidth="1.35" opacity="0.86" />
+      {/* A long, dark-edged forged link: the silhouette and overlap match a real hanging chain. */}
+      <ellipse rx="11.6" ry="22.8" fill="none" stroke="#060708" strokeWidth="9.2" opacity="0.98" />
+      <ellipse rx="11.25" ry="22.45" fill="none" stroke={`url(#${metalId})`} strokeWidth="6.45" />
+      <ellipse rx="7.75" ry="18.8" fill="none" stroke="#07090a" strokeWidth="1.2" opacity="0.9" />
       <path
-        d="M-15.6 -6.15C-9.4 -9.35 8.8 -9.35 15.6 -6.15"
+        d="M-7.4 -15.6C-10 -10 -10.1 8.2 -7.5 15.5"
         fill="none"
         stroke={`url(#${highlightId})`}
-        strokeWidth="1.85"
+        strokeWidth="1.8"
         strokeLinecap="round"
-        opacity="0.94"
+        opacity="0.98"
       />
       <path
-        d="M-15.2 6.2C-8 9.45 8 9.45 15.4 6.15"
+        d="M7.45 -15.4C10.2 -8.4 10.2 8.5 7.4 15.5"
         fill="none"
-        stroke="#2b3640"
-        strokeWidth="1.55"
+        stroke="#1e2020"
+        strokeWidth="2.05"
         strokeLinecap="round"
-        opacity="0.9"
+        opacity="0.88"
       />
-      <path d="M-21 -1.9C-22.3 0 -22.3 2 -21 3.7" fill="none" stroke="#e9f3f7" strokeWidth="1.1" opacity="0.55" />
+      <path d="M-5.3 -20.2C-1.6 -22.3 2.3 -22.3 5.5 -20.1" fill="none" stroke="#f4f2e9" strokeWidth="1.15" opacity="0.67" />
+      {isFrontLink && <path d="M-9.1 0C-4.2 2.6 4.4 2.6 9.1 0" fill="none" stroke="#d5d2c8" strokeWidth="1.05" opacity="0.68" />}
     </g>
   );
 }
 
+function makeChain({ from, to, sway, phase }: ChainRoute): ChainLink[] {
+  const linkCount = 12;
+  const dx = to[0] - from[0];
+  const dy = to[1] - from[1];
+  const length = Math.hypot(dx, dy) || 1;
+  const normalX = -dy / length;
+  const normalY = dx / length;
+  const routeAngle = (Math.atan2(dx, dy) * 180) / Math.PI;
+
+  return Array.from({ length: linkCount }, (_, index) => {
+    const t = index / (linkCount - 1);
+    // A restrained serpentine motion avoids ruler-straight links and gives the
+    // chain the same weight and natural hand-drawn rhythm as the reference.
+    const wave = Math.sin(t * Math.PI) * sway + Math.sin((t * 3.2 + phase) * Math.PI) * 2.25;
+    return {
+      x: from[0] + dx * t + normalX * wave,
+      y: from[1] + dy * t + normalY * wave,
+      angle: routeAngle + (index % 2 === 0 ? -4.2 : 4.2),
+    };
+  });
+}
+
 function ChainOverlay() {
   const instanceId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
-  const metalId = `premiumSteel-${instanceId}`;
-  const highlightId = `premiumSteelHighlight-${instanceId}`;
+  const metalId = `premiumForgedSteel-${instanceId}`;
+  const highlightId = `premiumForgedHighlight-${instanceId}`;
   const shadowId = `premiumChainShadow-${instanceId}`;
 
-  // Six independent, physical-looking routes converge under the lock. Links
-  // intentionally alternate direction, so the chain reads as interlocked metal
-  // rather than a painted/dashed line.
-  const chains: ChainLink[][] = [
-    [{ x: -22, y: 16, angle: -27 }, { x: 26, y: 36, angle: 61 }, { x: 75, y: 60, angle: -27 }, { x: 123, y: 88, angle: 61 }, { x: 170, y: 120, angle: -27 }, { x: 216, y: 153, angle: 61 }, { x: 260, y: 181, angle: -27 }, { x: 293, y: 199, angle: 61 }],
-    [{ x: -20, y: 167, angle: 2 }, { x: 33, y: 173, angle: 91 }, { x: 87, y: 180, angle: 2 }, { x: 141, y: 187, angle: 91 }, { x: 195, y: 193, angle: 2 }, { x: 248, y: 198, angle: 91 }, { x: 297, y: 202, angle: 2 }],
-    [{ x: -20, y: 391, angle: 26 }, { x: 31, y: 369, angle: -61 }, { x: 82, y: 344, angle: 26 }, { x: 132, y: 315, angle: -61 }, { x: 181, y: 280, angle: 26 }, { x: 229, y: 245, angle: -61 }, { x: 274, y: 218, angle: 26 }, { x: 302, y: 206, angle: -61 }],
-    [{ x: 622, y: 15, angle: 27 }, { x: 574, y: 38, angle: -61 }, { x: 526, y: 64, angle: 27 }, { x: 478, y: 95, angle: -61 }, { x: 431, y: 128, angle: 27 }, { x: 384, y: 160, angle: -61 }, { x: 339, y: 185, angle: 27 }, { x: 308, y: 199, angle: -61 }],
-    [{ x: 622, y: 202, angle: -2 }, { x: 568, y: 202, angle: 89 }, { x: 514, y: 203, angle: -2 }, { x: 460, y: 203, angle: 89 }, { x: 406, y: 204, angle: -2 }, { x: 352, y: 204, angle: 89 }, { x: 303, y: 204, angle: -2 }],
-    [{ x: 622, y: 391, angle: -26 }, { x: 570, y: 368, angle: 61 }, { x: 519, y: 343, angle: -26 }, { x: 468, y: 313, angle: 61 }, { x: 418, y: 279, angle: -26 }, { x: 370, y: 245, angle: 61 }, { x: 325, y: 218, angle: -26 }, { x: 299, y: 206, angle: 61 }],
+  // The six routes enter from each required side and converge behind the lock.
+  const chains = [
+    makeChain({ from: [-14, -24], to: [298, 200], sway: 8, phase: 0.08 }),
+    makeChain({ from: [-16, 157], to: [298, 202], sway: 5, phase: 0.28 }),
+    makeChain({ from: [-14, 430], to: [301, 207], sway: -9, phase: 0.53 }),
+    makeChain({ from: [614, -24], to: [305, 200], sway: -8, phase: 0.76 }),
+    makeChain({ from: [616, 157], to: [304, 202], sway: -5, phase: 0.46 }),
+    makeChain({ from: [614, 430], to: [303, 207], sway: 9, phase: 0.19 }),
   ];
 
   return (
     <svg className="premium-chain-art" viewBox="0 0 600 408" preserveAspectRatio="none" aria-hidden="true">
       <defs>
-        <linearGradient id={metalId} x1="0" y1="0" x2="0.82" y2="1">
-          <stop stopColor="#f8ffff" />
-          <stop offset="0.12" stopColor="#bfcbd2" />
-          <stop offset="0.34" stopColor="#596875" />
-          <stop offset="0.55" stopColor="#e2edf1" />
-          <stop offset="0.71" stopColor="#71818c" />
-          <stop offset="1" stopColor="#1b2630" />
+        <linearGradient id={metalId} x1="0" y1="0" x2="1" y2="0.86">
+          <stop stopColor="#fbfaf2" />
+          <stop offset="0.13" stopColor="#9f9e98" />
+          <stop offset="0.34" stopColor="#25282a" />
+          <stop offset="0.53" stopColor="#d7d5cc" />
+          <stop offset="0.72" stopColor="#555754" />
+          <stop offset="1" stopColor="#111314" />
         </linearGradient>
-        <linearGradient id={highlightId} x1="0" y1="0" x2="1" y2="0">
-          <stop stopColor="#8fa2ac" stopOpacity="0" />
-          <stop offset="0.26" stopColor="#ffffff" />
-          <stop offset="0.7" stopColor="#dceaf0" />
-          <stop offset="1" stopColor="#8fa2ac" stopOpacity="0" />
+        <linearGradient id={highlightId} x1="0" y1="0" x2="0" y2="1">
+          <stop stopColor="#ffffff" stopOpacity="0.25" />
+          <stop offset="0.45" stopColor="#ffffff" />
+          <stop offset="1" stopColor="#a8a79e" stopOpacity="0" />
         </linearGradient>
-        <filter id={shadowId} x="-35%" y="-45%" width="170%" height="190%">
-          <feDropShadow dx="0" dy="3" stdDeviation="2.65" floodColor="#071019" floodOpacity="0.7" />
-          <feDropShadow dx="0" dy="0.7" stdDeviation="0.45" floodColor="#ffffff" floodOpacity="0.35" />
+        <filter id={shadowId} x="-40%" y="-35%" width="180%" height="170%">
+          <feDropShadow dx="0" dy="3.15" stdDeviation="2.45" floodColor="#070707" floodOpacity="0.78" />
+          <feDropShadow dx="0" dy="0.6" stdDeviation="0.3" floodColor="#ffffff" floodOpacity="0.3" />
         </filter>
       </defs>
       {chains.map((chain, chainIndex) => (
         <g key={chainIndex} className={`premium-chain premium-chain-${chainIndex + 1}`} filter={`url(#${shadowId})`}>
           {chain.filter((_, index) => index % 2 === 0).map((link) => (
-            <SteelLink key={`${link.x}-${link.y}`} link={link} metalId={metalId} highlightId={highlightId} />
+            <SteelLink key={`${link.x}-${link.y}`} link={link} metalId={metalId} highlightId={highlightId} isFrontLink={false} />
           ))}
           {chain.filter((_, index) => index % 2 === 1).map((link) => (
-            <SteelLink key={`${link.x}-${link.y}`} link={link} metalId={metalId} highlightId={highlightId} />
+            <SteelLink key={`${link.x}-${link.y}`} link={link} metalId={metalId} highlightId={highlightId} isFrontLink />
           ))}
         </g>
       ))}
