@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Donut from "@/components/Donut";
 import Icon from "@/components/Icon";
+import PremiumPadlock from "@/components/PremiumPadlock";
 import { currentUser } from "@/lib/userAuth";
 import { getProfileData } from "@/lib/profileData";
 import { formatDateBn, toBn } from "@/lib/bn";
@@ -94,9 +95,24 @@ export default async function ProfilePage() {
           </div>
         </div>
 
-        <div className={`anim-fade-up delay-100 mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border p-5 ${premiumActive ? "border-amber-300 bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-50 shadow-[0_12px_30px_rgba(180,120,0,.15)]" : "border-slate-200 bg-slate-50"}`}>
-          <div className="flex items-center gap-3"><span className={`grid h-11 w-11 place-items-center rounded-xl text-lg ${premiumActive ? "bg-gradient-to-br from-amber-400 to-yellow-600 text-white shadow" : "bg-slate-200 text-slate-500"}`}>{premiumActive ? "✦" : "○"}</span><div><p className={`text-xs font-bold tracking-[.12em] ${premiumActive ? "text-amber-800" : "text-slate-500"}`}>{premiumActive ? "PREMIUM ACTIVE" : "MEMBERSHIP"}</p><p className="mt-1 font-bold text-[#1A1A1A]">{tierName}</p>{premiumActive && <p className="mt-0.5 text-xs text-amber-900/75">{user.premiumUntil ? `মেয়াদ: ${formatDateBn(user.premiumUntil)}` : "সদস্যতা সক্রিয় আছে"}</p>}</div></div>
-          <div className="flex flex-wrap gap-2">{premiumActive && latestReceipt?.receiptCode && <a href={`/api/payments/${latestReceipt.id}/receipt`} className="rounded-md border border-amber-400 bg-white/80 px-4 py-2 text-sm font-bold text-amber-900">Receipt PDF</a>}<Link href="/premium" className="skeuo-key rounded-md px-4 py-2 text-sm font-bold">{premiumActive ? "প্ল্যান দেখুন" : "Premium দেখুন"}</Link></div>
+        <div className={`anim-fade-up delay-100 relative mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border p-5 ${premiumActive ? "border-amber-300 bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-50 pt-12 shadow-[0_12px_30px_rgba(180,120,0,.15)]" : "border-slate-200 bg-slate-50"}`}>
+          {premiumActive && (
+            <div className="absolute left-1/2 top-0 grid h-20 w-20 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-2xl border border-amber-300 bg-gradient-to-b from-white via-amber-50 to-amber-100 p-1.5 shadow-[0_9px_20px_rgba(153,102,0,.24)]" title="Premium আনলক করা আছে">
+              <PremiumPadlock unlocked className="h-full w-full drop-shadow-[0_5px_5px_rgba(105,49,0,.28)]" />
+            </div>
+          )}
+          <div className="flex items-center gap-3">
+            {!premiumActive && <span className="grid h-11 w-11 place-items-center rounded-xl bg-slate-200 text-lg text-slate-500">○</span>}
+            <div>
+              <p className={`text-xs font-bold tracking-[.12em] ${premiumActive ? "text-amber-800" : "text-slate-500"}`}>{premiumActive ? "PREMIUM ACTIVE · UNLOCKED" : "MEMBERSHIP"}</p>
+              <p className="mt-1 font-bold text-[#1A1A1A]">{tierName}</p>
+              {premiumActive && <p className="mt-0.5 text-xs text-amber-900/75">{user.premiumUntil ? `মেয়াদ: ${formatDateBn(user.premiumUntil)}` : "সদস্যতা সক্রিয় আছে"}</p>}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {premiumActive && latestReceipt?.receiptCode && <a href={`/api/payments/${latestReceipt.id}/receipt`} className="rounded-md border border-amber-400 bg-white/80 px-4 py-2 text-sm font-bold text-amber-900">Receipt PDF</a>}
+            <Link href="/premium" className="skeuo-key rounded-md px-4 py-2 text-sm font-bold">{premiumActive ? "প্ল্যান দেখুন" : "Premium দেখুন"}</Link>
+          </div>
         </div>
 
         {/* overall + module donuts */}
