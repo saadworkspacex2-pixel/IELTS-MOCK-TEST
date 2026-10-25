@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
 import { applyAcademicMockLibrary } from "./academic-mock-library.mjs";
+import { applyLhbdCourseMockLibrary } from "./lhbd-course-library.mjs";
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -20,6 +21,7 @@ try {
   await pool.query(schemaSql);
   console.log("✓ Database schema is up to date.");
   await applyAcademicMockLibrary(pool);
+  await applyLhbdCourseMockLibrary(pool);
   // Existing installations and the guarded mock-library installer may have
   // rows created before exam ordering existed. Give only unnumbered rows a
   // stable initial position without overwriting an admin's chosen order.

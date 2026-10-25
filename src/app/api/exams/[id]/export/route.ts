@@ -38,6 +38,7 @@ export async function GET(
       passageText: s.passageText,
       instruction: s.instruction,
       audioUrl: s.audioUrl,
+      imageUrl: s.imageUrl,
       sortOrder: s.sortOrder,
     })),
     questions: qs.map((q) => ({

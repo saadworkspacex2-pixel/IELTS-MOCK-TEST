@@ -28,6 +28,7 @@ type Sec = {
   passageText: string;
   instruction: string;
   audioUrl: string;
+  imageUrl: string;
   sortOrder: number;
 };
 
@@ -68,6 +69,7 @@ const emptySec = {
   passageText: "",
   instruction: "",
   audioUrl: "",
+  imageUrl: "",
 };
 
 function qToPayload(q: Q): QPayload {
@@ -719,6 +721,20 @@ export default function QuestionManager({
                     className={input}
                   />
                 </div>
+                <div className="sm:col-span-2">
+                  <label className="text-sm font-medium text-slate-700">
+                    টাস্কের ছবি URL (ঐচ্ছিক, একাধিক হলে প্রতি লাইনে একটি)
+                  </label>
+                  <textarea
+                    value={secForm.imageUrl}
+                    onChange={(e) =>
+                      setSecForm((f) => ({ ...f, imageUrl: e.target.value }))
+                    }
+                    rows={2}
+                    placeholder="/course-mocks/writing/class-1-task.jpg"
+                    className={input}
+                  />
+                </div>
 
                 {/* audio upload from PC */}
                 <div className="sm:col-span-2">
@@ -834,6 +850,7 @@ export default function QuestionManager({
                           passageText: s.passageText,
                           instruction: s.instruction,
                           audioUrl: s.audioUrl,
+                          imageUrl: s.imageUrl,
                         });
                         setSecOpen(true);
                         setError("");

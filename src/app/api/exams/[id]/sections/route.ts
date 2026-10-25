@@ -31,6 +31,7 @@ export async function POST(req: Request, { params }: Params) {
       passageText: String(body.passageText ?? ""),
       instruction: String(body.instruction ?? ""),
       audioUrl: String(body.audioUrl ?? ""),
+      imageUrl: String(body.imageUrl ?? ""),
       sortOrder: Number(body.sortOrder ?? 0),
     })
     .returning();

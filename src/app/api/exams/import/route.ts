@@ -23,6 +23,7 @@ type ImportSection = {
   passageText?: string;
   instruction?: string;
   audioUrl?: string;
+  imageUrl?: string;
   sortOrder?: number;
 };
 type ImportPayload = {
@@ -78,6 +79,7 @@ export async function POST(req: Request) {
         passageText: s.passageText ?? "",
         instruction: s.instruction ?? "",
         audioUrl: s.audioUrl ?? "",
+        imageUrl: s.imageUrl ?? "",
         sortOrder: s.sortOrder ?? i,
       })
       .returning();

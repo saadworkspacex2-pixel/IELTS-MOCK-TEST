@@ -38,6 +38,8 @@ export const sections = appSchema.table("sections", {
   passageText: text("passage_text").notNull().default(""),
   instruction: text("instruction").notNull().default(""),
   audioUrl: text("audio_url").notNull().default(""),
+  // One URL per line supports course task diagrams without coupling media uploads to the seed.
+  imageUrl: text("image_url").notNull().default(""),
   sortOrder: integer("sort_order").notNull().default(0),
 });
 

@@ -11,6 +11,7 @@ import { toBn } from "@/lib/bn";
 import { currentUser } from "@/lib/userAuth";
 import { canAccessLevel } from "@/lib/premium";
 import PremiumGate from "@/components/PremiumGate";
+import { LHBD_IELTS_COURSE_MOCK_CATEGORY } from "@/lib/courseMocks";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +54,7 @@ export default async function ExamDetailPage({
   ]);
 
   const totalMarks = qCount.c * exam.marksPerQuestion;
+  const isCourseMock = exam.category === LHBD_IELTS_COURSE_MOCK_CATEGORY;
   const isWriting = exam.module === "writing";
   const isReading =
     exam.module === "reading" || exam.module === "listening";
@@ -87,29 +89,36 @@ export default async function ExamDetailPage({
         <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_340px]">
           <div className="space-y-6">
             <div className="anim-fade-up delay-100 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {(isWriting
+              {(isCourseMock
                 ? [
-                    { label: "টাস্ক", value: toBn(secCount.c) },
+                    { label: isWriting ? "কোর্স টাস্ক" : "উৎস অনুশীলন", value: isWriting ? toBn(secCount.c) : toBn(qCount.c) },
                     { label: "সময়", value: `${toBn(exam.durationMinutes)} মি` },
-                    { label: "মার্কিং", value: "ইনস্ট্রাক্টর" },
+                    { label: exam.module === "listening" ? "অডিও" : "উৎস", value: exam.module === "listening" ? "দেওয়া নেই" : "কোর্স বই" },
                     { label: "ফলাফল", value: "রিভিউর পর" },
                   ]
-                : isReading
+                : isWriting
                   ? [
-                      { label: "মোট প্রশ্ন", value: toBn(qCount.c) },
+                      { label: "টাস্ক", value: toBn(secCount.c) },
                       { label: "সময়", value: `${toBn(exam.durationMinutes)} মি` },
-                      { label: exam.module === "listening" ? "সেকশন" : "প্যাসেজ", value: toBn(secCount.c) },
-                      { label: "স্কোর", value: "ব্যান্ড" },
+                      { label: "মার্কিং", value: "ইনস্ট্রাক্টর" },
+                      { label: "ফলাফল", value: "রিভিউর পর" },
                     ]
-                  : [
-                      { label: "মোট প্রশ্ন", value: toBn(qCount.c) },
-                      { label: "সময়", value: `${toBn(exam.durationMinutes)} মি` },
-                      { label: "পূর্ণমান", value: toBn(totalMarks) },
-                      {
-                        label: "নেগেটিভ মার্ক",
-                        value: `-${toBn(exam.negativeMark)}`,
-                      },
-                    ]
+                  : isReading
+                    ? [
+                        { label: "মোট প্রশ্ন", value: toBn(qCount.c) },
+                        { label: "সময়", value: `${toBn(exam.durationMinutes)} মি` },
+                        { label: exam.module === "listening" ? "সেকশন" : "প্যাসেজ", value: toBn(secCount.c) },
+                        { label: "স্কোর", value: "ব্যান্ড" },
+                      ]
+                    : [
+                        { label: "মোট প্রশ্ন", value: toBn(qCount.c) },
+                        { label: "সময়", value: `${toBn(exam.durationMinutes)} মি` },
+                        { label: "পূর্ণমান", value: toBn(totalMarks) },
+                        {
+                          label: "নেগেটিভ মার্ক",
+                          value: `-${toBn(exam.negativeMark)}`,
+                        },
+                      ]
               ).map((s) => (
                 <div
                   key={s.label}
@@ -128,7 +137,18 @@ export default async function ExamDetailPage({
             <div className="anim-fade-up delay-200 rounded-lg border border-black/[0.07] card p-7">
               <SpringHeading as="h2" className="text-lg font-semibold">টেস্টের নিয়মাবলি</SpringHeading>
               <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[#6C757D]">
-                {isWriting ? (
+                {isCourseMock ? (
+                  <>
+                    <li className="flex gap-3"><span className="text-[#E51A24]">1</span> এই ক্লাসে দেওয়া course-book-এর মূল passage, prompt ও প্রশ্নের ভাষা সংরক্ষিত আছে।</li>
+                    <li className="flex gap-3"><span className="text-slate-600">◉</span> ডাউনলোড করা উৎসে machine-readable answer key নেই; তাই উত্তর auto-score না হয়ে রিভিউর জন্য জমা হবে।</li>
+                    {exam.module === "listening" ? (
+                      <li className="flex gap-3"><span className="text-amber-600">▶</span> দেওয়া বই/ডকুমেন্টে playable Listening audio ছিল না এবং মূল QR audio link-ও আর সক্রিয় নয়। কোনো বিকল্প audio যোগ করা হয়নি।</li>
+                    ) : (
+                      <li className="flex gap-3"><span className="text-slate-600">↔</span> প্রশ্ন ও task visual যেখানে উৎসে ছিল, সেগুলো class order অনুযায়ী এই অনুশীলনে রাখা হয়েছে।</li>
+                    )}
+                    <li className="flex gap-3"><span className="text-[#E51A24]">★</span> সব LHBD Course Mock সবার জন্য Free।</li>
+                  </>
+                ) : isWriting ? (
                   <>
                     <li className="flex gap-3">
                       <span className="text-[#E51A24]">1</span> Task 1-এর জন্য প্রায় ২০ মিনিটে কমপক্ষে ১৫০ শব্দ এবং Task 2-এর জন্য প্রায় ৪০ মিনিটে কমপক্ষে ২৫০ শব্দ লিখুন।

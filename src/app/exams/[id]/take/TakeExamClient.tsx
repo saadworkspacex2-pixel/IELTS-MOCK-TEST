@@ -2,6 +2,7 @@
 
 import SpringHeading from "@/components/SpringHeading";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Logo from "@/components/Logo";
@@ -25,6 +26,7 @@ type Sec = {
   passageText: string;
   instruction: string;
   audioUrl: string;
+  imageUrl: string;
 };
 type ExamInfo = {
   id: number;
@@ -37,6 +39,27 @@ type ExamInfo = {
 };
 
 const OPTION_LABELS = ["A", "B", "C", "D"];
+
+function SectionImages({ imageUrl }: { imageUrl: string }) {
+  const urls = imageUrl.split(/\r?\n/).map((url) => url.trim()).filter(Boolean);
+  if (urls.length === 0) return null;
+  return (
+    <div className="mt-6 space-y-4" aria-label="Supplied task visual">
+      {urls.map((url, index) => (
+        <figure key={url} className="overflow-hidden rounded-lg border border-black/[0.12] bg-white p-2 shadow-sm">
+          <Image
+            src={url}
+            alt={`Supplied course task visual ${index + 1}`}
+            width={1600}
+            height={1000}
+            unoptimized
+            className="mx-auto max-h-[34rem] w-auto max-w-full rounded object-contain"
+          />
+        </figure>
+      ))}
+    </div>
+  );
+}
 
 export default function TakeExamClient({ examId }: { examId: number }) {
   const router = useRouter();
@@ -324,7 +347,7 @@ export default function TakeExamClient({ examId }: { examId: number }) {
         }`}
       >
         <div className="flex items-start justify-between gap-3">
-          <p className="font-medium leading-relaxed text-[#1A1A1A]">
+          <p className="whitespace-pre-line font-medium leading-relaxed text-[#1A1A1A]">
             <span className="btn-ink mr-2.5 inline-grid h-7 w-7 place-items-center rounded-md text-center text-sm font-bold">
               {num}
             </span>
@@ -580,7 +603,7 @@ export default function TakeExamClient({ examId }: { examId: number }) {
                       </div>
                       <div className="flex-1 p-5 sm:p-7">
                         <p className="text-xs font-bold tracking-widest text-[#6C757D] uppercase">
-                          {part.sec.title} · Official Prompt Sheet
+                          {part.sec.title} · Prompt Sheet
                         </p>
                         <SpringHeading as="h2" className="mt-2 text-xl font-bold">
                           {part.sec.passageTitle}
@@ -593,6 +616,7 @@ export default function TakeExamClient({ examId }: { examId: number }) {
                         <div className="mt-5 space-y-4 leading-8 whitespace-pre-line text-[#212529]">
                           {part.sec.passageText}
                         </div>
+                        <SectionImages imageUrl={part.sec.imageUrl} />
                       </div>
                     </div>
                   ) : (
@@ -658,10 +682,23 @@ export default function TakeExamClient({ examId }: { examId: number }) {
                           </div>
                         )}
                         {exam.module === "listening" ? (
-                          <div className="skeuo-well mt-5 rounded-xl p-5 text-sm leading-7 text-[#4b5563]">
-                            <b className="block text-[#1A1A1A]">Listening test mode</b>
-                            Audio plays once at normal speed. The transcript is intentionally hidden during the test, as in an exam-style listening practice. Read the questions and use the answer boxes while listening.
-                          </div>
+                          part.sec.audioUrl ? (
+                            <div className="skeuo-well mt-5 rounded-xl p-5 text-sm leading-7 text-[#4b5563]">
+                              <b className="block text-[#1A1A1A]">Listening test mode</b>
+                              Audio plays once at normal speed. The transcript is intentionally hidden during the test, as in an exam-style listening practice. Read the questions and use the answer boxes while listening.
+                            </div>
+                          ) : (
+                            <div className="mt-5 space-y-4">
+                              <div className="skeuo-well rounded-xl p-5 text-sm leading-7 text-[#4b5563]">
+                                <b className="block text-[#1A1A1A]">Source audio unavailable</b>
+                                The supplied course-book downloads did not include playable listening audio. The original question sheet is shown below for guided or instructor review; no substitute audio has been invented.
+                              </div>
+                              <HighlightablePassage
+                                key={part.sec.id}
+                                text={part.sec.passageText}
+                              />
+                            </div>
+                          )
                         ) : (
                           <div className="mt-5">
                             <HighlightablePassage

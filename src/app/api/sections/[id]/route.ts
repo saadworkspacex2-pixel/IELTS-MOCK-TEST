@@ -26,6 +26,7 @@ export async function PUT(req: Request, { params }: Params) {
         instruction: String(body.instruction),
       }),
       ...(body.audioUrl !== undefined && { audioUrl: String(body.audioUrl) }),
+      ...(body.imageUrl !== undefined && { imageUrl: String(body.imageUrl) }),
       ...(body.sortOrder !== undefined && {
         sortOrder: Number(body.sortOrder),
       }),

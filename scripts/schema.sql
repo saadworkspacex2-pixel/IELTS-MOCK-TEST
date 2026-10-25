@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS sections (
   passage_text text NOT NULL DEFAULT '',
   instruction text NOT NULL DEFAULT '',
   audio_url text NOT NULL DEFAULT '',
+  image_url text NOT NULL DEFAULT '',
   sort_order integer NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS media (
@@ -127,6 +128,7 @@ ALTER TABLE exams ADD COLUMN IF NOT EXISTS access_level text NOT NULL DEFAULT 'f
 ALTER TABLE resources ADD COLUMN IF NOT EXISTS access_level text NOT NULL DEFAULT 'free';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS membership_tier text NOT NULL DEFAULT 'free';
 ALTER TABLE users ADD COLUMN IF NOT EXISTS premium_until timestamp;
+ALTER TABLE sections ADD COLUMN IF NOT EXISTS image_url text NOT NULL DEFAULT '';
 ALTER TABLE attempts ADD COLUMN IF NOT EXISTS feedback jsonb NOT NULL DEFAULT '{}';
 ALTER TABLE attempts ADD COLUMN IF NOT EXISTS ip text NOT NULL DEFAULT '';
 ALTER TABLE attempts ADD COLUMN IF NOT EXISTS is_published boolean NOT NULL DEFAULT true;

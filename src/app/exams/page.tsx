@@ -81,7 +81,7 @@ function ExamCards({ rows, user, course = false }: { rows: ExamRow[]; user: Awai
                     <div className="text-slate-500">সময়</div>
                   </div>
                   <div>
-                    <div className="font-bold text-slate-600">{exam.module === "listening" ? "অডিও" : "স্ক্রিন"}</div>
+                    <div className="font-bold text-slate-600">{exam.module === "listening" ? (course ? "রিভিউ" : "অডিও") : "স্ক্রিন"}</div>
                     <div className="text-slate-500">{label}</div>
                   </div>
                 </div>
