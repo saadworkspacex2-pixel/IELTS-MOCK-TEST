@@ -16,6 +16,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { getSettings } from "@/lib/settings";
 import { isPremiumMember } from "@/lib/premium";
 import LogoutButton from "./LogoutButton";
+import ProfileEditor from "./ProfileEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -77,7 +78,16 @@ export default async function ProfilePage() {
               {user.phone ? ` · ${toBn(user.phone)}` : ""}
             </p>
           </div>
-          <div className="flex flex-wrap gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <ProfileEditor
+              user={{
+                nameBn: user.nameBn,
+                nameEn: user.nameEn,
+                phone: user.phone,
+                avatar: user.avatar,
+                email: user.email,
+              }}
+            />
             <Link
               href="/profile/report"
               className="btn-red inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-bold"
