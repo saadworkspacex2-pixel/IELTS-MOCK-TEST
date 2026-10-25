@@ -50,40 +50,44 @@ function PadlockMark() {
   );
 }
 
+type ChainLink = { x: number; y: number; angle: number };
+
 function ChainOverlay() {
-  const chains = [
-    "M-24 30C72 38 137 73 214 126C258 156 297 181 349 202",
-    "M-30 171C75 175 145 182 225 193C278 200 311 204 360 204",
-    "M-24 368C83 342 164 300 235 253C282 222 312 211 357 207",
-    "M624 30C547 45 486 78 428 124C377 165 346 184 275 203",
-    "M624 202C535 203 471 204 397 205C349 205 319 205 274 205",
-    "M624 375C524 344 452 303 390 256C344 221 316 211 271 205",
+  // Each route is built from visible, alternating oval links rather than a
+  // dotted stroke. The rings overlap just like a physical chain around a lock.
+  const chains: ChainLink[][] = [
+    [{ x: -10, y: 23, angle: -28 }, { x: 38, y: 44, angle: 58 }, { x: 87, y: 69, angle: -28 }, { x: 136, y: 99, angle: 60 }, { x: 185, y: 132, angle: -28 }, { x: 233, y: 163, angle: 60 }, { x: 285, y: 190, angle: -28 }],
+    [{ x: -8, y: 168, angle: 0 }, { x: 45, y: 174, angle: 90 }, { x: 98, y: 181, angle: 0 }, { x: 151, y: 188, angle: 90 }, { x: 204, y: 194, angle: 0 }, { x: 257, y: 199, angle: 90 }, { x: 309, y: 203, angle: 0 }],
+    [{ x: -8, y: 376, angle: 25 }, { x: 44, y: 355, angle: -62 }, { x: 95, y: 331, angle: 25 }, { x: 146, y: 301, angle: -62 }, { x: 196, y: 266, angle: 25 }, { x: 247, y: 232, angle: -62 }, { x: 296, y: 211, angle: 25 }],
+    [{ x: 610, y: 22, angle: 28 }, { x: 561, y: 46, angle: -58 }, { x: 512, y: 74, angle: 28 }, { x: 463, y: 107, angle: -58 }, { x: 415, y: 141, angle: 28 }, { x: 366, y: 172, angle: -58 }, { x: 316, y: 195, angle: 28 }],
+    [{ x: 610, y: 202, angle: 0 }, { x: 557, y: 203, angle: 90 }, { x: 504, y: 204, angle: 0 }, { x: 451, y: 204, angle: 90 }, { x: 398, y: 205, angle: 0 }, { x: 345, y: 205, angle: 90 }, { x: 293, y: 205, angle: 0 }],
+    [{ x: 610, y: 382, angle: -25 }, { x: 558, y: 358, angle: 62 }, { x: 507, y: 333, angle: -25 }, { x: 456, y: 302, angle: 62 }, { x: 405, y: 267, angle: -25 }, { x: 354, y: 233, angle: 62 }, { x: 305, y: 211, angle: -25 }],
   ];
 
   return (
-    <svg
-      className="premium-chain-art"
-      viewBox="0 0 600 408"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
+    <svg className="premium-chain-art" viewBox="0 0 600 408" preserveAspectRatio="none" aria-hidden="true">
       <defs>
-        <linearGradient id="premiumChainRed" x1="0" y1="0" x2="1" y2="1">
-          <stop stopColor="#ffafb1" />
-          <stop offset="0.18" stopColor="#ef4048" />
-          <stop offset="0.52" stopColor="#a40815" />
-          <stop offset="0.78" stopColor="#ef3a43" />
-          <stop offset="1" stopColor="#6e010b" />
+        <linearGradient id="premiumChainMetal" x1="-18" y1="-8" x2="18" y2="8" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#ffd3d5" />
+          <stop offset="0.18" stopColor="#ec5960" />
+          <stop offset="0.46" stopColor="#a30a15" />
+          <stop offset="0.72" stopColor="#ef6970" />
+          <stop offset="1" stopColor="#71030c" />
         </linearGradient>
-        <filter id="premiumChainShadow" x="-15%" y="-20%" width="130%" height="140%">
-          <feDropShadow dx="0" dy="4" stdDeviation="3.5" floodColor="#42020a" floodOpacity="0.66" />
+        <filter id="premiumChainShadow" x="-25%" y="-35%" width="150%" height="170%">
+          <feDropShadow dx="0" dy="3" stdDeviation="2.8" floodColor="#390107" floodOpacity="0.62" />
         </filter>
       </defs>
-      {chains.map((path, index) => (
-        <g key={path} className={`premium-chain premium-chain-${index + 1}`} filter="url(#premiumChainShadow)">
-          <path d={path} fill="none" stroke="#68030d" strokeWidth="16" strokeLinecap="round" opacity="0.92" />
-          <path d={path} fill="none" stroke="url(#premiumChainRed)" strokeWidth="11" strokeLinecap="round" />
-          <path d={path} fill="none" stroke="#ffd4d6" strokeWidth="2" strokeLinecap="round" strokeDasharray="3 17" opacity="0.72" />
+      {chains.map((chain, chainIndex) => (
+        <g key={chainIndex} className={`premium-chain premium-chain-${chainIndex + 1}`} filter="url(#premiumChainShadow)">
+          {chain.map((link, linkIndex) => (
+            <g key={`${link.x}-${link.y}`} className="premium-chain-link" transform={`translate(${link.x} ${link.y}) rotate(${link.angle})`}>
+              <ellipse rx="18" ry="7.6" fill="none" stroke="#5e040d" strokeWidth="6.8" />
+              <ellipse rx="18" ry="7.6" fill="none" stroke="url(#premiumChainMetal)" strokeWidth="4.3" />
+              <path d="M-11 -3.6C-5 -6.5 5 -6.5 11 -3.6" fill="none" stroke="#ffe6e7" strokeWidth="1.25" strokeLinecap="round" opacity="0.88" />
+              {linkIndex % 2 === 1 && <ellipse rx="11.5" ry="3.4" fill="none" stroke="#78050e" strokeWidth="1.2" opacity="0.72" />}
+            </g>
+          ))}
         </g>
       ))}
     </svg>

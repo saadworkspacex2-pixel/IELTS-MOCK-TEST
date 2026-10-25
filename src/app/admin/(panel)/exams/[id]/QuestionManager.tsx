@@ -2,7 +2,7 @@
 
 import SpringHeading from "@/components/SpringHeading";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type DragEvent } from "react";
 import { toBn } from "@/components/CountUp";
 import Icon from "@/components/Icon";
 
@@ -33,10 +33,12 @@ type Sec = {
 
 type QPayload = Omit<Q, "id">;
 type SecPayload = Omit<Sec, "id">;
+type QuestionPlacement = Pick<Q, "id" | "sectionId" | "sortOrder">;
 
 type Op =
   | { kind: "create-q"; id: number; after: QPayload }
   | { kind: "edit-q"; id: number; before: QPayload; after: QPayload }
+  | { kind: "order-q"; before: QuestionPlacement[]; after: QuestionPlacement[] }
   | { kind: "delete-q"; id: number; before: QPayload }
   | { kind: "create-sec"; id: number; after: SecPayload }
   | { kind: "edit-sec"; id: number; before: SecPayload; after: SecPayload }
@@ -57,6 +59,7 @@ const emptyQ = {
   correctOption: 0,
   acceptedAnswers: "",
   explanation: "",
+  sortOrder: 0,
 };
 
 const emptySec = {
@@ -96,6 +99,9 @@ export default function QuestionManager({
   const [secOpen, setSecOpen] = useState(false);
 
   const [saving, setSaving] = useState(false);
+  const [ordering, setOrdering] = useState(false);
+  const [draggingQuestionId, setDraggingQuestionId] = useState<number | null>(null);
+  const [dragTarget, setDragTarget] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -163,6 +169,16 @@ export default function QuestionManager({
     const d = await res.json();
     return d.id;
   };
+  const apiSaveQuestionOrder = async (items: QuestionPlacement[]) => {
+    const res = await fetch(`/api/exams/${examId}/questions/order`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "প্রশ্নের ক্রম সংরক্ষণ ব্যর্থ হয়েছে");
+    return data as { questions: Q[] };
+  };
 
   const applyUndo = async (op: Op): Promise<Op> => {
     switch (op.kind) {
@@ -175,6 +191,9 @@ export default function QuestionManager({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(op.before),
         });
+        return op;
+      case "order-q":
+        await apiSaveQuestionOrder(op.before);
         return op;
       case "delete-q": {
         const newId = await apiCreateQ(op.before);
@@ -212,6 +231,9 @@ export default function QuestionManager({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(op.after),
         });
+        return op;
+      case "order-q":
+        await apiSaveQuestionOrder(op.after);
         return op;
       case "delete-q":
         await fetch(`/api/questions/${op.id}`, { method: "DELETE" });
@@ -393,19 +415,23 @@ export default function QuestionManager({
       setError("প্রশ্নটি কোন অংশের তা নির্বাচন করুন");
       return;
     }
+    const editedId = editingQ;
+    const maximumPosition = editedId ? list.length : list.length + 1;
+    const requestedPosition = Math.max(
+      1,
+      Math.min(Math.trunc(Number(qForm.sortOrder) || maximumPosition), maximumPosition),
+    );
     setSaving(true);
     setError("");
     const payload: QPayload = {
       ...qForm,
       sectionId: qForm.sectionId || null,
-      sortOrder: editingQ
-        ? (list.find((q) => q.id === editingQ)?.sortOrder ?? 0)
-        : (list[list.length - 1]?.sortOrder ?? 0) + 1,
+      sortOrder: requestedPosition,
     };
     const res = await fetch(
-      editingQ ? `/api/questions/${editingQ}` : `/api/exams/${examId}/questions`,
+      editedId ? `/api/questions/${editedId}` : `/api/exams/${examId}/questions`,
       {
-        method: editingQ ? "PUT" : "POST",
+        method: editedId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       },
@@ -415,13 +441,13 @@ export default function QuestionManager({
       setError("সংরক্ষণ ব্যর্থ হয়েছে");
       return;
     }
-    const saved = await res.json();
-    if (editingQ) {
-      const before = list.find((q) => q.id === editingQ);
+    const saved = (await res.json()) as Q;
+    if (editedId) {
+      const before = list.find((q) => q.id === editedId);
       if (before) {
         pushOp({
           kind: "edit-q",
-          id: editingQ,
+          id: editedId,
           before: qToPayload(before),
           after: payload,
         });
@@ -429,9 +455,26 @@ export default function QuestionManager({
     } else {
       pushOp({ kind: "create-q", id: saved.id, after: payload });
     }
-    setEditingQ(null);
-    setQForm(emptyQ);
-    await load();
+
+    // Insert at the requested 1-based position, shifting every other box to
+    // its new number instead of leaving duplicate sort_order values behind.
+    // A freshly inserted row may temporarily share the requested number with
+    // another row. Start the placement transaction from a valid append-only
+    // baseline, then insert it at the chosen position.
+    const source = editedId
+      ? list
+      : [...list, { ...saved, sortOrder: list.length + 1 }];
+    const reordered = await persistQuestionPlacement(
+      source,
+      saved.id,
+      payload.sectionId,
+      requestedPosition - 1,
+      "প্রশ্নের ক্রম সংরক্ষণ হয়েছে",
+    );
+    if (reordered) {
+      setEditingQ(null);
+      setQForm(emptyQ);
+    }
   };
 
   const removeQ = async (q: Q) => {
@@ -444,6 +487,98 @@ export default function QuestionManager({
     }
     await load();
     flash("প্রশ্ন মুছে ফেলা হয়েছে। আনডু করতে উপরের বোতাম চাপুন।");
+  };
+
+  const orderedQuestions = (source: Q[]) =>
+    [...source].sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
+
+  // One source of truth for manual position changes and drag-and-drop. Every
+  // save normalises to 1…N so the number shown in admin is the take-exam order.
+  const persistQuestionPlacement = async (
+    source: Q[],
+    questionId: number,
+    targetSectionId: number | null,
+    requestedIndex: number,
+    successMessage?: string,
+  ) => {
+    const moving = source.find((question) => question.id === questionId);
+    if (!moving || ordering) return false;
+
+    const without = orderedQuestions(source).filter((question) => question.id !== questionId);
+    const insertAt = Math.max(0, Math.min(requestedIndex, without.length));
+    const reordered = [
+      ...without.slice(0, insertAt),
+      { ...moving, sectionId: targetSectionId },
+      ...without.slice(insertAt),
+    ].map((question, index) => ({ ...question, sortOrder: index + 1 }));
+    const before = orderedQuestions(source).map(({ id, sectionId, sortOrder }) => ({ id, sectionId, sortOrder }));
+    const after = reordered.map(({ id, sectionId, sortOrder }) => ({ id, sectionId, sortOrder }));
+
+    setOrdering(true);
+    setError("");
+    setList(reordered);
+    try {
+      const data = await apiSaveQuestionOrder(after);
+      setList(data.questions ?? reordered);
+      const changed = before.some((item, index) =>
+        item.id !== after[index]?.id ||
+        item.sectionId !== after[index]?.sectionId ||
+        item.sortOrder !== after[index]?.sortOrder,
+      );
+      if (changed) pushOp({ kind: "order-q", before, after });
+      if (successMessage) flash(successMessage);
+      return true;
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "প্রশ্নের ক্রম সংরক্ষণ ব্যর্থ হয়েছে");
+      await load();
+      return false;
+    } finally {
+      setOrdering(false);
+    }
+  };
+
+  const startQuestionDrag = (event: DragEvent<HTMLElement>, question: Q) => {
+    if (ordering) return;
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", String(question.id));
+    setDraggingQuestionId(question.id);
+    setDragTarget(null);
+  };
+
+  const dropQuestion = async (
+    event: DragEvent<HTMLElement>,
+    targetSectionId: number | null,
+    beforeQuestionId?: number,
+  ) => {
+    event.preventDefault();
+    const transferredId = Number(event.dataTransfer.getData("text/plain"));
+    const questionId = Number.isInteger(transferredId) && transferredId > 0
+      ? transferredId
+      : draggingQuestionId;
+    setDragTarget(null);
+    setDraggingQuestionId(null);
+    if (!questionId || ordering || questionId === beforeQuestionId) return;
+
+    const without = orderedQuestions(list).filter((question) => question.id !== questionId);
+    const beforeIndex = beforeQuestionId
+      ? without.findIndex((question) => question.id === beforeQuestionId)
+      : -1;
+    const lastSectionIndex = without.reduce(
+      (last, question, index) => question.sectionId === targetSectionId ? index : last,
+      -1,
+    );
+    const insertAt = beforeIndex >= 0
+      ? beforeIndex
+      : lastSectionIndex >= 0
+        ? lastSectionIndex + 1
+        : without.length;
+    await persistQuestionPlacement(
+      list,
+      questionId,
+      targetSectionId,
+      insertAt,
+      "প্রশ্নের অবস্থান সংরক্ষণ হয়েছে",
+    );
   };
 
   const input =
@@ -645,7 +780,18 @@ export default function QuestionManager({
 
           <div className="space-y-2">
             {secs.map((s, secIndex) => (
-              <div key={s.id} className="card rounded-lg px-5 py-4">
+              <div
+                key={s.id}
+                onDragOver={(event) => {
+                  if (!draggingQuestionId) return;
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = "move";
+                  setDragTarget(`section-${s.id}`);
+                }}
+                onDragLeave={() => setDragTarget((target) => target === `section-${s.id}` ? null : target)}
+                onDrop={(event) => dropQuestion(event, s.id)}
+                className={`card rounded-lg px-5 py-4 transition ${dragTarget === `section-${s.id}` ? "ring-2 ring-[#E51A24] ring-offset-2" : ""}`}
+              >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-semibold">
@@ -704,6 +850,11 @@ export default function QuestionManager({
                     </button>
                   </div>
                 </div>
+                {draggingQuestionId && (
+                  <div className={`mt-3 flex items-center gap-2 rounded-md border border-dashed px-3 py-2 text-xs font-semibold transition ${dragTarget === `section-${s.id}` ? "border-[#E51A24] bg-red-50 text-[#B50C16]" : "border-slate-300 bg-slate-50 text-slate-500"}`}>
+                    <Icon name="grip" size={15} /> প্রশ্নের বক্সটি এখানে ছেড়ে এই {isWriting ? "টাস্কে" : "সেকশনে"} নিন
+                  </div>
+                )}
                 {s.passageText && examModule === "reading" && (
                   <div className="mt-3 rounded-md border border-black/[0.06] bg-white/60 px-4 py-3">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Passage Content</p>
@@ -738,6 +889,8 @@ export default function QuestionManager({
                 if (qOpen) {
                   setEditingQ(null);
                   setQForm(emptyQ);
+                } else if (!editingQ) {
+                  setQForm((form) => ({ ...form, sortOrder: list.length + 1 }));
                 }
                 setError("");
               }}
@@ -802,6 +955,20 @@ export default function QuestionManager({
                       </select>
                     </div>
                   )}
+                  <div>
+                    <label className="text-sm font-medium text-slate-700">
+                      প্রশ্নের ক্রম / Sort number
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={editingQ ? list.length : list.length + 1}
+                      value={qForm.sortOrder || (editingQ ? list.find((q) => q.id === editingQ)?.sortOrder ?? 1 : list.length + 1)}
+                      onChange={(e) => setQForm((f) => ({ ...f, sortOrder: Number(e.target.value) || 1 }))}
+                      className={input}
+                    />
+                    <p className="mt-1 text-[11px] text-[#6C757D]">১ দিলে সবার আগে, ২ দিলে দ্বিতীয়—বাকি প্রশ্ন স্বয়ংক্রিয়ভাবে সরে যাবে।</p>
+                  </div>
                 </div>
 
                 <label className="mt-4 block text-sm font-medium text-slate-700">
@@ -911,7 +1078,7 @@ export default function QuestionManager({
                 <div className="mt-5 flex gap-3">
                   <button
                     onClick={saveQ}
-                    disabled={saving}
+                    disabled={saving || ordering}
                     className="btn-red rounded-md px-6 py-2.5 text-sm font-bold disabled:opacity-60"
                   >
                     {saving
@@ -936,16 +1103,41 @@ export default function QuestionManager({
             )}
           </div>
 
-          <p className="text-sm text-[#6C757D]">
-            মোট প্রশ্ন: {toBn(list.length)}টি
-          </p>
-          {list.map((q, idx) => {
+          <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-[#6C757D]">
+            <p>মোট প্রশ্ন: {toBn(list.length)}টি</p>
+            <p className="text-xs">বক্স ধরে টেনে অন্য প্রশ্নের আগে রাখুন, অথবা উপরের সেকশনে ছেড়ে প্রশ্নটি সরান।</p>
+          </div>
+          {orderedQuestions(list).map((q, idx) => {
             const sec = secs.find((s) => s.id === q.sectionId);
+            const questionDropKey = `question-${q.id}`;
             return (
-              <div key={q.id} data-tour="qm-questions-list" className="card rounded-lg p-6">
+              <div
+                key={q.id}
+                data-tour="qm-questions-list"
+                draggable={!ordering}
+                onDragStart={(event) => startQuestionDrag(event, q)}
+                onDragEnd={() => {
+                  setDraggingQuestionId(null);
+                  setDragTarget(null);
+                }}
+                onDragOver={(event) => {
+                  if (!draggingQuestionId || draggingQuestionId === q.id) return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  event.dataTransfer.dropEffect = "move";
+                  setDragTarget(questionDropKey);
+                }}
+                onDragLeave={() => setDragTarget((target) => target === questionDropKey ? null : target)}
+                onDrop={(event) => {
+                  event.stopPropagation();
+                  dropQuestion(event, q.sectionId, q.id);
+                }}
+                className={`card cursor-grab rounded-lg p-6 transition active:cursor-grabbing ${draggingQuestionId === q.id ? "scale-[0.99] opacity-55" : ""} ${dragTarget === questionDropKey ? "ring-2 ring-[#E51A24] ring-offset-2" : ""}`}
+              >
                 <div className="flex items-start justify-between gap-4">
-                  <SpringHeading as="h3" className="font-semibold leading-relaxed">
-                    {toBn(idx + 1)}. {q.text}
+                  <SpringHeading as="h3" className="flex min-w-0 items-start gap-2 font-semibold leading-relaxed">
+                    <span className="mt-0.5 shrink-0 rounded-md border border-slate-200 bg-slate-50 p-1 text-slate-400" title="ধরে টেনে সাজান"><Icon name="grip" size={15} /></span>
+                    <span>{toBn(idx + 1)}. {q.text}</span>
                     <span className="ml-2 rounded-md bg-slate-100 px-2.5 py-0.5 text-[11px] font-normal text-[#6C757D]">
                       {q.qtype === "gap"
                         ? "ফাঁকা পূরণ"
@@ -976,6 +1168,7 @@ export default function QuestionManager({
                           correctOption: q.correctOption,
                           acceptedAnswers: q.acceptedAnswers,
                           explanation: q.explanation,
+                          sortOrder: q.sortOrder,
                         });
                         setQOpen(true);
                         setError("");

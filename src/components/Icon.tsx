@@ -124,6 +124,16 @@ const PATHS: Record<string, React.ReactNode> = {
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
+  grip: (
+    <>
+      <circle cx="8" cy="6.5" r="0.85" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="6.5" r="0.85" fill="currentColor" stroke="none" />
+      <circle cx="8" cy="12" r="0.85" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="12" r="0.85" fill="currentColor" stroke="none" />
+      <circle cx="8" cy="17.5" r="0.85" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="17.5" r="0.85" fill="currentColor" stroke="none" />
+    </>
+  ),
   eye: (
     <>
       <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />

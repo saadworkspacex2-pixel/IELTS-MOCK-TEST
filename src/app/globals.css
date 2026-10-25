@@ -847,10 +847,10 @@ html {
   z-index: 2;
   inset: 0;
   background:
-    radial-gradient(circle at 50% 52%, rgba(255, 238, 239, 0.31) 0 15%, rgba(238, 31, 44, 0.24) 37%, rgba(125, 1, 13, 0.5) 100%),
-    linear-gradient(135deg, rgba(255, 123, 130, 0.27), rgba(177, 0, 15, 0.42));
-  backdrop-filter: blur(3.5px) saturate(0.86);
-  -webkit-backdrop-filter: blur(3.5px) saturate(0.86);
+    radial-gradient(circle at 50% 52%, rgba(255, 252, 252, 0.42) 0 17%, rgba(237, 77, 85, 0.1) 42%, rgba(116, 8, 17, 0.22) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(162, 13, 25, 0.16));
+  backdrop-filter: blur(2.75px) saturate(0.93);
+  -webkit-backdrop-filter: blur(2.75px) saturate(0.93);
   pointer-events: none;
 }
 
