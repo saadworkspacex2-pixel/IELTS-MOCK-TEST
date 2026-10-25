@@ -10,6 +10,7 @@ import Reveal from "@/components/Reveal";
 import { toBn } from "@/lib/bn";
 import { currentUser } from "@/lib/userAuth";
 import { canAccessLevel } from "@/lib/premium";
+import LockedPremiumExamCard from "@/components/LockedPremiumExamCard";
 
 export const dynamic = "force-dynamic";
 
@@ -74,66 +75,74 @@ export default async function ExamsPage({
         </div>
 
         <div data-tour="exams-grid" className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-          {filtered.map((r, i) => (
-            <Reveal key={r.exam.id} delay={(i % 3) * 80}>
-              <Link
-                href={`/exams/${r.exam.id}`}
-                className="lift card group block h-full rounded-xl p-6"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="skeuo-well rounded-full px-3 py-1 text-xs font-semibold text-[#6C757D]">
-                    {r.exam.category}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    {r.exam.accessLevel === "premium" && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-800">✦ PREMIUM</span>}
-                    <span className="status-pill flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold">
-                      <span className="anim-pulse-live h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                      LIVE
-                    </span>
-                  </div>
-                </div>
-                <SpringHeading as="h2" className="mt-4 text-lg font-semibold transition-colors group-hover:text-[#E51A24]">
-                  {r.exam.title}
-                </SpringHeading>
-                <p className="mt-2 line-clamp-2 text-sm text-[#6C757D]">
-                  {r.exam.description}
-                </p>
-                {r.exam.accessLevel === "premium" && !canAccessLevel(r.exam.accessLevel, user) && <p className="mt-2 text-xs font-semibold text-amber-700">প্রিমিয়াম অ্যাক্সেস প্রয়োজন</p>}
-                <div className="skeuo-well mt-5 grid grid-cols-3 gap-2 rounded-lg p-3 text-center text-xs">
-                  <div>
-                    <div className="font-bold text-slate-800">
-                      {r.exam.module === "writing"
-                        ? "টাস্ক"
-                        : toBn(r.questionCount)}
+          {filtered.map((r, i) => {
+            const isLockedPremium = r.exam.accessLevel === "premium" && !canAccessLevel(r.exam.accessLevel, user);
+            const moduleLabel = r.exam.module === "reading"
+              ? "Reading"
+              : r.exam.module === "listening"
+                ? "Listening"
+                : r.exam.module === "writing"
+                  ? "Writing"
+                  : "MCQ";
+
+            return (
+              <Reveal key={r.exam.id} delay={(i % 3) * 80}>
+                {isLockedPremium ? (
+                  <LockedPremiumExamCard
+                    id={r.exam.id}
+                    category={r.exam.category}
+                    title={r.exam.title}
+                    description={r.exam.description}
+                    questionValue={r.exam.module === "writing" ? "টাস্ক" : toBn(r.questionCount)}
+                    questionLabel={r.exam.module === "writing" ? "রাইটিং" : "প্রশ্ন"}
+                    durationValue={`${toBn(r.exam.durationMinutes)} মি`}
+                    moduleValue={r.exam.module === "listening" ? "অডিও" : "স্ক্রিন"}
+                    moduleLabel={moduleLabel}
+                  />
+                ) : (
+                  <Link
+                    href={`/exams/${r.exam.id}`}
+                    className="lift card group block h-full rounded-xl p-6"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="skeuo-well rounded-full px-3 py-1 text-xs font-semibold text-[#6C757D]">
+                        {r.exam.category}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {r.exam.accessLevel === "premium" && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-800">PREMIUM</span>}
+                        <span className="status-pill flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold">
+                          <span className="anim-pulse-live h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          LIVE
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-slate-500">
-                      {r.exam.module === "writing" ? "রাইটিং" : "প্রশ্ন"}
+                    <SpringHeading as="h2" className="mt-4 text-lg font-semibold transition-colors group-hover:text-[#E51A24]">
+                      {r.exam.title}
+                    </SpringHeading>
+                    <p className="mt-2 line-clamp-2 text-sm text-[#6C757D]">
+                      {r.exam.description}
+                    </p>
+                    <div className="skeuo-well mt-5 grid grid-cols-3 gap-2 rounded-lg p-3 text-center text-xs">
+                      <div>
+                        <div className="font-bold text-slate-800">
+                          {r.exam.module === "writing" ? "টাস্ক" : toBn(r.questionCount)}
+                        </div>
+                        <div className="text-slate-500">{r.exam.module === "writing" ? "রাইটিং" : "প্রশ্ন"}</div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-slate-800">{toBn(r.exam.durationMinutes)} মি</div>
+                        <div className="text-slate-500">সময়</div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-slate-600">{r.exam.module === "listening" ? "অডিও" : "স্ক্রিন"}</div>
+                        <div className="text-slate-500">{moduleLabel}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <div className="font-bold text-slate-800">
-                      {toBn(r.exam.durationMinutes)} মি
-                    </div>
-                    <div className="text-slate-500">সময়</div>
-                  </div>
-                  <div>
-                    <div className="font-bold text-slate-600">
-                      {r.exam.module === "listening" ? "অডিও" : "স্ক্রিন"}
-                    </div>
-                    <div className="text-slate-500">
-                      {r.exam.module === "reading"
-                        ? "Reading"
-                        : r.exam.module === "listening"
-                          ? "Listening"
-                          : r.exam.module === "writing"
-                            ? "Writing"
-                            : "MCQ"}
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </Reveal>
-          ))}
+                  </Link>
+                )}
+              </Reveal>
+            );
+          })}
           {filtered.length === 0 && (
             <p className="col-span-full py-20 text-center text-[#6C757D]">
               কোনো পরীক্ষা পাওয়া যায়নি।

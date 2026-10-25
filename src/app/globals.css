@@ -800,3 +800,175 @@ html {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* ---------------- Locked Premium test card ---------------- */
+
+.premium-locked-card {
+  isolation: isolate;
+  min-height: 255px;
+  border-color: rgba(172, 18, 31, 0.3);
+  background:
+    radial-gradient(circle at 50% 51%, rgba(255, 236, 237, 0.8), transparent 24%),
+    #ffffff;
+  box-shadow:
+    0 15px 32px rgba(117, 7, 17, 0.16),
+    var(--skeuo-raised);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.premium-locked-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 20px 36px rgba(117, 7, 17, 0.22),
+    var(--skeuo-raised-hover);
+}
+
+.premium-locked-card::before {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  border: 1px solid rgba(255, 158, 164, 0.65);
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(111, 4, 14, 0.24), inset 0 0 38px rgba(138, 8, 19, 0.3);
+  pointer-events: none;
+}
+
+.premium-locked-label {
+  color: #fff1f1;
+  border: 1px solid rgba(255, 219, 221, 0.46);
+  background: linear-gradient(135deg, #ff5a62, #ae0715 58%, #72020d);
+  box-shadow: 0 3px 7px rgba(103, 2, 11, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+
+.premium-red-blur {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 52%, rgba(255, 238, 239, 0.31) 0 15%, rgba(238, 31, 44, 0.24) 37%, rgba(125, 1, 13, 0.5) 100%),
+    linear-gradient(135deg, rgba(255, 123, 130, 0.27), rgba(177, 0, 15, 0.42));
+  backdrop-filter: blur(3.5px) saturate(0.86);
+  -webkit-backdrop-filter: blur(3.5px) saturate(0.86);
+  pointer-events: none;
+}
+
+.premium-chain-art {
+  position: absolute;
+  z-index: 5;
+  inset: -2% -6%;
+  width: 112%;
+  height: 104%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.premium-chain {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: premiumChainSettle 760ms cubic-bezier(0.18, 0.9, 0.22, 1) both;
+}
+
+.premium-chain-2 { animation-delay: 50ms; }
+.premium-chain-3 { animation-delay: 110ms; }
+.premium-chain-4 { animation-delay: 80ms; }
+.premium-chain-5 { animation-delay: 130ms; }
+.premium-chain-6 { animation-delay: 170ms; }
+
+.premium-lock-stage {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding-top: 2px;
+  pointer-events: none;
+}
+
+.premium-lock-button {
+  width: 94px;
+  height: 106px;
+  padding: 0;
+  border: 0;
+  border-radius: 32px;
+  background: transparent;
+  cursor: pointer;
+  filter: drop-shadow(0 12px 10px rgba(81, 1, 9, 0.55));
+  pointer-events: auto;
+  transition: transform 180ms ease, filter 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.premium-lock-button:hover,
+.premium-lock-button:focus-visible {
+  transform: scale(1.08);
+  filter: drop-shadow(0 14px 13px rgba(81, 1, 9, 0.65)) brightness(1.08);
+  outline: none;
+}
+
+.premium-lock-button:focus-visible {
+  border-radius: 32px;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.88), 0 0 0 7px rgba(229, 26, 36, 0.86);
+}
+
+.premium-lock-button.is-shaking {
+  animation: premiumLockShake 560ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.premium-lock-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.premium-lock-copy {
+  margin: 0;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  text-shadow: 0 1px 3px rgba(74, 1, 8, 0.78);
+  pointer-events: none;
+}
+
+@keyframes premiumChainSettle {
+  0% {
+    opacity: 0;
+    transform: scale(1.17);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes premiumLockShake {
+  0%, 100% { transform: rotate(0) translateX(0); }
+  14% { transform: rotate(-9deg) translateX(-4px); }
+  30% { transform: rotate(8deg) translateX(5px); }
+  46% { transform: rotate(-7deg) translateX(-4px); }
+  62% { transform: rotate(5deg) translateX(3px); }
+  78% { transform: rotate(-2deg) translateX(-1px); }
+}
+
+@media (max-width: 640px) {
+  .premium-locked-card {
+    min-height: 248px;
+  }
+  .premium-lock-button {
+    width: 82px;
+    height: 94px;
+  }
+  .premium-lock-copy {
+    font-size: 0.66rem;
+  }
+}
