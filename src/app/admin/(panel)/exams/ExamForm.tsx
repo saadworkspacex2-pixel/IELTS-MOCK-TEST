@@ -5,6 +5,7 @@ import SpringHeading from "@/components/SpringHeading";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { ExamRules } from "@/lib/examRules";
+import { LHBD_IELTS_COURSE_MOCK_CATEGORY } from "@/lib/courseMocks";
 
 export type ExamFormData = {
   title: string;
@@ -29,6 +30,7 @@ const CATEGORY_OPTIONS = [
   "বাংলা",
   "বিজ্ঞান ও প্রযুক্তি",
   "কম্পিউটার",
+  LHBD_IELTS_COURSE_MOCK_CATEGORY,
 ];
 
 export default function ExamForm({
@@ -143,7 +145,14 @@ export default function ExamForm({
           <label className="text-sm font-medium text-slate-700">বিভাগ</label>
           <select
             value={form.category}
-            onChange={(e) => set("category", e.target.value)}
+            onChange={(e) => {
+              const category = e.target.value;
+              setForm((current) => ({
+                ...current,
+                category,
+                accessLevel: category === LHBD_IELTS_COURSE_MOCK_CATEGORY ? "free" : current.accessLevel,
+              }));
+            }}
             className={input}
           >
             {[...new Set([...CATEGORY_OPTIONS, form.category])].map((c) => (
@@ -191,10 +200,16 @@ export default function ExamForm({
         </div>
         <div data-tour="admin-exam-premium-box">
           <label className="text-sm font-medium text-slate-700">কনটেন্ট অ্যাক্সেস</label>
-          <select value={form.accessLevel} onChange={(e) => set("accessLevel", e.target.value === "premium" ? "premium" : "free")} className={input}>
+          <select
+            value={form.accessLevel}
+            disabled={form.category === LHBD_IELTS_COURSE_MOCK_CATEGORY}
+            onChange={(e) => set("accessLevel", e.target.value === "premium" ? "premium" : "free")}
+            className={`${input} disabled:cursor-not-allowed disabled:opacity-60`}
+          >
             <option value="free">ফ্রি — সবাই টেস্ট দিতে পারবে</option>
             <option value="premium">Premium — শুধু অনুমোদিত সদস্য</option>
           </select>
+          {form.category === LHBD_IELTS_COURSE_MOCK_CATEGORY && <p className="mt-1.5 text-xs font-semibold text-emerald-700">Course Mock সব শিক্ষার্থীর জন্য ফ্রি থাকবে।</p>}
         </div>
         <div className="flex items-end pb-1">
           <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-slate-700">

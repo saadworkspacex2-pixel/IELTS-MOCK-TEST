@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { exams } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { isAdmin } from "@/lib/adminAuth";
+import { LHBD_IELTS_COURSE_MOCK_CATEGORY } from "@/lib/courseMocks";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -22,6 +23,8 @@ export async function PUT(req: Request, { params }: Params) {
   }
   const { id } = await params;
   const body = await req.json().catch(() => ({}));
+  const category = body.category !== undefined ? String(body.category) : undefined;
+  const examModule = body.module !== undefined && ["reading", "listening", "writing"].includes(body.module) ? body.module : body.module !== undefined ? "mcq" : undefined;
   const [row] = await db
     .update(exams)
     .set({
@@ -29,7 +32,8 @@ export async function PUT(req: Request, { params }: Params) {
       ...(body.description !== undefined && {
         description: String(body.description),
       }),
-      ...(body.category !== undefined && { category: String(body.category) }),
+      ...(category !== undefined && { category }),
+      ...(examModule !== undefined && { module: examModule }),
       ...(body.durationMinutes !== undefined && {
         durationMinutes: Number(body.durationMinutes),
       }),
@@ -40,9 +44,11 @@ export async function PUT(req: Request, { params }: Params) {
         negativeMark: Number(body.negativeMark),
       }),
       ...(body.isLive !== undefined && { isLive: Boolean(body.isLive) }),
-      ...(body.accessLevel !== undefined && {
-        accessLevel: body.accessLevel === "premium" ? "premium" : "free",
-      }),
+      ...(category === LHBD_IELTS_COURSE_MOCK_CATEGORY
+        ? { accessLevel: "free" }
+        : body.accessLevel !== undefined && {
+            accessLevel: body.accessLevel === "premium" ? "premium" : "free",
+          }),
       ...(body.rules !== undefined && { rules: body.rules }),
     })
     .where(eq(exams.id, Number(id)))
