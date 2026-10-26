@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="#readme"><img src="./docs/assets/diagram.png" width="100%" alt="LHBD · IELTS Mock Test — Academic English practice platform" /></a>
+  <a href="#readme"><img src="./docs/assets/banner.png" width="100%" alt="LHBD · IELTS Mock Test — Academic English practice platform" /></a>
 
   <br />
   <br />
