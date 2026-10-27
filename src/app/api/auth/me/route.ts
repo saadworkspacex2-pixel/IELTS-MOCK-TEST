@@ -3,6 +3,7 @@ import { currentUser } from "@/lib/userAuth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { bangladeshPhoneE164 } from "@/lib/sms";
 
 export async function GET() {
   const user = await currentUser();
@@ -29,7 +30,8 @@ export async function PUT(req: Request) {
   const body = await req.json().catch(() => ({}));
   const nameEn = body.nameEn !== undefined ? String(body.nameEn ?? "").trim() : user.nameEn;
   const nameBn = body.nameBn !== undefined ? String(body.nameBn ?? "").trim() : user.nameBn;
-  const phone = body.phone !== undefined ? String(body.phone ?? "").trim() : user.phone;
+  const submittedPhone = body.phone !== undefined ? String(body.phone ?? "").trim() : null;
+  const phone = submittedPhone === null ? user.phone : submittedPhone ? bangladeshPhoneE164(submittedPhone) : "";
   const avatar = body.avatar !== undefined ? String(body.avatar ?? "") : user.avatar;
 
   if (!nameBn && !nameEn) {
@@ -38,8 +40,8 @@ export async function PUT(req: Request) {
   if (nameBn.length > 120 || nameEn.length > 120) {
     return NextResponse.json({ error: "নাম সর্বোচ্চ ১২০ অক্ষরের হতে পারবে" }, { status: 400 });
   }
-  if (phone.length > 32 || (phone && !/^[0-9+()\-\s]+$/.test(phone))) {
-    return NextResponse.json({ error: "সঠিক মোবাইল নম্বর দিন" }, { status: 400 });
+  if (submittedPhone && !phone) {
+    return NextResponse.json({ error: "সঠিক বাংলাদেশি মোবাইল নম্বর দিন" }, { status: 400 });
   }
   if (avatar.length > 1_500_000) {
     return NextResponse.json(

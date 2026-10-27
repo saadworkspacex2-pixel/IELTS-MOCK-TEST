@@ -8,6 +8,7 @@ import { bandFromRaw, matchesAcceptedAnswer } from "@/lib/band";
 import { rulesOf } from "@/lib/examRules";
 import { canAccessLevel } from "@/lib/premium";
 import { sendExamResultEmail, siteUrl } from "@/lib/email";
+import { sendExamResultSms } from "@/lib/sms";
 
 export async function GET() {
   if (!(await isAdmin())) {
@@ -109,7 +110,13 @@ export async function POST(req: Request) {
       })
       .returning();
     await closeSession();
-    if (user) { try { await sendExamResultEmail(user.email, user.nameBn || user.nameEn, exam.title, "ইনস্ট্রাক্টর রিভিউয়ের জন্য জমা হয়েছে", `${siteUrl()}/results/${row.id}`); } catch (error) { console.error("Result email failed", error); } }
+    if (user) {
+      const resultUrl = `${siteUrl()}/results/${row.id}`;
+      try { await sendExamResultEmail(user.email, user.nameBn || user.nameEn, exam.title, "ইনস্ট্রাক্টর রিভিউয়ের জন্য জমা হয়েছে", resultUrl); } catch (error) { console.error("Result email failed", error); }
+      if (user.phone) {
+        try { await sendExamResultSms(user.phone, exam.title, "ইনস্ট্রাক্টর রিভিউয়ের জন্য জমা হয়েছে", resultUrl); } catch (error) { console.error("Result SMS failed", error); }
+      }
+    }
     return NextResponse.json({ attemptId: row.id }, { status: 201 });
   }
 
@@ -207,7 +214,11 @@ export async function POST(req: Request) {
   await closeSession();
   if (user) {
     const result = bandScore !== null ? `Band ${bandScore}` : rules.hideResults || hasEssay ? "রিভিউয়ের জন্য জমা হয়েছে" : `${score} নম্বর`;
-    try { await sendExamResultEmail(user.email, user.nameBn || user.nameEn, exam.title, result, `${siteUrl()}/results/${row.id}`); } catch (error) { console.error("Result email failed", error); }
+    const resultUrl = `${siteUrl()}/results/${row.id}`;
+    try { await sendExamResultEmail(user.email, user.nameBn || user.nameEn, exam.title, result, resultUrl); } catch (error) { console.error("Result email failed", error); }
+    if (user.phone) {
+      try { await sendExamResultSms(user.phone, exam.title, result, resultUrl); } catch (error) { console.error("Result SMS failed", error); }
+    }
   }
   return NextResponse.json({ attemptId: row.id }, { status: 201 });
 }

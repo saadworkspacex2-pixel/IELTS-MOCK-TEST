@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { PremiumTier } from "@/lib/premium";
 
-type Wallet = { key: "bkash" | "nagad" | "rocket" | "upay"; label: string; number: string; color: string };
+type Wallet = {
+  key: "bkash" | "nagad" | "rocket" | "upay";
+  label: string;
+  number: string;
+  logo: string;
+};
 
 export default function PaymentFlow({
   tier,
@@ -55,8 +60,17 @@ export default function PaymentFlow({
       <p className="text-xs font-bold text-[#6C757D]">১. একটি বাংলাদেশি মোবাইল ফাইন্যান্সিয়াল সার্ভিস বেছে নিন</p>
       <div className="mt-3 grid grid-cols-2 gap-2">
         {wallets.map((wallet) => (
-          <button key={wallet.key} type="button" onClick={() => { setSelected(wallet); setNotice(""); }} className={`rounded-md border px-2 py-2 text-xs font-bold transition ${selected?.key === wallet.key ? "border-[#E51A24] bg-red-50 text-[#E51A24]" : "border-slate-200 text-slate-600 hover:border-slate-400"}`}>
-            <span className="block text-sm" style={{ color: wallet.color }}>●</span>{wallet.label}
+          <button
+            key={wallet.key}
+            type="button"
+            onClick={() => { setSelected(wallet); setNotice(""); }}
+            className={`flex min-h-16 flex-col items-center justify-center rounded-md border px-2 py-2 text-xs font-bold transition ${selected?.key === wallet.key ? "border-[#E51A24] bg-red-50 text-[#E51A24]" : "border-slate-200 text-slate-600 hover:border-slate-400"}`}
+            aria-label={`${wallet.label} পেমেন্ট পদ্ধতি`}
+          >
+            {/* Official provider mark. Brand names remain as accessible text. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={wallet.logo} alt="" className={`mb-1 h-7 max-w-20 object-contain ${wallet.key === "upay" ? "w-7" : "w-full"}`} />
+            <span>{wallet.label}</span>
           </button>
         ))}
       </div>

@@ -15,7 +15,7 @@ const links = [
   { href: "/exams", label: "টেস্ট" },
   { href: "/leaderboard", label: "লিডারবোর্ড" },
   { href: "/resources", label: "রিসোর্স" },
-  { href: "/premium", label: "Premium" },
+  { href: "/payment", label: "Premium" },
 ];
 
 export default function Navbar() {
@@ -47,7 +47,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  data-tour={link.href === "/exams" ? "nav-tests" : link.href === "/premium" ? "nav-premium" : undefined}
+                  data-tour={link.href === "/exams" ? "nav-tests" : link.href === "/payment" ? "nav-premium" : undefined}
                   className={`relative whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-semibold transition-all xl:px-4 xl:text-sm ${active ? "skeuo-key text-[#E51A24]" : "text-[#212529] hover:text-[#1A1A1A]"}`}
                 >
                   {text(link.label)}

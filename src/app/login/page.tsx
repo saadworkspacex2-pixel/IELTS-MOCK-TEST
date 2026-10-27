@@ -2,7 +2,7 @@
 
 import SpringHeading from "@/components/SpringHeading";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/Logo";
@@ -21,6 +21,22 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const auth = new URLSearchParams(window.location.search).get("auth");
+    if (!auth) return;
+    const messages: Record<string, string> = {
+      google_not_configured: "Google login এখনো configure করা হয়নি।",
+      google_cancelled: "Google sign-in বাতিল করা হয়েছে।",
+      google_security_check_failed: "Google sign-in নিরাপত্তা যাচাই করা যায়নি। আবার চেষ্টা করুন।",
+      google_token_exchange_failed: "Google থেকে sign-in তথ্য নেওয়া যায়নি। আবার চেষ্টা করুন।",
+      google_email_not_verified: "Google account-এর verified email প্রয়োজন।",
+    };
+    const timer = window.setTimeout(() => {
+      setError(messages[auth] || "Google sign-in সম্পন্ন করা যায়নি। আবার চেষ্টা করুন।");
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const pickAvatar = (file: File) => {
     if (file.size > 1_000_000) {
@@ -234,6 +250,24 @@ export default function LoginPage() {
                 ? "লগইন করুন"
                 : "অ্যাকাউন্ট খুলুন"}
           </button>
+
+          <div className="flex items-center gap-3 pt-1 text-xs text-[#6C757D]" aria-hidden="true">
+            <span className="h-px flex-1 bg-slate-200" />
+            অথবা
+            <span className="h-px flex-1 bg-slate-200" />
+          </div>
+          <button
+            type="button"
+            onClick={() => { window.location.assign("/api/auth/google"); }}
+            className="flex w-full items-center justify-center gap-3 rounded-md border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/google-mark.svg" alt="" className="h-5 w-5" />
+            Continue with Google
+          </button>
+          <p className="-mt-2 text-center text-[11px] leading-relaxed text-[#6C757D]">
+            Google দিয়ে {mode === "login" ? "লগইন" : "অ্যাকাউন্ট খোলা"} যাবে। প্রথমবার sign-in করলে স্বয়ংক্রিয়ভাবে প্রোফাইল তৈরি হবে।
+          </p>
         </div>
 
         <p className="mt-5 text-center text-xs text-[#6C757D]">

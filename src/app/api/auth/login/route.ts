@@ -8,6 +8,7 @@ import {
   USER_COOKIE,
 } from "@/lib/userAuth";
 import { sendLoginAlertEmail, siteUrl } from "@/lib/email";
+import { sendLoginAlertSms } from "@/lib/sms";
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -40,6 +41,9 @@ export async function POST(req: Request) {
     .where(eq(users.id, user.id));
 
   try { await sendLoginAlertEmail(user.email, user.nameBn || user.nameEn, siteUrl()); } catch (error) { console.error("Login notification email failed", error); }
+  if (user.phone) {
+    try { await sendLoginAlertSms(user.phone); } catch (error) { console.error("Login notification SMS failed", error); }
+  }
   const res = NextResponse.json({ ok: true });
   res.cookies.set(USER_COOKIE, token, {
     httpOnly: true,

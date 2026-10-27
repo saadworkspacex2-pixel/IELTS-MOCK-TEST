@@ -4,6 +4,7 @@ import { attempts, exams, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { canAccess } from "@/lib/adminAuth";
 import { sendExamResultEmail, siteUrl } from "@/lib/email";
+import { sendExamResultSms } from "@/lib/sms";
 
 export async function PUT(
   req: Request,
@@ -28,8 +29,15 @@ export async function PUT(
     .returning();
   if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (row.userId && row.status === "scored") {
-    const [detail] = await db.select({ email: users.email, nameBn: users.nameBn, nameEn: users.nameEn, examTitle: exams.title }).from(attempts).innerJoin(users, eq(attempts.userId, users.id)).innerJoin(exams, eq(attempts.examId, exams.id)).where(eq(attempts.id, row.id));
-    if (detail) { try { await sendExamResultEmail(detail.email, detail.nameBn || detail.nameEn, detail.examTitle, row.bandScore ? `Band ${row.bandScore}` : `${row.score} নম্বর`, `${siteUrl()}/results/${row.id}`); } catch (error) { console.error("Graded result email failed", error); } }
+    const [detail] = await db.select({ email: users.email, phone: users.phone, nameBn: users.nameBn, nameEn: users.nameEn, examTitle: exams.title }).from(attempts).innerJoin(users, eq(attempts.userId, users.id)).innerJoin(exams, eq(attempts.examId, exams.id)).where(eq(attempts.id, row.id));
+    if (detail) {
+      const result = row.bandScore ? `Band ${row.bandScore}` : `${row.score} নম্বর`;
+      const resultUrl = `${siteUrl()}/results/${row.id}`;
+      try { await sendExamResultEmail(detail.email, detail.nameBn || detail.nameEn, detail.examTitle, result, resultUrl); } catch (error) { console.error("Graded result email failed", error); }
+      if (detail.phone) {
+        try { await sendExamResultSms(detail.phone, detail.examTitle, result, resultUrl); } catch (error) { console.error("Graded result SMS failed", error); }
+      }
+    }
   }
   return NextResponse.json(row);
 }

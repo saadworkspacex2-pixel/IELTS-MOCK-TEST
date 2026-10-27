@@ -38,7 +38,7 @@ function getTourForPath(pathname: string): TourDefinition | null {
   if (pathname === "/forgot-password") return { key: "forgot-password", pageLabel: "পাসওয়ার্ড রিকভারি গাইড", steps: [
     { selector: '[data-tour="forgot-card"]', title: "ইমেইল OTP দিয়ে পাসওয়ার্ড রিসেট", description: "রেজিস্টার করা ইমেইল দিলে ৬ সংখ্যার OTP কোড পাঠানো হবে। কোড ও নতুন পাসওয়ার্ড দিলেই অ্যাকাউন্ট পুনরুদ্ধার হবে।" },
   ] };
-  if (pathname === "/premium" || pathname === "/pricing") return { key: "pricing", pageLabel: "প্রিমিয়াম ও পেমেন্ট গাইড", steps: [
+  if (pathname === "/premium" || pathname === "/payment" || pathname === "/pricing") return { key: "pricing", pageLabel: "প্রিমিয়াম ও পেমেন্ট গাইড", steps: [
     { selector: '[data-tour="pricing-tiers"]', title: "৩টি প্রিমিয়াম প্যাকেজ", description: "এখান থেকে আপনার প্রয়োজনমতো Premium Starter, Premium Plus অথবা Premium Pro প্যাকেজ নির্বাচন করুন।" },
     { selector: '[data-tour="bd-send-money"]', title: "One-Tap Send Money", description: "পেমেন্ট মাধ্যম বেছে One-Tap Send Money চাপলে নম্বর কপি হবে। টাকা পাঠিয়ে Sender নম্বর ও TrxID লিখে জমা দিন।" },
   ] };

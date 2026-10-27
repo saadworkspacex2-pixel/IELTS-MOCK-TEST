@@ -8,11 +8,13 @@ import {
   USER_COOKIE,
 } from "@/lib/userAuth";
 import { sendWelcomeEmail, siteUrl } from "@/lib/email";
+import { bangladeshPhoneE164, sendWelcomeSms } from "@/lib/sms";
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const email = String(body?.email ?? "").trim().toLowerCase();
-  const phone = String(body?.phone ?? "").trim();
+  const submittedPhone = String(body?.phone ?? "").trim();
+  const phone = submittedPhone ? bangladeshPhoneE164(submittedPhone) : "";
   const nameEn = String(body?.nameEn ?? "").trim();
   const nameBn = String(body?.nameBn ?? "").trim();
   const password = String(body?.password ?? "");
@@ -23,6 +25,9 @@ export async function POST(req: Request) {
   }
   if (!nameBn && !nameEn) {
     return NextResponse.json({ error: "নাম লিখুন" }, { status: 400 });
+  }
+  if (submittedPhone && !phone) {
+    return NextResponse.json({ error: "সঠিক বাংলাদেশি মোবাইল নম্বর দিন" }, { status: 400 });
   }
   if (password.length < 6) {
     return NextResponse.json(
@@ -62,6 +67,9 @@ export async function POST(req: Request) {
   });
 
   try { await sendWelcomeEmail(email, nameBn || nameEn, siteUrl()); } catch (error) { console.error("Welcome email failed", error); }
+  if (phone) {
+    try { await sendWelcomeSms(phone, nameBn || nameEn); } catch (error) { console.error("Welcome SMS failed", error); }
+  }
   const res = NextResponse.json({ ok: true }, { status: 201 });
   res.cookies.set(USER_COOKIE, token, {
     httpOnly: true,
